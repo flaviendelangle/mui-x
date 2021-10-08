@@ -8,8 +8,9 @@ import { useGridApiEventHandler } from '../../root/useGridApiEventHandler';
 import { GridEvents } from '../../../constants/eventsConstants';
 import { gridRowGroupingColumnSelector } from './rowGroupingSelector';
 import { GridComponentProps } from '../../../GridComponentProps';
-import {GridColDef, GridRowId, GridRowsLookup} from '../../../models';
-import {GridRowGroupingGroupColDef} from "./gridRowGroupingGroupColDef";
+import { GridColDef, GridRowId, GridRowsLookup } from '../../../models';
+import { GridRowGroupingGroupColDef } from './gridRowGroupingGroupColDef';
+import { insertLeafInTree } from '../rows/gridRowsUtils';
 
 export const useGridRowGrouping = (
   apiRef: GridApiRef,
@@ -17,9 +18,9 @@ export const useGridRowGrouping = (
 ) => {
   const updateColumnsPreProcessing = React.useCallback(() => {
     const addGroupingColumn: GridColumnsPreProcessing = (columns) => {
-      const hasGroupingColumns = columns.some(col => col.groupRows)
+      const hasGroupingColumns = columns.some((col) => col.groupRows);
       if (!hasGroupingColumns) {
-        return columns
+        return columns;
       }
 
       const index = columns[0].type === 'checkboxSelection' ? 1 : 0;
@@ -65,48 +66,28 @@ export const useGridRowGrouping = (
       });
 
       const tree: GridRowConfigTree = new Map();
-      const idRowsLookupFiller: GridRowsLookup = {};
+      const idRowsLookup: GridRowsLookup = { ...params.idRowsLookup };
       const paths: Record<GridRowId, string[]> = {};
 
       params.ids.forEach((rowId) => {
         const row = params.idRowsLookup[rowId];
         // TODO: Handle valueGetter
         const parentPath = groupingFields.map((groupingField) => row[groupingField]);
-        paths[rowId] = [...parentPath, rowId.toString()];
-        let subTree = tree;
-        parentPath.forEach((nodeName, index) => {
-          let parentNode = subTree.get(nodeName)
 
-          if (!parentNode) {
-            const path = parentPath.slice(0, index + 1);
-            const fillerId = `filler-row-${path.join('-')}`;
-            const childrenTree = new Map();
-
-            idRowsLookupFiller[fillerId] = {};
-            paths[fillerId] = path;
-
-            parentNode = {
-              id: fillerId,
-              fillerNode: true,
-              expanded: props.defaultGroupingExpansionDepth > index,
-              children: childrenTree,
-            }
-
-            subTree.set(nodeName, parentNode);
-          }
-
-          subTree = parentNode?.children!;
-        });
-
-        subTree.set(rowId.toString(), {
+        insertLeafInTree({
+          tree,
+          path: [...parentPath, rowId.toString()],
           id: rowId,
+          defaultGroupingExpansionDepth: props.defaultGroupingExpansionDepth,
+          paths,
+          idRowsLookup,
         });
       });
 
       return {
         tree,
         paths,
-        idRowsLookup: { ...params.idRowsLookup, ...idRowsLookupFiller },
+        idRowsLookup,
       };
     };
 

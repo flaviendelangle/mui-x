@@ -39,7 +39,7 @@ const GridRowGroupingGroupingCell = (props: GridRenderCellParams) => {
   }
 
   if (!node.fillerNode) {
-    return null
+    return null;
   }
 
   return (
