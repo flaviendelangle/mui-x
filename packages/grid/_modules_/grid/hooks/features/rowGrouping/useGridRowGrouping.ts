@@ -64,8 +64,8 @@ export const useGridRowGrouping = (
         const groupingField = groupingFields[depth];
 
         distinctValues[groupingField].list.forEach((groupingValue) => {
-          const fillerId = `filler-row-${groupingField}-${groupingValue}`;
           const path = [...parentPath, groupingValue];
+          const fillerId = `filler-row-${groupingField}-${path.join('-')}`;
           const childrenTree = new Map();
 
           tree.set(groupingValue, {
@@ -92,10 +92,10 @@ export const useGridRowGrouping = (
       params.ids.forEach((rowId) => {
         const row = params.idRowsLookup[rowId];
         // TODO: Handle valueGetter
-        const path = groupingFields.map((groupingField) => row[groupingField]);
-        leafPaths[rowId] = path;
+        const parentPath = groupingFields.map((groupingField) => row[groupingField]);
+        leafPaths[rowId] = [...parentPath, rowId.toString()];
         let tree = fullTree;
-        path.forEach((nodeName) => {
+        parentPath.forEach((nodeName) => {
           tree = tree.get(nodeName)!.children!;
         });
 
