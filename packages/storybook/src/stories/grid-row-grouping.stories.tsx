@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { DataGridPro } from '@mui/x-data-grid-pro';
+import {DataGridPro, DataGridProProps} from '@mui/x-data-grid-pro';
 import { Meta } from '@storybook/react';
 import { useDemoData } from '@mui/x-data-grid-generator';
 
@@ -21,18 +21,25 @@ export function BasicRowGrouping() {
   const columns = React.useMemo(
     () =>
       data.columns.map((col) =>
-        ['commodity', 'status'].includes(col.field) ? { ...col, groupRows: true } : col,
+        ['commodity', 'status'].includes(col.field) ? { ...col, groupRows: true, hide: true } : col,
       ),
     [data.columns],
+  );
+
+  const groupingColDef = React.useMemo<DataGridProProps['groupingColDef']>(
+      () => ({
+        width: 300,
+      }),
+      [],
   );
 
   return (
     <DataGridPro
       loading={loading}
       disableSelectionOnClick
-      defaultGroupingExpansionDepth={2}
       {...data}
       columns={columns}
+      groupingColDef={groupingColDef}
     />
   );
 }

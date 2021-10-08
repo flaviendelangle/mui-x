@@ -8,17 +8,32 @@ import { useGridApiEventHandler } from '../../root/useGridApiEventHandler';
 import { GridEvents } from '../../../constants/eventsConstants';
 import { gridRowGroupingColumnSelector } from './rowGroupingSelector';
 import { GridComponentProps } from '../../../GridComponentProps';
-import { GridRowId, GridRowsLookup } from '../../../models';
+import {GridColDef, GridRowId, GridRowsLookup} from '../../../models';
+import {GridRowGroupingGroupColDef} from "./gridRowGroupingGroupColDef";
 
 export const useGridRowGrouping = (
   apiRef: GridApiRef,
-  props: Pick<GridComponentProps, 'defaultGroupingExpansionDepth'>,
+  props: Pick<GridComponentProps, 'defaultGroupingExpansionDepth' | 'groupingColDef'>,
 ) => {
   const updateColumnsPreProcessing = React.useCallback(() => {
-    const addGroupingColumn: GridColumnsPreProcessing = (columns) => columns;
+    const addGroupingColumn: GridColumnsPreProcessing = (columns) => {
+      const hasGroupingColumns = columns.some(col => col.groupRows)
+      if (!hasGroupingColumns) {
+        return columns
+      }
+
+      const index = columns[0].type === 'checkboxSelection' ? 1 : 0;
+      const groupingColumn: GridColDef = {
+        ...GridRowGroupingGroupColDef,
+        headerName: apiRef.current.getLocaleText('treeDataGroupingHeaderName'),
+        ...props.groupingColDef,
+      };
+
+      return [...columns.slice(0, index), groupingColumn, ...columns.slice(index)];
+    };
 
     apiRef.current.registerColumnPreProcessing('rowGrouping', addGroupingColumn);
-  }, [apiRef]);
+  }, [apiRef, props.groupingColDef]);
 
   const updateRowGrouping = React.useCallback(() => {
     const groupRows: GridRowGroupingPreProcessing = (params) => {
@@ -49,65 +64,48 @@ export const useGridRowGrouping = (
         });
       });
 
-      const fullTree: GridRowConfigTree = new Map();
-      const fillerPaths: Record<GridRowId, string[]> = {};
+      const tree: GridRowConfigTree = new Map();
       const idRowsLookupFiller: GridRowsLookup = {};
-
-      const buildGroupingFieldTree = ({
-        tree,
-        parentPath,
-      }: {
-        tree: GridRowConfigTree;
-        parentPath: string[];
-      }) => {
-        const depth = parentPath.length;
-        const groupingField = groupingFields[depth];
-
-        distinctValues[groupingField].list.forEach((groupingValue) => {
-          const path = [...parentPath, groupingValue];
-          const fillerId = `filler-row-${groupingField}-${path.join('-')}`;
-          const childrenTree = new Map();
-
-          tree.set(groupingValue, {
-            id: fillerId,
-            fillerNode: true,
-            depth: 0,
-            expanded: props.defaultGroupingExpansionDepth > depth,
-            children: childrenTree,
-          });
-          idRowsLookupFiller[fillerId] = {};
-          fillerPaths[fillerId] = path;
-
-          if (depth < groupingFields.length - 1) {
-            buildGroupingFieldTree({ tree: childrenTree, parentPath: path });
-          }
-        });
-      };
-
-      buildGroupingFieldTree({ tree: fullTree, parentPath: [] });
-
-      const leafDepth = groupingFields.length;
-      const leafPaths: Record<GridRowId, string[]> = {};
+      const paths: Record<GridRowId, string[]> = {};
 
       params.ids.forEach((rowId) => {
         const row = params.idRowsLookup[rowId];
         // TODO: Handle valueGetter
         const parentPath = groupingFields.map((groupingField) => row[groupingField]);
-        leafPaths[rowId] = [...parentPath, rowId.toString()];
-        let tree = fullTree;
-        parentPath.forEach((nodeName) => {
-          tree = tree.get(nodeName)!.children!;
+        paths[rowId] = [...parentPath, rowId.toString()];
+        let subTree = tree;
+        parentPath.forEach((nodeName, index) => {
+          let parentNode = subTree.get(nodeName)
+
+          if (!parentNode) {
+            const path = parentPath.slice(0, index + 1);
+            const fillerId = `filler-row-${path.join('-')}`;
+            const childrenTree = new Map();
+
+            idRowsLookupFiller[fillerId] = {};
+            paths[fillerId] = path;
+
+            parentNode = {
+              id: fillerId,
+              fillerNode: true,
+              expanded: props.defaultGroupingExpansionDepth > index,
+              children: childrenTree,
+            }
+
+            subTree.set(nodeName, parentNode);
+          }
+
+          subTree = parentNode?.children!;
         });
 
-        tree.set(rowId.toString(), {
+        subTree.set(rowId.toString(), {
           id: rowId,
-          depth: leafDepth,
         });
       });
 
       return {
-        tree: fullTree,
-        paths: { ...leafPaths, ...fillerPaths },
+        tree,
+        paths,
         idRowsLookup: { ...params.idRowsLookup, ...idRowsLookupFiller },
       };
     };
