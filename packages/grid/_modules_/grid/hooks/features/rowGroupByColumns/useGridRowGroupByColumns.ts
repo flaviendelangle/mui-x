@@ -6,13 +6,13 @@ import { useFirstRender } from '../../utils/useFirstRender';
 import { isSpaceKey } from '../../../utils/keyboardUtils';
 import { useGridApiEventHandler } from '../../root/useGridApiEventHandler';
 import { GridEvents } from '../../../constants/eventsConstants';
-import { gridRowGroupingColumnSelector } from './rowGroupingSelector';
+import { gridRowGroupingColumnSelector } from './rowGroupByColumnsSelector';
 import { GridComponentProps } from '../../../GridComponentProps';
 import { GridColDef, GridRowId, GridRowsLookup } from '../../../models';
-import { GridRowGroupingGroupColDef } from './gridRowGroupingGroupColDef';
+import { GRID_ROW_GROUP_BY_COLUMNS_GROUP_COL_DEF } from './gridRowGroupByColumnsGroupColDef';
 import { insertLeafInTree } from '../rows/gridRowsUtils';
 
-export const useGridRowGrouping = (
+export const useGridRowGroupByColumns = (
   apiRef: GridApiRef,
   props: Pick<GridComponentProps, 'defaultGroupingExpansionDepth' | 'groupingColDef'>,
 ) => {
@@ -25,7 +25,7 @@ export const useGridRowGrouping = (
 
       const index = columns[0].type === 'checkboxSelection' ? 1 : 0;
       const groupingColumn: GridColDef = {
-        ...GridRowGroupingGroupColDef,
+        ...GRID_ROW_GROUP_BY_COLUMNS_GROUP_COL_DEF,
         headerName: apiRef.current.getLocaleText('treeDataGroupingHeaderName'),
         ...props.groupingColDef,
       };
@@ -122,7 +122,10 @@ export const useGridRowGrouping = (
       const cellParams = apiRef.current.getCellParams(params.id, params.field);
       if (cellParams.field === '__tree_data_group__' && isSpaceKey(event.key)) {
         event.stopPropagation();
-        apiRef.current.UNSTABLE_setRowExpansion(params.id, !apiRef.current.UNSTABLE_getRowNode(params.id)?.expanded);
+        apiRef.current.UNSTABLE_setRowExpansion(
+          params.id,
+          !apiRef.current.UNSTABLE_getRowNode(params.id)?.expanded,
+        );
       }
     },
     [apiRef],

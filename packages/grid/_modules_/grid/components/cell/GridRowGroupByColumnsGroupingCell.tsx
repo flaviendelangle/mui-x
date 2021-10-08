@@ -20,7 +20,7 @@ const useStyles = makeStyles({
   },
 });
 
-const GridRowGroupingGroupingCell = (props: GridRenderCellParams) => {
+const GridRowGroupByColumnsGroupingCell = (props: GridRenderCellParams) => {
   const { id } = props;
 
   const rootProps = useGridRootProps();
@@ -65,7 +65,7 @@ const GridRowGroupingGroupingCell = (props: GridRenderCellParams) => {
   );
 };
 
-GridRowGroupingGroupingCell.propTypes = {
+GridRowGroupByColumnsGroupingCell.propTypes = {
   // ----------------------------- Warning --------------------------------
   // | These PropTypes are generated from the TypeScript type definitions |
   // | To update them edit the TypeScript types and run "yarn proptypes"  |
@@ -135,4 +135,4 @@ GridRowGroupingGroupingCell.propTypes = {
   ]),
 } as any;
 
-export { GridRowGroupingGroupingCell };
+export { GridRowGroupByColumnsGroupingCell };
