@@ -74,5 +74,5 @@ const Status = React.memo((props: StatusProps) => {
 });
 
 export function renderStatus(params: GridCellParams) {
-  return <Status status={params.value!.toString() as Statuses} />;
+  return params.value == null ? null : <Status status={params.value.toString() as Statuses} />;
 }

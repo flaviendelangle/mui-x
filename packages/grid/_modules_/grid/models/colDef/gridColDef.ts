@@ -157,6 +157,10 @@ export interface GridColDef {
    */
   filterOperators?: GridFilterOperator[];
   /**
+   * If `true`, the rows will be grouped according to this column
+   */
+  groupRows?: boolean;
+  /**
    * If `true`, this column cannot be reordered.
    * @default false
    */
