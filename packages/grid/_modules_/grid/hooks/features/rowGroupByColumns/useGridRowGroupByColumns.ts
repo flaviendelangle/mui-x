@@ -120,7 +120,7 @@ export const useGridRowGroupByColumns = (
   const handleCellKeyDown = React.useCallback(
     (params: GridCellParams, event: MuiEvent<React.KeyboardEvent>) => {
       const cellParams = apiRef.current.getCellParams(params.id, params.field);
-      if (cellParams.field === '__tree_data_group__' && isSpaceKey(event.key)) {
+      if (cellParams.field === '__row_group_by_columns_group' && isSpaceKey(event.key)) {
         event.stopPropagation();
         apiRef.current.UNSTABLE_setRowExpansion(
           params.id,
