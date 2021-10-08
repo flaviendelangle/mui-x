@@ -13,20 +13,22 @@ const CustomGridTreeDataGroupingCell = (props: GridRenderCellParams) => {
   const { id } = props;
 
   const { apiRef } = useGridSlotComponentProps();
-  const node = apiRef.current.getRowNode(id);
+  const node = apiRef.current.UNSTABLE_getRowNode(id);
 
-  const path = apiRef.current.getRowPath(id);
+  const path = apiRef.current.UNSTABLE_getRowPath(id);
 
   if (!node || !path) {
     throw new Error(`MUI: No row with id #${id} found`);
   }
 
   return (
-    <Box sx={{ ml: node.depth * 4 }}>
+    <Box sx={{ ml: path.length * 4 }}>
       <div>
         {node.children?.size ? (
           <Button
-            onClick={() => apiRef.current.setRowExpansion(id, !node?.expanded)}
+            onClick={() =>
+              apiRef.current.UNSTABLE_setRowExpansion(id, !node?.expanded)
+            }
             tabIndex={-1}
             size="small"
           >
