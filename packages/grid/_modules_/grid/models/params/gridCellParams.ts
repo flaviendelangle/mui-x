@@ -103,3 +103,21 @@ export interface GridValueFormatterParams {
    */
   api: any;
 }
+
+/**
+ * Object passed as parameter in the column [[GridColDef]] key getter callback.
+ */
+export interface GridKeyGetterParams {
+  /**
+   * The grid row id.
+   */
+  id: GridRowId;
+  /**
+   * The column field of the cell that triggered the event
+   */
+  field: string;
+  /**
+   * The cell value (if the column has valueGetter, this is the value returned by it)
+   */
+  value: GridCellValue;
+}

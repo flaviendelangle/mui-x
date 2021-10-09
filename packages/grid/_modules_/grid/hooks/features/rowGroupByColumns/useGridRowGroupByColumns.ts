@@ -1,6 +1,13 @@
 import * as React from 'react';
 import { GridColumnsPreProcessing } from '../../root/columnsPreProcessing';
-import type { GridApiRef, GridCellParams, GridRowConfigTree, MuiEvent } from '../../../models';
+import type {
+  GridApiRef,
+  GridCellParams,
+  GridColumnLookup,
+  GridRowConfigTree,
+  GridRowModel,
+  MuiEvent,
+} from '../../../models';
 import { GridRowGroupingPreProcessing } from '../../root/rowGroupsPerProcessing';
 import { useFirstRender } from '../../utils/useFirstRender';
 import { isSpaceKey } from '../../../utils/keyboardUtils';
@@ -11,6 +18,40 @@ import { GridComponentProps } from '../../../GridComponentProps';
 import { GridColDef, GridRowId, GridRowsLookup } from '../../../models';
 import { GRID_ROW_GROUP_BY_COLUMNS_GROUP_COL_DEF } from './gridRowGroupByColumnsGroupColDef';
 import { insertLeafInTree } from '../rows/gridRowsUtils';
+
+const orderGroupingFields = (groupingColumns: GridColumnLookup) => {
+  const unOrderedGroupingFields = Object.keys(groupingColumns);
+  const shouldApplyExplicitGroupOrder = unOrderedGroupingFields.some(
+    (field) => groupingColumns[field].groupRowIndex != null,
+  );
+
+  if (!shouldApplyExplicitGroupOrder) {
+    return unOrderedGroupingFields;
+  }
+
+  const fieldInitialIndex = Object.fromEntries(
+    unOrderedGroupingFields.map((field, fieldIndex) => [field, fieldIndex]),
+  );
+
+  return unOrderedGroupingFields.sort((a, b) => {
+    const colA = groupingColumns[a];
+    const colB = groupingColumns[b];
+
+    if (colA.groupRowIndex == null && colB.groupRowIndex != null) {
+      return -1;
+    }
+
+    if (colA.groupRowIndex != null && colB.groupRowIndex == null) {
+      return 1;
+    }
+
+    if (colA.groupRowIndex != null && colB.groupRowIndex != null) {
+      return colA.groupRowIndex - colB.groupRowIndex;
+    }
+
+    return fieldInitialIndex[a] - fieldInitialIndex[b];
+  });
+};
 
 export const useGridRowGroupByColumns = (
   apiRef: GridApiRef,
@@ -39,7 +80,7 @@ export const useGridRowGroupByColumns = (
   const updateRowGrouping = React.useCallback(() => {
     const groupRows: GridRowGroupingPreProcessing = (params) => {
       const groupingColumns = gridRowGroupingColumnSelector(apiRef.current.state);
-      const groupingFields = Object.keys(groupingColumns);
+      const groupingFields = orderGroupingFields(groupingColumns);
 
       if (groupingFields.length === 0) {
         return null;
@@ -50,17 +91,46 @@ export const useGridRowGroupByColumns = (
           groupingFields.map((groupingField) => [groupingField, { map: {}, list: [] }]),
         );
 
-      // TODO: Handle valueGetter
+      const getCellKey = ({
+        row,
+        id,
+        colDef,
+        field,
+      }: {
+        row: GridRowModel;
+        id: GridRowId;
+        colDef: GridColDef;
+        field: string;
+      }) => {
+        // TODO: Handle valueGetter
+        const value = row[field];
+
+        if (colDef.keyGetter) {
+          return colDef.keyGetter({
+            value,
+            id,
+            field,
+          });
+        }
+
+        return value;
+      };
+
       params.ids.forEach((rowId) => {
         const row = params.idRowsLookup[rowId];
 
         groupingFields.forEach((groupingField) => {
-          const cellValue = row[groupingField];
-          const groupingFieldDistinctValues = distinctValues[groupingField];
+          const cellKey = getCellKey({
+            row,
+            id: rowId,
+            colDef: groupingColumns[groupingField],
+            field: groupingField,
+          });
+          const groupingFieldsDistinctKeys = distinctValues[groupingField];
 
-          if (!groupingFieldDistinctValues.map[cellValue]) {
-            groupingFieldDistinctValues.map[cellValue] = true;
-            groupingFieldDistinctValues.list.push(cellValue);
+          if (!groupingFieldsDistinctKeys.map[cellKey]) {
+            groupingFieldsDistinctKeys.map[cellKey] = true;
+            groupingFieldsDistinctKeys.list.push(cellKey);
           }
         });
       });
@@ -71,8 +141,14 @@ export const useGridRowGroupByColumns = (
 
       params.ids.forEach((rowId) => {
         const row = params.idRowsLookup[rowId];
-        // TODO: Handle valueGetter
-        const parentPath = groupingFields.map((groupingField) => row[groupingField]);
+        const parentPath = groupingFields.map((groupingField) =>
+          getCellKey({
+            row,
+            id: rowId,
+            colDef: groupingColumns[groupingField],
+            field: groupingField,
+          }),
+        );
 
         insertLeafInTree({
           tree,

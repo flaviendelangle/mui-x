@@ -5,6 +5,7 @@ import { GridColumnHeaderClassNamePropType } from '../gridColumnHeaderClass';
 import { GridFilterOperator } from '../gridFilterOperator';
 import {
   GridCellParams,
+  GridKeyGetterParams,
   GridRenderCellParams,
   GridRenderEditCellParams,
   GridValueFormatterParams,
@@ -101,6 +102,12 @@ export interface GridColDef {
    */
   valueFormatter?: (params: GridValueFormatterParams) => GridCellValue;
   /**
+   * Function that transforms a complex cell value into a value that can be used as a key in the tree.
+   * @param {GridKeyGetterParams} params Object containing parameters for the getter.
+   * @returns {string | number | boolean} The key representing this value.
+   */
+  keyGetter?: (params: GridKeyGetterParams) => string | number | boolean;
+  /**
    * Function that takes the user-entered value and converts it to a value used internally.
    * @param {GridCellValue} value The user-entered value.
    * @param {GridCellParams} params The params when called before saving the value.
@@ -160,6 +167,11 @@ export interface GridColDef {
    * If `true`, the rows will be grouped according to this column
    */
   groupRows?: boolean;
+  /**
+   * The index of this grouping field in the tree structure
+   * By default, the groups are created based on the order of the `columns` property
+   */
+  groupRowIndex?: number;
   /**
    * If `true`, the `renderCell` / will be called for the filler rows
    */
