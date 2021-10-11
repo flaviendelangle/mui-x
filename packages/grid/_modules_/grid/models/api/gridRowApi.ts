@@ -1,20 +1,14 @@
-import {
-  GridRowModel,
-  GridRowId,
-  GridRowModelUpdate,
-  GridRowConfigTree,
-  GridRowConfigTreeNode,
-} from '../gridRows';
+import { GridRowModel, GridRowId, GridRowModelUpdate, GridRowConfigTreeNode } from '../gridRows';
 
 /**
  * The Row API interface that is available in the grid `apiRef`.
  */
 export interface GridRowApi {
   /**
-   * Gets the full set of rows ordered in a tree structure.
-   * @returns {GridRowConfigTree} The full set of rows.
+   * Gets the full set of rows as [[Map<GridRowId, GridRowModel>]].
+   * @returns {Map<GridRowId, GridRowModel>} The full set of rows.
    */
-  getRowModels: () => GridRowConfigTree;
+  getRowModels: () => Map<GridRowId, GridRowModel>;
   /**
    * Gets the total number of rows in the grid.
    * @returns {number} The number of rows.
