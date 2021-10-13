@@ -4,7 +4,7 @@ import { makeStyles } from '@mui/styles';
 import IconButton from '@mui/material/IconButton';
 import Box from '@mui/material/Box';
 import { useGridRootProps } from '../../hooks/utils/useGridRootProps';
-import { useGridApiContext } from '../../hooks/root/useGridApiContext';
+import { useGridApiContext } from '../../hooks/utils/useGridApiContext';
 import { GridRenderCellParams } from '../../models/params/gridCellParams';
 
 const useStyles = makeStyles({
@@ -21,7 +21,7 @@ const useStyles = makeStyles({
 });
 
 const GridTreeDataGroupingCell = (props: GridRenderCellParams) => {
-  const { id } = props;
+  const { id, row } = props;
 
   const rootProps = useGridRootProps();
   const apiRef = useGridApiContext();
@@ -32,16 +32,16 @@ const GridTreeDataGroupingCell = (props: GridRenderCellParams) => {
     ? rootProps.components.TreeDataCollapseIcon
     : rootProps.components.TreeDataExpandIcon;
 
-  const path = apiRef.current.UNSTABLE_getRowPath(id);
+  const path = rootProps.getTreeDataPath!(row);
 
-  if (!node || !path) {
+  if (!node) {
     throw new Error(`MUI: No row with id #${id} found`);
   }
 
   return (
     <Box className={classes.root} sx={{ ml: (path.length - 1) * 4 }}>
       <div className={classes.toggle}>
-        {!!node.children?.size && (
+        {!!node.children?.length && (
           <IconButton
             size="small"
             onClick={() => apiRef.current.UNSTABLE_setRowExpansion(id, !node?.expanded)}

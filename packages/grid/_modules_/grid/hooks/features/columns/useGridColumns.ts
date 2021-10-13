@@ -8,14 +8,14 @@ import {
   GridColumnsState,
   GridStateColDef,
 } from '../../../models/colDef/gridColDef';
-import { GridColumnTypesRecord } from '../../../models/colDef/gridColTypeDef';
+import { GridColumnTypesRecord } from '../../../models/colDef/gridColumnTypesRecord';
 import { getGridDefaultColumnTypes } from '../../../models/colDef/gridDefaultColumnTypes';
 import { getGridColDef } from '../../../models/colDef/getGridColDef';
 import { GridColumnOrderChangeParams } from '../../../models/params/gridColumnOrderChangeParams';
 import { mergeGridColTypes } from '../../../utils/mergeUtils';
-import { useGridApiMethod } from '../../root/useGridApiMethod';
+import { useGridApiMethod } from '../../utils/useGridApiMethod';
 import { useGridLogger } from '../../utils/useGridLogger';
-import { useGridState } from '../core/useGridState';
+import { useGridState } from '../../utils/useGridState';
 import {
   allGridColumnsFieldsSelector,
   allGridColumnsSelector,
@@ -23,7 +23,10 @@ import {
   gridColumnsSelector,
   visibleGridColumnsSelector,
 } from './gridColumnsSelector';
-import { useGridApiEventHandler, useGridApiOptionHandler } from '../../root/useGridApiEventHandler';
+import {
+  useGridApiEventHandler,
+  useGridApiOptionHandler,
+} from '../../utils/useGridApiEventHandler';
 import { GRID_STRING_COL_DEF } from '../../../models/colDef/gridStringColDef';
 import { GridComponentProps } from '../../../GridComponentProps';
 import { useGridStateInit } from '../../utils/useGridStateInit';
@@ -129,7 +132,8 @@ export function useGridColumns(
 
   useGridStateInit(apiRef, (state) => {
     const hydratedColumns = hydrateColumnsType(props.columns, props.columnTypes);
-    const preProcessedColumns = apiRef.current.applyAllColumnPreProcessing(hydratedColumns);
+    const preProcessedColumns =
+      apiRef.current.UNSTABLE_applyAllColumnPreProcessing(hydratedColumns);
     const columns = upsertColumnsState(preProcessedColumns);
     let newColumns: GridColumns = columns.all.map((field) => columns.lookup[field]);
     newColumns = hydrateColumnsWidth(newColumns, 0);
@@ -329,7 +333,8 @@ export function useGridColumns(
 
     const hydratedColumns = hydrateColumnsType(props.columns, props.columnTypes);
 
-    const preProcessedColumns = apiRef.current.applyAllColumnPreProcessing(hydratedColumns);
+    const preProcessedColumns =
+      apiRef.current.UNSTABLE_applyAllColumnPreProcessing(hydratedColumns);
     const columnState = upsertColumnsState(preProcessedColumns);
     setColumnsState(columnState);
   }, [logger, apiRef, setColumnsState, props.columns, props.columnTypes]);
@@ -351,7 +356,8 @@ export function useGridColumns(
     logger.info(`Columns pre-processing have changed, regenerating the columns`);
 
     const hydratedColumns = hydrateColumnsType(props.columns, props.columnTypes);
-    const preProcessedColumns = apiRef.current.applyAllColumnPreProcessing(hydratedColumns);
+    const preProcessedColumns =
+      apiRef.current.UNSTABLE_applyAllColumnPreProcessing(hydratedColumns);
     const columnState = upsertColumnsState(preProcessedColumns);
     setColumnsState(columnState);
   }, [apiRef, logger, setColumnsState, props.columns, props.columnTypes]);

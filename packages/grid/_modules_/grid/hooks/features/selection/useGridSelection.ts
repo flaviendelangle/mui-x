@@ -5,21 +5,21 @@ import { GridApiRef } from '../../../models/api/gridApiRef';
 import { GridSelectionApi } from '../../../models/api/gridSelectionApi';
 import { GridRowParams } from '../../../models/params/gridRowParams';
 import { GridRowId } from '../../../models/gridRows';
-import { useGridApiEventHandler } from '../../root/useGridApiEventHandler';
-import { useGridApiMethod } from '../../root/useGridApiMethod';
+import { useGridApiEventHandler } from '../../utils/useGridApiEventHandler';
+import { useGridApiMethod } from '../../utils/useGridApiMethod';
 import { useGridLogger } from '../../utils/useGridLogger';
-import { useGridState } from '../core/useGridState';
+import { useGridState } from '../../utils/useGridState';
 import { gridRowsLookupSelector } from '../rows/gridRowsSelector';
 import {
   gridSelectionStateSelector,
   selectedGridRowsSelector,
   selectedIdsLookupSelector,
 } from './gridSelectionSelector';
-import { gridSortedVisibleRowsAsArrayFlatSelector } from '../filter/gridFilterSelector';
+import { gridSortedVisibleRowEntriesSelector } from '../filter/gridFilterSelector';
 import { GridCellParams } from '../../../models/params/gridCellParams';
 import { GridRowSelectionCheckboxParams } from '../../../models/params/gridRowSelectionCheckboxParams';
-import { GridColumnsPreProcessing } from '../../root/columnsPreProcessing';
-import { gridCheckboxSelectionColDef, GridColDef } from '../../../models';
+import { GridColumnsPreProcessing } from '../../core/columnsPreProcessing';
+import { GRID_CHECKBOX_SELECTION_COL_DEF, GridColDef } from '../../../models';
 import { composeClasses } from '../../../utils/material-ui-utils';
 import { getDataGridUtilityClass } from '../../../gridClasses';
 import { useGridStateInit } from '../../utils/useGridStateInit';
@@ -183,7 +183,7 @@ export const useGridSelection = (
 
       logger.debug(`Expanding selection from row ${startId} to row ${endId}`);
 
-      const visibleRowIds = gridSortedVisibleRowsAsArrayFlatSelector(apiRef.current.state);
+      const visibleRowIds = gridSortedVisibleRowEntriesSelector(apiRef.current.state);
       const startIndex = visibleRowIds.findIndex((el) => el.id === startId);
       const endIndex = visibleRowIds.findIndex((el) => el.id === endId);
       const [start, end] = startIndex > endIndex ? [endIndex, startIndex] : [startIndex, endIndex];
@@ -200,7 +200,7 @@ export const useGridSelection = (
       const startId = lastRowToggled.current ?? id;
       const isSelected = apiRef.current.isRowSelected(id);
       if (isSelected) {
-        const visibleRowIds = gridSortedVisibleRowsAsArrayFlatSelector(apiRef.current.state);
+        const visibleRowIds = gridSortedVisibleRowEntriesSelector(apiRef.current.state);
         const startIndex = visibleRowIds.findIndex((row) => row.id === startId);
         const endIndex = visibleRowIds.findIndex((row) => row.id === endId);
         if (startIndex > endIndex) {
@@ -356,11 +356,11 @@ export const useGridSelection = (
 
   const updateColumnsPreProcessing = React.useCallback(() => {
     if (!props.checkboxSelection) {
-      apiRef.current.registerColumnPreProcessing('selection', null);
+      apiRef.current.UNSTABLE_registerColumnPreProcessing('selection', null);
     } else {
       const addCheckboxColumn: GridColumnsPreProcessing = (columns) => {
         const groupingColumn: GridColDef = {
-          ...gridCheckboxSelectionColDef,
+          ...GRID_CHECKBOX_SELECTION_COL_DEF,
           cellClassName: classes.cellCheckbox,
           headerClassName: classes.columnHeaderCheckbox,
           headerName: apiRef.current.getLocaleText('checkboxSelectionHeaderName'),
@@ -369,7 +369,7 @@ export const useGridSelection = (
         return [groupingColumn, ...columns];
       };
 
-      apiRef.current.registerColumnPreProcessing('selection', addCheckboxColumn);
+      apiRef.current.UNSTABLE_registerColumnPreProcessing('selection', addCheckboxColumn);
     }
   }, [apiRef, props.checkboxSelection, classes]);
 

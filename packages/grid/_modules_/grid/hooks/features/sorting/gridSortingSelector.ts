@@ -1,9 +1,7 @@
 import { createSelector } from 'reselect';
-import { GridRowId } from '../../../models/gridRows';
 import { GridSortDirection, GridSortModel } from '../../../models/gridSortModel';
-import { GridState } from '../core/gridState';
+import { GridState } from '../../../models/gridState';
 import { gridRowsLookupSelector } from '../rows/gridRowsSelector';
-import { GridSortedRowsIdTreeNode, GridSortedRowsTree } from './gridSortingState';
 
 const gridSortingStateSelector = (state: GridState) => state.sorting;
 
@@ -12,35 +10,10 @@ export const gridSortedRowIdsSelector = createSelector(
   (sortingState) => sortingState.sortedRows,
 );
 
-export const gridSortedRowIdsFlatSelector = createSelector(
-  gridSortedRowIdsSelector,
-  (sortedRowIds) => {
-    const flattenRowIds = (nodes: GridSortedRowsIdTreeNode[]): GridRowId[] =>
-      nodes.flatMap((node) => [node.id, ...(node.children ? flattenRowIds(node.children) : [])]);
-
-    return flattenRowIds(sortedRowIds);
-  },
-);
-
-export const gridSortedRowsSelector = createSelector(
+export const gridSortedRowEntriesSelector = createSelector(
   gridSortedRowIdsSelector,
   gridRowsLookupSelector,
-  (sortedTree, idRowsLookup) => {
-    const buildMap = (nodes: GridSortedRowsIdTreeNode[]) => {
-      const map: GridSortedRowsTree = new Map();
-
-      nodes.forEach((node) => {
-        map.set(node.id, {
-          model: idRowsLookup[node.id],
-          children: node.children ? buildMap(node.children) : undefined,
-        });
-      });
-
-      return map;
-    };
-
-    return buildMap(sortedTree);
-  },
+  (sortedIds, idRowsLookup) => sortedIds.map((id) => ({ id, model: idRowsLookup[id] })),
 );
 
 export const gridSortModelSelector = createSelector(

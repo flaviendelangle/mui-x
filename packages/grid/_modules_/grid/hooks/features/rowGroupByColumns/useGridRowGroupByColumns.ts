@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { GridColumnsPreProcessing } from '../../root/columnsPreProcessing';
 import type {
   GridApiRef,
   GridCellParams,
@@ -8,16 +7,17 @@ import type {
   GridRowModel,
   MuiEvent,
 } from '../../../models';
-import { GridRowGroupingPreProcessing } from '../../root/rowGroupsPerProcessing';
+import { GridColumnsPreProcessing } from '../../core/columnsPreProcessing';
+import { GridRowGroupingPreProcessing } from '../../core/rowGroupsPerProcessing';
 import { useFirstRender } from '../../utils/useFirstRender';
 import { isSpaceKey } from '../../../utils/keyboardUtils';
-import { useGridApiEventHandler } from '../../root/useGridApiEventHandler';
+import { useGridApiEventHandler } from '../../utils/useGridApiEventHandler';
 import { GridEvents } from '../../../constants/eventsConstants';
 import { gridRowGroupingColumnSelector } from './rowGroupByColumnsSelector';
 import { GridComponentProps } from '../../../GridComponentProps';
 import { GridColDef, GridRowId, GridRowsLookup } from '../../../models';
 import { GRID_ROW_GROUP_BY_COLUMNS_GROUP_COL_DEF } from './gridRowGroupByColumnsGroupColDef';
-import { insertLeafInTree } from '../rows/gridRowsUtils';
+import {GridNodeNameToIdTree, insertRowInTree} from '../rows/gridRowsUtils';
 
 const orderGroupingFields = (groupingColumns: GridColumnLookup) => {
   const unOrderedGroupingFields = Object.keys(groupingColumns);
@@ -74,7 +74,7 @@ export const useGridRowGroupByColumns = (
       return [...columns.slice(0, index), groupingColumn, ...columns.slice(index)];
     };
 
-    apiRef.current.registerColumnPreProcessing('rowGrouping', addGroupingColumn);
+    apiRef.current.UNSTABLE_registerColumnPreProcessing('rowGrouping', addGroupingColumn);
   }, [apiRef, props.groupingColDef]);
 
   const updateRowGrouping = React.useCallback(() => {
@@ -135,9 +135,9 @@ export const useGridRowGroupByColumns = (
         });
       });
 
-      const tree: GridRowConfigTree = new Map();
+      const tree: GridRowConfigTree = {};
       const idRowsLookup: GridRowsLookup = { ...params.idRowsLookup };
-      const paths: Record<GridRowId, string[]> = {};
+      const nodeNameToIdTree: GridNodeNameToIdTree = {};
 
       params.ids.forEach((rowId) => {
         const row = params.idRowsLookup[rowId];
@@ -150,24 +150,23 @@ export const useGridRowGroupByColumns = (
           }),
         );
 
-        insertLeafInTree({
+        insertRowInTree({
           tree,
           path: [...parentPath, rowId.toString()],
           id: rowId,
           defaultGroupingExpansionDepth: props.defaultGroupingExpansionDepth,
-          paths,
           idRowsLookup,
+          nodeNameToIdTree,
         });
       });
 
       return {
         tree,
-        paths,
         idRowsLookup,
       };
     };
 
-    return apiRef.current.registerRowGroupsBuilder('rowGrouping', groupRows);
+    return apiRef.current.UNSTABLE_registerRowGroupsBuilder('rowGrouping', groupRows);
   }, [apiRef, props.defaultGroupingExpansionDepth]);
 
   useFirstRender(() => {

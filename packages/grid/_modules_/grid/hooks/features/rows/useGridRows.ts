@@ -10,26 +10,23 @@ import {
   GridRowsProp,
   GridRowIdGetter,
   GridRowData,
-  GridRowConfigTreeNode,
-  GridRowConfigTree,
 } from '../../../models/gridRows';
-import { useGridApiMethod } from '../../root/useGridApiMethod';
+import { useGridApiMethod } from '../../utils/useGridApiMethod';
 import { useGridLogger } from '../../utils/useGridLogger';
-import { useGridState } from '../core/useGridState';
+import { useGridState } from '../../utils/useGridState';
 import { useGridStateInit } from '../../utils/useGridStateInit';
 import { GridRowsState } from './gridRowsState';
 import {
   gridRowCountSelector,
   gridRowsLookupSelector,
   gridRowTreeSelector,
-  gridRowIdsFlatSelector,
-  gridRowsPathSelector,
+  gridRowIdsSelector,
 } from './gridRowsSelector';
-import { useGridApiEventHandler } from '../../root/useGridApiEventHandler';
+import { useGridApiEventHandler } from '../../utils/useGridApiEventHandler';
 
 export type GridRowsInternalCacheState = Omit<
   GridRowsState,
-  'tree' | 'paths' | 'totalRowCount' | 'totalTopLevelRowCount'
+  'tree' | 'totalRowCount' | 'totalTopLevelRowCount'
 > & {
   rowIds: GridRowId[];
 
@@ -86,80 +83,25 @@ export function convertGridRowsPropToState(
   return state;
 }
 
-const getNodeFromTree = (tree: GridRowConfigTree, path: string[]): GridRowConfigTreeNode | null => {
-  if (path.length === 0) {
-    return null;
-  }
-
-  const [nodeName, ...restPath] = path;
-  const node = tree.get(nodeName);
-
-  if (!node) {
-    return null;
-  }
-
-  if (restPath.length === 0) {
-    return node;
-  }
-
-  if (!node.children) {
-    return null;
-  }
-
-  return getNodeFromTree(node.children, restPath);
-};
-
-const setRowExpansionInTree = (
-  id: GridRowId,
-  tree: GridRowConfigTree,
-  path: string[],
-  isExpanded: boolean,
-) => {
-  if (path.length === 0) {
-    throw new Error(`MUI: Invalid path for row #${id}.`);
-  }
-
-  const clonedMap = new Map(tree.entries());
-  const [nodeName, ...restPath] = path;
-  const nodeBefore = clonedMap.get(nodeName);
-
-  if (!nodeBefore) {
-    throw new Error(`MUI: Invalid path for row #${id}.`);
-  }
-
-  if (restPath.length === 0) {
-    clonedMap.set(nodeName, { ...nodeBefore, expanded: isExpanded });
-  } else {
-    if (!nodeBefore.children) {
-      throw new Error(`MUI: Invalid path for row #${id}.`);
-    }
-
-    clonedMap.set(nodeName, {
-      ...nodeBefore,
-      expanded: nodeBefore.expanded || isExpanded,
-      children: setRowExpansionInTree(id, nodeBefore.children, restPath, isExpanded),
-    });
-  }
-
-  return clonedMap;
-};
-
 const getRowsStateFromCache = (
   rowsCache: GridRowsInternalCache,
   apiRef: GridApiRef,
 ): GridRowsState => {
-  const { rowIds, idRowsLookup, propRowCount = 0, propGetRowId, ...rowState } = rowsCache.state;
+  const { rowIds, idRowsLookup, propRowCount = 0 } = rowsCache.state;
 
-  const groupingResponse = apiRef.current.groupRows({
+  const groupingResponse = apiRef.current.UNSTABLE_groupRows({
     idRowsLookup,
     ids: rowIds,
   });
 
+  const dataTopLevelRowCount = Object.values(groupingResponse.tree).filter(
+    (node) => node.parent == null,
+  ).length;
   const totalRowCount = propRowCount > rowIds.length ? propRowCount : rowIds.length;
   const totalTopLevelRowCount =
-    propRowCount > groupingResponse.tree.size ? propRowCount : groupingResponse.tree.size;
+    propRowCount > dataTopLevelRowCount ? propRowCount : dataTopLevelRowCount;
 
-  return { ...rowState, ...groupingResponse, totalRowCount, totalTopLevelRowCount };
+  return { ...groupingResponse, rowIds, totalRowCount, totalTopLevelRowCount };
 };
 
 // The cache is always redefined synchronously in `useGridStateInit` so this object don't need to be regenerated across DataGrid instances.
@@ -183,6 +125,11 @@ export const useGridRows = (
   apiRef: GridApiRef,
   props: Pick<GridComponentProps, 'rows' | 'getRowId' | 'rowCount' | 'throttleRowsMs'>,
 ): void => {
+  if (process.env.NODE_ENV !== 'production') {
+    // Freeze rows for immutability
+    Object.freeze(props.rows);
+  }
+
   const logger = useGridLogger(apiRef, 'useGridRows');
   const rowsCache = React.useRef(INITIAL_GRID_ROWS_INTERNAL_CACHE);
 
@@ -201,13 +148,13 @@ export const useGridRows = (
 
   // TODO: Move in useGridSorting
   const getRowIndex = React.useCallback<GridRowApi['getRowIndex']>(
-    (id) => apiRef.current.getFlatSortedRowIds().indexOf(id),
+    (id) => apiRef.current.getSortedRowIds().indexOf(id),
     [apiRef],
   );
 
   // TODO: Move in useGridSorting
   const getRowIdFromRowIndex = React.useCallback<GridRowApi['getRowIdFromRowIndex']>(
-    (index) => apiRef.current.getFlatSortedRowIds()[index],
+    (index) => apiRef.current.getSortedRowIds()[index],
     [apiRef],
   );
 
@@ -320,7 +267,7 @@ export const useGridRows = (
   );
 
   const getRowModels = React.useCallback<GridRowApi['getRowModels']>(() => {
-    const allRows = gridRowIdsFlatSelector(apiRef.current.state);
+    const allRows = gridRowIdsSelector(apiRef.current.state);
     const idRowsLookup = gridRowsLookupSelector(apiRef.current.state);
 
     return new Map(allRows.map((id) => [id, idRowsLookup[id]]));
@@ -332,20 +279,23 @@ export const useGridRows = (
   );
 
   const getAllRowIds = React.useCallback<GridRowApi['getAllRowIds']>(
-    () => gridRowIdsFlatSelector(apiRef.current.state),
+    () => gridRowIdsSelector(apiRef.current.state),
     [apiRef],
   );
 
   const setRowExpansion = React.useCallback<GridRowApi['UNSTABLE_setRowExpansion']>(
     (id, isExpanded) => {
       setGridState((state) => {
-        const path = state.rows.paths[id];
+        const node = apiRef.current.UNSTABLE_getRowNode(id);
+        if (!node) {
+          throw new Error(`MUI: No row with id #${id} found`);
+        }
 
         return {
           ...state,
           rows: {
             ...state.rows,
-            tree: setRowExpansionInTree(id, state.rows.tree, path, isExpanded),
+            tree: { ...state.rows.tree, [id]: { ...node, expanded: isExpanded } },
           },
         };
       });
@@ -355,21 +305,8 @@ export const useGridRows = (
     [apiRef, setGridState, forceUpdate],
   );
 
-  const getRowPath = React.useCallback<GridRowApi['UNSTABLE_getRowPath']>(
-    (id) => gridRowsPathSelector(apiRef.current.state)[id] ?? null,
-    [apiRef],
-  );
-
   const getRowNode = React.useCallback<GridRowApi['UNSTABLE_getRowNode']>(
-    (id) => {
-      const path = apiRef.current.UNSTABLE_getRowPath(id);
-
-      if (!path) {
-        throw new Error(`MUI: No row with id #${id} found in row path list`);
-      }
-
-      return getNodeFromTree(gridRowTreeSelector(apiRef.current.state), path);
-    },
+    (id) => gridRowTreeSelector(apiRef.current.state)[id] ?? null,
     [apiRef],
   );
 
@@ -417,7 +354,6 @@ export const useGridRows = (
     getAllRowIds,
     setRows,
     updateRows,
-    UNSTABLE_getRowPath: getRowPath,
     UNSTABLE_setRowExpansion: setRowExpansion,
     UNSTABLE_getRowNode: getRowNode,
   };

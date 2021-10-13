@@ -1,15 +1,15 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { GridEvents } from '../../constants/eventsConstants';
-import { useGridSelector } from '../../hooks/features/core/useGridSelector';
-import { gridSortedVisiblePaginatedRowsAsArrayFlatSelector } from '../../hooks/features/pagination/gridPaginationSelector';
-import { gridSortedVisibleRowsAsArrayFlatSelector } from '../../hooks/features/filter/gridFilterSelector';
+import { useGridSelector } from '../../hooks/utils/useGridSelector';
+import { gridSortedVisiblePaginatedRowEntriesSelector } from '../../hooks/features/pagination/gridPaginationSelector';
+import { gridSortedVisibleRowEntriesSelector } from '../../hooks/features/filter/gridFilterSelector';
 import { gridTabIndexColumnHeaderSelector } from '../../hooks/features/focus/gridFocusStateSelector';
 import { gridRowCountSelector } from '../../hooks/features/rows/gridRowsSelector';
 import { gridSelectionStateSelector } from '../../hooks/features/selection/gridSelectionSelector';
 import { GridColumnHeaderParams } from '../../models/params/gridColumnHeaderParams';
 import { isNavigationKey, isSpaceKey } from '../../utils/keyboardUtils';
-import { useGridApiContext } from '../../hooks/root/useGridApiContext';
+import { useGridApiContext } from '../../hooks/utils/useGridApiContext';
 import { getDataGridUtilityClass } from '../../gridClasses';
 import { useGridRootProps } from '../../hooks/utils/useGridRootProps';
 import { composeClasses } from '../../utils/material-ui-utils';
@@ -58,8 +58,8 @@ const GridHeaderCheckbox = React.forwardRef<HTMLInputElement, GridColumnHeaderPa
         rootProps.checkboxSelectionVisibleOnly && rootProps.pagination;
 
       const selector = shouldLimitSelectionToCurrentPage
-        ? gridSortedVisiblePaginatedRowsAsArrayFlatSelector
-        : gridSortedVisibleRowsAsArrayFlatSelector;
+        ? gridSortedVisiblePaginatedRowEntriesSelector
+        : gridSortedVisibleRowEntriesSelector;
 
       const rowsToBeSelected = selector(apiRef.current.state).map((row) => row.id);
       apiRef.current.selectRows(rowsToBeSelected, checked, !event.target.indeterminate);

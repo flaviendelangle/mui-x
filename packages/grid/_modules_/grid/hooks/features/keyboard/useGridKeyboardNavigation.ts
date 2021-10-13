@@ -15,15 +15,15 @@ import {
   isSpaceKey,
   isTabKey,
 } from '../../../utils/keyboardUtils';
-import { gridContainerSizesSelector } from '../../root/gridContainerSizesSelector';
+import { gridContainerSizesSelector } from '../container/gridContainerSizesSelector';
 import { visibleGridColumnsLengthSelector } from '../columns/gridColumnsSelector';
-import { useGridSelector } from '../core/useGridSelector';
+import { useGridSelector } from '../../utils/useGridSelector';
 import { gridPaginationSelector } from '../pagination/gridPaginationSelector';
 import { useGridLogger } from '../../utils/useGridLogger';
-import { useGridApiEventHandler } from '../../root/useGridApiEventHandler';
+import { useGridApiEventHandler } from '../../utils/useGridApiEventHandler';
 import { GridComponentProps } from '../../../GridComponentProps';
 import {
-  gridSortedVisibleRowsAsArrayFlatSelector,
+  gridSortedVisibleRowEntriesSelector,
   gridVisibleRowCountSelector,
 } from '../filter/gridFilterSelector';
 
@@ -81,7 +81,7 @@ export const useGridKeyboardNavigation = (
   const totalVisibleRowCount = useGridSelector(apiRef, gridVisibleRowCountSelector);
   const colCount = useGridSelector(apiRef, visibleGridColumnsLengthSelector);
   const containerSizes = useGridSelector(apiRef, gridContainerSizesSelector);
-  const visibleSortedRows = useGridSelector(apiRef, gridSortedVisibleRowsAsArrayFlatSelector);
+  const visibleSortedRows = useGridSelector(apiRef, gridSortedVisibleRowEntriesSelector);
 
   const mapKey = (event: React.KeyboardEvent) => {
     if (isEnterKey(event.key)) {

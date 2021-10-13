@@ -1,16 +1,16 @@
 import * as React from 'react';
-import { GridRowConfigTree, GridRowId, GridRowsLookup } from '../../../models/gridRows';
+import { GridRowConfigTree, GridRowsLookup } from '../../../models/gridRows';
 import { GridApiRef } from '../../../models/api/gridApiRef';
 import { GridComponentProps } from '../../../GridComponentProps';
-import { GridColumnsPreProcessing } from '../../root/columnsPreProcessing';
+import { GridColumnsPreProcessing } from '../../core/columnsPreProcessing';
 import { GRID_TREE_DATA_GROUP_COL_DEF } from './gridTreeDataGroupColDef';
-import { useGridApiEventHandler } from '../../root/useGridApiEventHandler';
+import { useGridApiEventHandler } from '../../utils/useGridApiEventHandler';
 import { GridEvents } from '../../../constants';
 import { GridCellParams, GridColDef, MuiEvent } from '../../../models';
 import { isSpaceKey } from '../../../utils/keyboardUtils';
 import { useFirstRender } from '../../utils/useFirstRender';
-import { GridRowGroupingPreProcessing } from '../../root/rowGroupsPerProcessing';
-import { insertLeafInTree } from '../rows/gridRowsUtils';
+import { GridRowGroupingPreProcessing } from '../../core/rowGroupsPerProcessing';
+import { GridNodeNameToIdTree, insertRowInTree } from '../rows/gridRowsUtils';
 
 /**
  * Only available in DataGridPro
@@ -26,7 +26,7 @@ export const useGridTreeData = (
 ) => {
   const updateColumnsPreProcessing = React.useCallback(() => {
     if (!props.treeData) {
-      apiRef.current.registerColumnPreProcessing('treeData', null);
+      apiRef.current.UNSTABLE_registerColumnPreProcessing('treeData', null);
     } else {
       const addGroupingColumn: GridColumnsPreProcessing = (columns) => {
         const index = columns[0].type === 'checkboxSelection' ? 1 : 0;
@@ -39,13 +39,13 @@ export const useGridTreeData = (
         return [...columns.slice(0, index), groupingColumn, ...columns.slice(index)];
       };
 
-      apiRef.current.registerColumnPreProcessing('treeData', addGroupingColumn);
+      apiRef.current.UNSTABLE_registerColumnPreProcessing('treeData', addGroupingColumn);
     }
   }, [apiRef, props.treeData, props.groupingColDef]);
 
   const updateRowGrouping = React.useCallback(() => {
     if (!props.treeData) {
-      return apiRef.current.registerRowGroupsBuilder('treeData', null);
+      return apiRef.current.UNSTABLE_registerRowGroupsBuilder('treeData', null);
     }
 
     const groupRows: GridRowGroupingPreProcessing = (params) => {
@@ -60,29 +60,28 @@ export const useGridTreeData = (
         }))
         .sort((a, b) => a.path.length - b.path.length);
 
-      const tree: GridRowConfigTree = new Map();
-      const paths: Record<GridRowId, string[]> = {};
+      const tree: GridRowConfigTree = {};
       const idRowsLookup: GridRowsLookup = { ...params.idRowsLookup };
+      const nodeNameToIdTree: GridNodeNameToIdTree = {};
 
       rows.forEach((row) => {
-        insertLeafInTree({
+        insertRowInTree({
           tree,
           path: row.path,
           id: row.id,
           defaultGroupingExpansionDepth: props.defaultGroupingExpansionDepth,
-          paths,
           idRowsLookup,
+          nodeNameToIdTree,
         });
       });
 
       return {
         tree,
-        paths,
         idRowsLookup,
       };
     };
 
-    return apiRef.current.registerRowGroupsBuilder('treeData', groupRows);
+    return apiRef.current.UNSTABLE_registerRowGroupsBuilder('treeData', groupRows);
   }, [apiRef, props.getTreeDataPath, props.treeData, props.defaultGroupingExpansionDepth]);
 
   useFirstRender(() => {

@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { GridApiRef } from '../../../models/api/gridApiRef';
-import { useGridApiMethod } from '../../root/useGridApiMethod';
-import { useGridSelector } from '../core/useGridSelector';
+import { useGridApiMethod } from '../../utils/useGridApiMethod';
+import { useGridSelector } from '../../utils/useGridSelector';
 import { allGridColumnsSelector, visibleGridColumnsSelector } from '../columns';
-import { gridSortedVisibleRowsAsArrayFlatSelector } from '../filter';
+import { gridSortedVisibleRowEntriesSelector } from '../filter';
 import { gridSelectionStateSelector } from '../selection';
 import { GridCsvExportApi } from '../../../models/api/gridCsvExportApi';
 import { GridExportCsvOptions } from '../../../models/gridExport';
@@ -23,7 +23,7 @@ export const useGridCsvExport = (apiRef: GridApiRef): void => {
   const logger = useGridLogger(apiRef, 'useGridCsvExport');
   const visibleColumns = useGridSelector(apiRef, visibleGridColumnsSelector);
   const columns = useGridSelector(apiRef, allGridColumnsSelector);
-  const visibleSortedRows = useGridSelector(apiRef, gridSortedVisibleRowsAsArrayFlatSelector);
+  const visibleSortedRows = useGridSelector(apiRef, gridSortedVisibleRowEntriesSelector);
   const selection = useGridSelector(apiRef, gridSelectionStateSelector);
 
   const getDataAsCsv = React.useCallback(
@@ -42,7 +42,6 @@ export const useGridCsvExport = (apiRef: GridApiRef): void => {
         exportedColumns = validColumns.filter((column) => !column.disableExport);
       }
 
-      // TODO: Use a selector with only the ids
       let exportedRowIds = visibleSortedRows.map((el) => el.id);
       if (selection.length) {
         exportedRowIds = exportedRowIds.filter((id) => selection.includes(id));
