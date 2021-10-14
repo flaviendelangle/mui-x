@@ -3,7 +3,7 @@ import type {
   GridApiRef,
   GridCellParams,
   GridColumnLookup,
-  GridRowConfigTree,
+  GridRowTreeConfig,
   GridRowModel,
   MuiEvent,
 } from '../../../models';
@@ -116,7 +116,7 @@ export const useGridRowGroupByColumns = (
         return value;
       };
 
-      params.ids.forEach((rowId) => {
+      params.rowIds.forEach((rowId) => {
         const row = params.idRowsLookup[rowId];
 
         groupingFields.forEach((groupingField) => {
@@ -135,11 +135,12 @@ export const useGridRowGroupByColumns = (
         });
       });
 
-      const tree: GridRowConfigTree = {};
+      const tree: GridRowTreeConfig = {};
       const idRowsLookup: GridRowsLookup = { ...params.idRowsLookup };
+      const rowIds = [...params.rowIds];
       const nodeNameToIdTree: GridNodeNameToIdTree = {};
 
-      params.ids.forEach((rowId) => {
+      params.rowIds.forEach((rowId) => {
         const row = params.idRowsLookup[rowId];
         const parentPath = groupingFields.map((groupingField) =>
           getCellKey({
@@ -156,6 +157,7 @@ export const useGridRowGroupByColumns = (
           id: rowId,
           defaultGroupingExpansionDepth: props.defaultGroupingExpansionDepth,
           idRowsLookup,
+          rowIds,
           nodeNameToIdTree,
         });
       });
@@ -163,6 +165,7 @@ export const useGridRowGroupByColumns = (
       return {
         tree,
         idRowsLookup,
+        rowIds,
       };
     };
 
