@@ -7,7 +7,7 @@ import { GridCellValue } from '../../../models/gridCell';
 import { GridColDef } from '../../../models/colDef/gridColDef';
 import { GridFeatureModeConstant } from '../../../models/gridFeatureMode';
 import { GridColumnHeaderParams } from '../../../models/params/gridColumnHeaderParams';
-import { GridRowId, GridRowConfigTreeNode } from '../../../models/gridRows';
+import { GridRowId, GridRowTreeNodeConfig } from '../../../models/gridRows';
 import {
   GridFieldComparatorList,
   GridSortItem,
@@ -27,7 +27,7 @@ import {
   gridSortedRowEntriesSelector,
   gridSortModelSelector,
 } from './gridSortingSelector';
-import { gridRowTreeSelector } from '../rows';
+import { gridRowIdsSelector, gridRowTreeSelector } from '../rows';
 import { useGridStateInit } from '../../utils/useGridStateInit';
 import { useFirstRender } from '../../utils/useFirstRender';
 
@@ -181,13 +181,15 @@ export const useGridSorting = (
     }
 
     const rowTree = gridRowTreeSelector(apiRef.current.state);
+    const rowIds = gridRowIdsSelector(apiRef.current.state);
     const sortModel = gridSortModelSelector(apiRef.current.state);
     const comparatorList = buildComparatorList(sortModel);
     const aggregatedComparator = comparatorListAggregate(comparatorList);
 
     // Group the rows by parent
-    const groupedByParentRows = new Map<GridRowId | null, GridRowConfigTreeNode[]>([[null, []]]);
-    Object.values(rowTree).forEach((node) => {
+    const groupedByParentRows = new Map<GridRowId | null, GridRowTreeNodeConfig[]>([[null, []]]);
+    rowIds.forEach((rowId) => {
+      const node = rowTree[rowId];
       const isExpanded = node.parent == null || rowTree[node.parent].expanded;
 
       if (isExpanded) {
@@ -203,9 +205,13 @@ export const useGridSorting = (
     // Apply the sorting to each list of children
     const sortedGroupedByParentRows = new Map<GridRowId | null, GridRowId[]>();
     groupedByParentRows.forEach((rowList, parent) => {
+      if (rowList.length === 0) {
+        return sortedGroupedByParentRows.set(parent, []);
+      }
+
       const depth = rowList[0].depth;
       if ((depth > 0 && props.disableChildrenSorting) || comparatorList.length === 0) {
-        sortedGroupedByParentRows.set(
+        return sortedGroupedByParentRows.set(
           parent,
           rowList.map((row) => row.id),
         );
@@ -221,7 +227,7 @@ export const useGridSorting = (
         .sort((a, b) => aggregatedComparator(a.params, b.params))
         .map((row) => row.value.id);
 
-      sortedGroupedByParentRows.set(parent, sortedRowList);
+      return sortedGroupedByParentRows.set(parent, sortedRowList);
     });
 
     // Flatten the sorted lists to have children just after their parent

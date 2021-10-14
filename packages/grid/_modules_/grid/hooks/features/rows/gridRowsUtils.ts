@@ -1,6 +1,6 @@
 import type {
-  GridRowConfigTree,
-  GridRowConfigTreeNode,
+  GridRowTreeConfig,
+  GridRowTreeNodeConfig,
   GridRowId,
   GridRowsLookup,
 } from '../../../models';
@@ -10,19 +10,20 @@ export type GridNodeNameToIdTree = {
 };
 
 interface InsertRowInTreeParams {
-  tree: GridRowConfigTree;
+  tree: GridRowTreeConfig;
   path: string[];
   id: GridRowId;
   defaultGroupingExpansionDepth: number;
   idRowsLookup: GridRowsLookup;
+  rowIds: GridRowId[];
   nodeNameToIdTree: GridNodeNameToIdTree;
 }
 
 export const insertRowInTree = (params: InsertRowInTreeParams) => {
-  const { tree, path, id, defaultGroupingExpansionDepth, idRowsLookup, nodeNameToIdTree } = params;
+  const { tree, path, id, defaultGroupingExpansionDepth, idRowsLookup, rowIds, nodeNameToIdTree } = params;
 
   let nodeNameToIdSubTree = nodeNameToIdTree;
-  let parentNode: GridRowConfigTreeNode | null = null;
+  let parentNode: GridRowTreeNodeConfig | null = null;
 
   for (let depth = 0; depth < path.length; depth += 1) {
     const nodeName = path[depth];
@@ -51,17 +52,20 @@ export const insertRowInTree = (params: InsertRowInTreeParams) => {
           expanded,
           children: [],
           parent: parentNode?.id ?? null,
+          label: path[depth],
           depth,
         };
 
         tree[nodeId] = node;
         idRowsLookup[nodeId] = {};
+        rowIds.push(nodeId)
       }
     } else {
       tree[id] = {
         id,
         expanded: defaultGroupingExpansionDepth > depth,
         parent: parentNode?.id ?? null,
+        label: path[depth],
         depth,
       };
     }

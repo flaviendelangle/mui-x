@@ -1,12 +1,13 @@
-import { GridRowConfigTree, GridRowId, GridRowsLookup } from '../../../models/gridRows';
+import { GridRowTreeConfig, GridRowId, GridRowsLookup } from '../../../models/gridRows';
 
 export type RowGroupParams = {
-  ids: GridRowId[];
+  rowIds: GridRowId[];
   idRowsLookup: GridRowsLookup;
 };
 
 export interface GridRowGroupingResult {
-  tree: GridRowConfigTree;
+  tree: GridRowTreeConfig;
+  rowIds: GridRowId[]
   idRowsLookup: GridRowsLookup;
 }
 

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { GridRowConfigTree, GridRowsLookup } from '../../../models/gridRows';
+import { GridRowTreeConfig, GridRowsLookup } from '../../../models/gridRows';
 import { GridApiRef } from '../../../models/api/gridApiRef';
 import { GridComponentProps } from '../../../GridComponentProps';
 import { GridColumnsPreProcessing } from '../../core/columnsPreProcessing';
@@ -53,15 +53,16 @@ export const useGridTreeData = (
         throw new Error('MUI: No getTreeDataPath given.');
       }
 
-      const rows = params.ids
+      const rows = params.rowIds
         .map((rowId) => ({
           id: rowId,
           path: props.getTreeDataPath!(params.idRowsLookup[rowId]),
         }))
         .sort((a, b) => a.path.length - b.path.length);
 
-      const tree: GridRowConfigTree = {};
+      const tree: GridRowTreeConfig = {};
       const idRowsLookup: GridRowsLookup = { ...params.idRowsLookup };
+      const rowIds = [...params.rowIds]
       const nodeNameToIdTree: GridNodeNameToIdTree = {};
 
       rows.forEach((row) => {
@@ -71,6 +72,7 @@ export const useGridTreeData = (
           id: row.id,
           defaultGroupingExpansionDepth: props.defaultGroupingExpansionDepth,
           idRowsLookup,
+          rowIds,
           nodeNameToIdTree,
         });
       });
@@ -78,6 +80,7 @@ export const useGridTreeData = (
       return {
         tree,
         idRowsLookup,
+        rowIds,
       };
     };
 

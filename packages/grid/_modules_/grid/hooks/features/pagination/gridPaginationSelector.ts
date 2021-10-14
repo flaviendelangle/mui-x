@@ -1,7 +1,11 @@
 import { createSelector } from 'reselect';
 import { GridState } from '../../../models/gridState';
-import { gridSortedVisibleRowEntriesSelector } from '../filter/gridFilterSelector';
+import {
+  gridSortedVisibleRowEntriesSelector,
+  gridSortedVisibleTopLevelRowEntriesSelector,
+} from '../filter/gridFilterSelector';
 import { GridPaginationState } from './gridPaginationState';
+import { gridRowTreeSelector } from '../rows/gridRowsSelector';
 
 export const gridPaginationSelector = (state: GridState): GridPaginationState => state.pagination;
 
@@ -17,11 +21,44 @@ export const gridPageSizeSelector = createSelector(
 
 export const gridSortedVisiblePaginatedRowEntriesSelector = createSelector(
   gridPaginationSelector,
+  gridRowTreeSelector,
   gridSortedVisibleRowEntriesSelector,
-  (pagination, visibleSortedRows) => {
-    const firstSelectedRowIndex = pagination.page * pagination.pageSize;
-    const lastSelectedRowIndex = firstSelectedRowIndex + pagination.pageSize;
+  gridSortedVisibleTopLevelRowEntriesSelector,
+  (pagination, rowTree, visibleSortedRowEntries, visibleSortedTopLevelRowEntries) => {
+    const topLevelFirstRowIndex = pagination.pageSize * pagination.page;
+    const topLevelFirstRow = visibleSortedTopLevelRowEntries[topLevelFirstRowIndex];
 
-    return visibleSortedRows.slice(firstSelectedRowIndex, lastSelectedRowIndex);
+    if (!topLevelFirstRow) {
+      return [];
+    }
+
+    const topLevelInCurrentPageCount = visibleSortedTopLevelRowEntries.slice(
+      topLevelFirstRowIndex,
+      topLevelFirstRowIndex + pagination.pageSize,
+    ).length;
+
+    const firstRowIndex = visibleSortedRowEntries.findIndex(
+      (row) => row.id === topLevelFirstRow.id,
+    );
+    let lastRowIndex = firstRowIndex;
+    let topLevelRowAdded = 0;
+
+    while (
+      lastRowIndex < visibleSortedRowEntries.length &&
+      topLevelRowAdded <= topLevelInCurrentPageCount
+    ) {
+      const row = visibleSortedRowEntries[lastRowIndex];
+      const depth = rowTree[row.id].depth;
+
+      if (topLevelRowAdded < topLevelInCurrentPageCount || depth > 0) {
+        lastRowIndex += 1;
+      }
+
+      if (depth === 0) {
+        topLevelRowAdded += 1;
+      }
+    }
+
+    return visibleSortedRowEntries.slice(firstRowIndex, lastRowIndex);
   },
 );
