@@ -17,7 +17,7 @@ import { gridRowGroupingColumnSelector } from './rowGroupByColumnsSelector';
 import { GridComponentProps } from '../../../GridComponentProps';
 import { GridColDef, GridRowId, GridRowsLookup } from '../../../models';
 import { GRID_ROW_GROUP_BY_COLUMNS_GROUP_COL_DEF } from './gridRowGroupByColumnsGroupColDef';
-import {GridNodeNameToIdTree, insertRowInTree} from '../rows/gridRowsUtils';
+import { GridNodeNameToIdTree, insertRowInTree } from '../rows/gridRowsUtils';
 
 const orderGroupingFields = (groupingColumns: GridColumnLookup) => {
   const unOrderedGroupingFields = Object.keys(groupingColumns);

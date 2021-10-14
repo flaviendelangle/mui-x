@@ -41,7 +41,7 @@ const GridRowGroupByColumnsGroupingCell = (props: GridRenderCellParams) => {
   }
 
   return (
-    <Box className={classes.root} sx={{ ml: (node.depth - 1) * 4 }}>
+    <Box className={classes.root} sx={{ ml: node.depth * 4 }}>
       <div className={classes.toggle}>
         {!!node.children?.length && (
           <IconButton
@@ -58,7 +58,7 @@ const GridRowGroupByColumnsGroupingCell = (props: GridRenderCellParams) => {
           </IconButton>
         )}
       </div>
-      <span>{`Test`}</span>
+      <span>{node.label}</span>
     </Box>
   );
 };
