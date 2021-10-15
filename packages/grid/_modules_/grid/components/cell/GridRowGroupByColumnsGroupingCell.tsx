@@ -6,6 +6,7 @@ import Box from '@mui/material/Box';
 import { useGridRootProps } from '../../hooks/utils/useGridRootProps';
 import { useGridApiContext } from '../../hooks/utils/useGridApiContext';
 import { GridRenderCellParams } from '../../models/params/gridCellParams';
+import { gridVisibleDescendantCountLookupSelector, useGridSelector } from '../../hooks';
 
 const useStyles = makeStyles({
   root: {
@@ -25,8 +26,10 @@ const GridRowGroupByColumnsGroupingCell = (props: GridRenderCellParams) => {
 
   const rootProps = useGridRootProps();
   const apiRef = useGridApiContext();
+  const descendantCountLookup = useGridSelector(apiRef, gridVisibleDescendantCountLookupSelector);
   const classes = useStyles();
   const node = apiRef.current.UNSTABLE_getRowNode(id);
+  const descendantCount = descendantCountLookup[id];
 
   const Icon = node?.expanded
     ? rootProps.components.TreeDataCollapseIcon
@@ -43,7 +46,7 @@ const GridRowGroupByColumnsGroupingCell = (props: GridRenderCellParams) => {
   return (
     <Box className={classes.root} sx={{ ml: node.depth * 4 }}>
       <div className={classes.toggle}>
-        {!!node.children?.length && (
+        {descendantCount > 0 && (
           <IconButton
             size="small"
             onClick={() => apiRef.current.UNSTABLE_setRowExpansion(id, !node?.expanded)}
@@ -58,7 +61,10 @@ const GridRowGroupByColumnsGroupingCell = (props: GridRenderCellParams) => {
           </IconButton>
         )}
       </div>
-      <span>{node.label}</span>
+      <span>
+        {node.label}
+        {descendantCount > 0 ? ` (${descendantCount})` : ''}
+      </span>
     </Box>
   );
 };

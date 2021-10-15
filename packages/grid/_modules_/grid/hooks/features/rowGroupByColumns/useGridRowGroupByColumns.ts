@@ -7,7 +7,7 @@ import type {
   MuiEvent,
 } from '../../../models';
 import { GridColumnsPreProcessing } from '../../core/columnsPreProcessing';
-import {GridRowGroupingPreProcessing, GridRowGroupingResult} from '../../core/rowGroupsPerProcessing';
+import { GridRowGroupingPreProcessing } from '../../core/rowGroupsPerProcessing';
 import { useFirstRender } from '../../utils/useFirstRender';
 import { isSpaceKey } from '../../../utils/keyboardUtils';
 import { useGridApiEventHandler } from '../../utils/useGridApiEventHandler';
@@ -16,7 +16,7 @@ import { gridRowGroupingColumnSelector } from './rowGroupByColumnsSelector';
 import { GridComponentProps } from '../../../GridComponentProps';
 import { GridColDef, GridRowId } from '../../../models';
 import { GRID_ROW_GROUP_BY_COLUMNS_GROUP_COL_DEF } from './gridRowGroupByColumnsGroupColDef';
-import { GridNodeNameToIdTree, insertRowInTree } from '../rows/gridRowsUtils';
+import { generateRowTree } from '../rows/gridRowsUtils';
 
 const orderGroupingFields = (groupingColumns: GridColumnLookup) => {
   const unOrderedGroupingFields = Object.keys(groupingColumns);
@@ -134,16 +134,7 @@ export const useGridRowGroupByColumns = (
         });
       });
 
-      const result: GridRowGroupingResult = {
-        tree: {},
-        treeDepth: 1,
-        idRowsLookup: { ...params.idRowsLookup },
-        rowIds: [...params.rowIds],
-      };
-
-      const nodeNameToIdTree: GridNodeNameToIdTree = {};
-
-      params.rowIds.forEach((rowId) => {
+      const rows = params.rowIds.map((rowId) => {
         const row = params.idRowsLookup[rowId];
         const parentPath = groupingFields.map((groupingField) =>
           getCellKey({
@@ -154,16 +145,17 @@ export const useGridRowGroupByColumns = (
           }),
         );
 
-        insertRowInTree({
-          result,
+        return {
           path: [...parentPath, rowId.toString()],
           id: rowId,
-          defaultGroupingExpansionDepth: props.defaultGroupingExpansionDepth,
-          nodeNameToIdTree,
-        });
+        };
       });
 
-      return result
+      return generateRowTree({
+        ...params,
+        rows,
+        defaultGroupingExpansionDepth: props.defaultGroupingExpansionDepth,
+      });
     };
 
     return apiRef.current.UNSTABLE_registerRowGroupsBuilder('rowGrouping', groupRows);
