@@ -3,19 +3,18 @@ import type {
   GridApiRef,
   GridCellParams,
   GridColumnLookup,
-  GridRowTreeConfig,
   GridRowModel,
   MuiEvent,
 } from '../../../models';
 import { GridColumnsPreProcessing } from '../../core/columnsPreProcessing';
-import { GridRowGroupingPreProcessing } from '../../core/rowGroupsPerProcessing';
+import {GridRowGroupingPreProcessing, GridRowGroupingResult} from '../../core/rowGroupsPerProcessing';
 import { useFirstRender } from '../../utils/useFirstRender';
 import { isSpaceKey } from '../../../utils/keyboardUtils';
 import { useGridApiEventHandler } from '../../utils/useGridApiEventHandler';
 import { GridEvents } from '../../../constants/eventsConstants';
 import { gridRowGroupingColumnSelector } from './rowGroupByColumnsSelector';
 import { GridComponentProps } from '../../../GridComponentProps';
-import { GridColDef, GridRowId, GridRowsLookup } from '../../../models';
+import { GridColDef, GridRowId } from '../../../models';
 import { GRID_ROW_GROUP_BY_COLUMNS_GROUP_COL_DEF } from './gridRowGroupByColumnsGroupColDef';
 import { GridNodeNameToIdTree, insertRowInTree } from '../rows/gridRowsUtils';
 
@@ -135,9 +134,13 @@ export const useGridRowGroupByColumns = (
         });
       });
 
-      const tree: GridRowTreeConfig = {};
-      const idRowsLookup: GridRowsLookup = { ...params.idRowsLookup };
-      const rowIds = [...params.rowIds];
+      const result: GridRowGroupingResult = {
+        tree: {},
+        treeDepth: 1,
+        idRowsLookup: { ...params.idRowsLookup },
+        rowIds: [...params.rowIds],
+      };
+
       const nodeNameToIdTree: GridNodeNameToIdTree = {};
 
       params.rowIds.forEach((rowId) => {
@@ -152,21 +155,15 @@ export const useGridRowGroupByColumns = (
         );
 
         insertRowInTree({
-          tree,
+          result,
           path: [...parentPath, rowId.toString()],
           id: rowId,
           defaultGroupingExpansionDepth: props.defaultGroupingExpansionDepth,
-          idRowsLookup,
-          rowIds,
           nodeNameToIdTree,
         });
       });
 
-      return {
-        tree,
-        idRowsLookup,
-        rowIds,
-      };
+      return result
     };
 
     return apiRef.current.UNSTABLE_registerRowGroupsBuilder('rowGrouping', groupRows);
