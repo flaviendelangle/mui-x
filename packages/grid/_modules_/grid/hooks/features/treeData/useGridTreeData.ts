@@ -8,8 +8,8 @@ import { GridEvents } from '../../../constants';
 import { GridCellParams, GridColDef, MuiEvent } from '../../../models';
 import { isSpaceKey } from '../../../utils/keyboardUtils';
 import { useFirstRender } from '../../utils/useFirstRender';
+import { buildRowTree } from '../../../utils/rowTreeUtils';
 import { GridRowGroupingPreProcessing } from '../../core/rowGroupsPerProcessing';
-import { generateRowTree } from '../rows/gridRowsUtils';
 
 /**
  * Only available in DataGridPro
@@ -59,7 +59,7 @@ export const useGridTreeData = (
         }))
         .sort((a, b) => a.path.length - b.path.length);
 
-      return generateRowTree({
+      return buildRowTree({
         rows,
         ...params,
         defaultGroupingExpansionDepth: props.defaultGroupingExpansionDepth,
@@ -97,6 +97,8 @@ export const useGridTreeData = (
       const cellParams = apiRef.current.getCellParams(params.id, params.field);
       if (cellParams.field === '__tree_data_group__' && isSpaceKey(event.key)) {
         event.stopPropagation();
+        event.preventDefault();
+        event.defaultMuiPrevented = true;
         apiRef.current.UNSTABLE_setRowExpansion(
           params.id,
           !apiRef.current.UNSTABLE_getRowNode(params.id)?.expanded,
