@@ -10,13 +10,13 @@ import { GridColumnsPreProcessing } from '../../core/columnsPreProcessing';
 import { GridRowGroupingPreProcessing } from '../../core/rowGroupsPerProcessing';
 import { useFirstRender } from '../../utils/useFirstRender';
 import { isSpaceKey } from '../../../utils/keyboardUtils';
+import { buildRowTree } from '../../../utils/rowTreeUtils';
 import { useGridApiEventHandler } from '../../utils/useGridApiEventHandler';
 import { GridEvents } from '../../../constants/eventsConstants';
 import { gridRowGroupingColumnSelector } from './rowGroupByColumnsSelector';
 import { GridComponentProps } from '../../../GridComponentProps';
 import { GridColDef, GridRowId } from '../../../models';
 import { GRID_ROW_GROUP_BY_COLUMNS_GROUP_COL_DEF } from './gridRowGroupByColumnsGroupColDef';
-import { generateRowTree } from '../rows/gridRowsUtils';
 
 const orderGroupingFields = (groupingColumns: GridColumnLookup) => {
   const unOrderedGroupingFields = Object.keys(groupingColumns);
@@ -151,7 +151,7 @@ export const useGridRowGroupByColumns = (
         };
       });
 
-      return generateRowTree({
+      return buildRowTree({
         ...params,
         rows,
         defaultGroupingExpansionDepth: props.defaultGroupingExpansionDepth,
