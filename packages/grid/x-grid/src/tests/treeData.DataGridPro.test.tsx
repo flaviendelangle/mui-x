@@ -18,7 +18,7 @@ import {
 
 const isJSDOM = /jsdom/.test(window.navigator.userAgent);
 
-const rowsWithoutFiller: GridRowsProp = [
+const rowsWithoutGap: GridRowsProp = [
   { name: 'A', value: 10 },
   { name: 'A.A', value: 4 },
   { name: 'A.B', value: 6 },
@@ -26,10 +26,11 @@ const rowsWithoutFiller: GridRowsProp = [
   { name: 'B.A', value: 12 },
   { name: 'B.B', value: 8 },
   { name: 'B.B.A', value: 8 },
+  { name: 'B.B.A.A', value: 8 },
   { name: 'C', value: 5 },
 ];
 
-const rowsWithFiller: GridRowsProp = [
+const rowsWithGap: GridRowsProp = [
   { name: 'A', value: 10 },
   { name: 'A.B', value: 6 },
   { name: 'A.A', value: 4 },
@@ -39,7 +40,7 @@ const rowsWithFiller: GridRowsProp = [
 
 const baselineProps: DataGridProProps = {
   autoHeight: isJSDOM,
-  rows: rowsWithoutFiller,
+  rows: rowsWithoutGap,
   columns: [
     {
       field: 'name',
@@ -83,6 +84,7 @@ describe('<DataGridPro /> - Tree Data', () => {
         'B.A',
         'B.B',
         'B.B.A',
+        'B.B.A.A',
         'C',
       ]);
       setProps({ treeData: true });
@@ -98,6 +100,7 @@ describe('<DataGridPro /> - Tree Data', () => {
         'B.A',
         'B.B',
         'B.B.A',
+        'B.B.A.A',
         'C',
       ]);
     });
@@ -113,10 +116,20 @@ describe('<DataGridPro /> - Tree Data', () => {
         'B.A',
         'B.B',
         'B.B.A',
+        'B.B.A.A',
         'C',
       ]);
       apiRef.current.updateRows([{ name: 'A.A', _action: 'delete' }]);
-      expect(getColumnValues(0)).to.deep.equal(['A', 'A.B', 'B', 'B.A', 'B.B', 'B.B.A', 'C']);
+      expect(getColumnValues(0)).to.deep.equal([
+        'A',
+        'A.B',
+        'B',
+        'B.A',
+        'B.B',
+        'B.B.A',
+        'B.B.A.A',
+        'C',
+      ]);
       setProps({ treeData: true });
       expect(getColumnHeadersTextContent()).to.deep.equal(['Group', 'name', 'value']);
       expect(getColumnValues(1)).to.deep.equal(['A', 'B', 'C']);
@@ -156,6 +169,20 @@ describe('<DataGridPro /> - Tree Data', () => {
     });
 
     it('should expand all rows up to depth of 2 if defaultGroupingExpansionDepth = 2', () => {
+      render(<Test defaultGroupingExpansionDepth={2} />);
+      expect(getColumnValues(1)).to.deep.equal([
+        'A',
+        'A.A',
+        'A.B',
+        'B',
+        'B.A',
+        'B.B',
+        'B.B.A',
+        'C',
+      ]);
+    });
+
+    it('should expand all rows if defaultGroupingExpansionDepth = -1', () => {
       render(<Test defaultGroupingExpansionDepth={2} />);
       expect(getColumnValues(1)).to.deep.equal([
         'A',
@@ -211,8 +238,8 @@ describe('<DataGridPro /> - Tree Data', () => {
       expect(getColumnValues(1)).to.deep.equal(['A', 'B', 'C']);
     });
 
-    it('should add filler rows if some parents do not exist', () => {
-      render(<Test rows={rowsWithFiller} />);
+    it('should add auto generated rows if some parents do not exist', () => {
+      render(<Test rows={rowsWithGap} />);
       expect(getColumnValues(1)).to.deep.equal(['A', '']);
       expect(getColumnValues(0)).to.deep.equal(['A', 'B']);
       fireEvent.click(getCell(1, 0).querySelector('button'));
@@ -233,34 +260,77 @@ describe('<DataGridPro /> - Tree Data', () => {
   });
 
   describe('filter', () => {
-    it('should filter every depth of the tree if props.disableChildrenFiltering = false', () => {
-      const { setProps } = render(<Test />);
-      fireEvent.click(getCell(0, 0).querySelector('button'));
-      expect(getColumnValues(1)).to.deep.equal(['A', 'A.A', 'A.B', 'B', 'C']);
-      setProps({
-        filterModel: { items: [{ columnField: 'name', value: 'A', operatorValue: 'endsWith' }] },
-      });
-      expect(getColumnValues(1)).to.deep.equal(['A', 'A.A']);
-    });
+    const filterBaselineProps = {
+      autoHeight: isJSDOM,
+      columns: [
+        {
+          field: 'name',
+          width: 200,
+        },
+      ],
+      treeData: true,
+      getTreeDataPath: (row) => row.name.split('.'),
+      getRowId: (row) => row.name,
+    };
 
-    it('should only filter to top level rows if props.disableChildrenFiltering = true', () => {
-      const { setProps } = render(<Test disableChildrenFiltering />);
-      fireEvent.click(getCell(0, 0).querySelector('button'));
-      expect(getColumnValues(1)).to.deep.equal(['A', 'A.A', 'A.B', 'B', 'C']);
-      setProps({
-        filterModel: { items: [{ columnField: 'name', value: 'A', operatorValue: 'endsWith' }] },
-      });
-      expect(getColumnValues(1)).to.deep.equal(['A', 'A.A', 'A.B']);
-    });
+    const TestFilter = (props: Omit<DataGridProProps, 'columns'>) => {
+      apiRef = useGridApiRef();
 
-    it('should not show children when its parent does not match the filters', () => {
-      const { setProps } = render(<Test />);
-      fireEvent.click(getCell(0, 0).querySelector('button'));
-      expect(getColumnValues(1)).to.deep.equal(['A', 'A.A', 'A.B', 'B', 'C']);
-      setProps({
-        filterModel: { items: [{ columnField: 'name', value: 'A.B', operatorValue: 'equals' }] },
-      });
+      return (
+        <div style={{ width: 300, height: 800 }}>
+          <DataGridPro
+            {...filterBaselineProps}
+            defaultGroupingExpansionDepth={-1}
+            apiRef={apiRef}
+            {...props}
+          />
+        </div>
+      );
+    };
+
+    it('should not show a node if none of its children match the filters and it does not match the filters', () => {
+      render(
+        <TestFilter
+          rows={[{ name: 'B' }, { name: 'B.B' }]}
+          filterModel={{ items: [{ columnField: 'name', value: 'A', operatorValue: 'endsWith' }] }}
+        />,
+      );
+
       expect(getColumnValues(1)).to.deep.equal([]);
+    });
+
+    it('should show a node if some of its children match the filters even if it does not match the filters', () => {
+      render(
+        <TestFilter
+          rows={[{ name: 'B' }, { name: 'B.A' }, { name: 'B.B' }]}
+          filterModel={{ items: [{ columnField: 'name', value: 'A', operatorValue: 'endsWith' }] }}
+        />,
+      );
+
+      expect(getColumnValues(1)).to.deep.equal(['B', 'B.A']);
+    });
+
+    it('should show a node if none of its children match the filters but it does match the filters', () => {
+      render(
+        <TestFilter
+          rows={[{ name: 'A' }, { name: 'A.B' }]}
+          filterModel={{ items: [{ columnField: 'name', value: 'A', operatorValue: 'endsWith' }] }}
+        />,
+      );
+
+      expect(getColumnValues(1)).to.deep.equal(['A']);
+    });
+
+    it('should not filter the children if props.disableChildrenFiltering = true', () => {
+      render(
+        <TestFilter
+          rows={[{ name: 'B' }, { name: 'B.A' }, { name: 'B.B' }]}
+          filterModel={{ items: [{ columnField: 'name', value: 'A', operatorValue: 'endsWith' }] }}
+          disableChildrenFiltering
+        />,
+      );
+
+      expect(getColumnValues(1)).to.deep.equal(['B', 'B.A', 'B.B']);
     });
   });
 

@@ -19,7 +19,10 @@ import { gridSortedVisibleRowEntriesSelector } from '../hooks/features/filter/gr
 import { gridDensityRowHeightSelector } from '../hooks/features/density/densitySelector';
 import { gridEditRowsStateSelector } from '../hooks/features/editRows/gridEditRowsSelector';
 import { GridEvents } from '../constants/eventsConstants';
-import { gridSortedVisiblePaginatedRowEntriesSelector } from '../hooks/features/pagination/gridPaginationSelector';
+import {
+  gridPaginationSelector,
+  gridSortedVisiblePaginatedRowEntriesSelector,
+} from '../hooks/features/pagination/gridPaginationSelector';
 import { useGridApiEventHandler } from '../hooks/utils/useGridApiEventHandler';
 import { getDataGridUtilityClass } from '../gridClasses';
 import { GridComponentProps } from '../GridComponentProps';
@@ -31,7 +34,7 @@ const useUtilityClasses = (ownerState: OwnerState) => {
   const { classes } = ownerState;
 
   const slots = {
-    root: ['virtualizedContainer'],
+    root: ['virtualScroller'],
     renderingZone: ['renderingZone'],
     content: ['content'],
   };
@@ -39,14 +42,14 @@ const useUtilityClasses = (ownerState: OwnerState) => {
   return composeClasses(slots, getDataGridUtilityClass, classes);
 };
 
-const VirtualizedContainerRoot = styled('div', {
+const VirtualScrollerRoot = styled('div', {
   name: 'MuiDataGrid',
-  slot: 'VirtualizedContainer',
+  slot: 'VirtualScroller',
 })({
   overflow: 'auto',
 });
 
-const VirtualizedContainerContent = styled('div', {
+const VirtualScrollerContent = styled('div', {
   name: 'MuiDataGrid',
   slot: 'Content',
 })({
@@ -54,7 +57,7 @@ const VirtualizedContainerContent = styled('div', {
   overflow: 'hidden',
 });
 
-const VirtualizedContainerRenderingZone = styled('div', {
+const VirtualScrollerRenderingZone = styled('div', {
   name: 'MuiDataGrid',
   slot: 'RenderingZone',
 })({
@@ -90,13 +93,13 @@ export interface RenderContext {
   lastColumnIndex: number;
 }
 
-interface GridVirtualizedContainerProps extends React.HTMLAttributes<HTMLDivElement> {
+interface GridVirtualScrollerProps extends React.HTMLAttributes<HTMLDivElement> {
   selectionLookup: Record<string, GridRowId>;
   disableVirtualization?: boolean;
 }
 
-const GridVirtualizedContainer = React.forwardRef<HTMLDivElement, GridVirtualizedContainerProps>(
-  function GridVirtualizedContainer(props, ref) {
+const GridVirtualScroller = React.forwardRef<HTMLDivElement, GridVirtualScrollerProps>(
+  function GridVirtualScroller(props, ref) {
     const { className, selectionLookup, disableVirtualization, ...other } = props;
     const apiRef = useGridApiContext();
     const rootProps = useGridRootProps();
@@ -112,6 +115,7 @@ const GridVirtualizedContainer = React.forwardRef<HTMLDivElement, GridVirtualize
     const cellTabIndex = useGridSelector(apiRef, gridTabIndexCellSelector);
     const editRowsState = useGridSelector(apiRef, gridEditRowsStateSelector);
     const scrollBarState = useGridSelector(apiRef, gridScrollBarSizeSelector);
+    const paginationState = useGridSelector(apiRef, gridPaginationSelector);
     const renderingZoneRef = React.useRef<HTMLDivElement>(null);
     const rootRef = React.useRef<HTMLDivElement>(null);
     const handleRef = useForkRef<HTMLDivElement>(ref, rootRef);
@@ -279,6 +283,7 @@ const GridVirtualizedContainer = React.forwardRef<HTMLDivElement, GridVirtualize
 
       const renderedRows = rowsInCurrentPage.slice(firstRowToRender, lastRowToRender);
       const renderedColumns = visibleColumns.slice(firstColumnToRender, lastColumnToRender);
+      const startIndex = paginationState.pageSize * paginationState.page;
 
       const rows: JSX.Element[] = [];
 
@@ -300,7 +305,7 @@ const GridVirtualizedContainer = React.forwardRef<HTMLDivElement, GridVirtualize
             firstColumnToRender={firstColumnToRender}
             lastColumnToRender={lastColumnToRender}
             selected={selectionLookup[row.id] !== undefined}
-            index={renderContext.firstRowIndex! + i}
+            index={startIndex + renderContext.firstRowIndex! + i}
             containerWidth={containerWidth}
             {...rootProps.componentsProps?.row}
           />,
@@ -325,23 +330,20 @@ const GridVirtualizedContainer = React.forwardRef<HTMLDivElement, GridVirtualize
     }
 
     return (
-      <VirtualizedContainerRoot
+      <VirtualScrollerRoot
         ref={handleRef}
         className={clsx(classes.root, className)}
         onScroll={handleScroll}
         {...other}
       >
-        <VirtualizedContainerContent className={classes.content} style={contentSize}>
-          <VirtualizedContainerRenderingZone
-            ref={renderingZoneRef}
-            className={classes.renderingZone}
-          >
+        <VirtualScrollerContent className={classes.content} style={contentSize}>
+          <VirtualScrollerRenderingZone ref={renderingZoneRef} className={classes.renderingZone}>
             {getRows()}
-          </VirtualizedContainerRenderingZone>
-        </VirtualizedContainerContent>
-      </VirtualizedContainerRoot>
+          </VirtualScrollerRenderingZone>
+        </VirtualScrollerContent>
+      </VirtualScrollerRoot>
     );
   },
 );
 
-export { GridVirtualizedContainer };
+export { GridVirtualScroller };
