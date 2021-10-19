@@ -189,9 +189,9 @@ export const useGridRowGroupByColumns = (
       const cellParams = apiRef.current.getCellParams(params.id, params.field);
       if (cellParams.field === '__row_group_by_columns_group' && isSpaceKey(event.key)) {
         event.stopPropagation();
-        apiRef.current.UNSTABLE_setRowExpansion(
+        apiRef.current.unstable_setRowExpansion(
           params.id,
-          !apiRef.current.UNSTABLE_getRowNode(params.id)?.expanded,
+          !apiRef.current.unstable_getRowNode(params.id)?.expanded,
         );
       }
     },

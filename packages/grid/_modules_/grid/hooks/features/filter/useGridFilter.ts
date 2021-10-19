@@ -43,6 +43,7 @@ export const useGridFilter = (
   apiRef: GridApiRef,
   props: Pick<
     GridComponentProps,
+    | 'initialState'
     | 'filterModel'
     | 'onFilterModelChange'
     | 'filterMode'
@@ -60,7 +61,10 @@ export const useGridFilter = (
     return {
       ...state,
       filter: {
-        filterModel: props.filterModel ?? getDefaultGridFilterModel(),
+        filterModel:
+          props.filterModel ??
+          props.initialState?.filter?.filterModel ??
+          getDefaultGridFilterModel(),
         visibleRowsLookup: {},
         visibleRows: [],
         visibleDescendantsCountLookup: {},
@@ -184,11 +188,11 @@ export const useGridFilter = (
       // No filter to apply
       const filteringMethod = buildAggregatedFilterApplier(filterModel);
       if (!filteringMethod) {
-        let visibleDescendantsCountLookup: Record<GridRowId, number> = {};
+        const visibleDescendantsCountLookup: Record<GridRowId, number> = {};
         if (shouldApplyTreeFiltering) {
-          visibleDescendantsCountLookup = Object.fromEntries(
-            rowIds.map((rowId) => [rowId, rowTree[rowId].descendantCount ?? 0]),
-          );
+          rowIds.forEach((rowId) => {
+            visibleDescendantsCountLookup[rowId] = rowTree[rowId].descendantCount ?? 0;
+          });
         }
 
         return {
@@ -208,11 +212,20 @@ export const useGridFilter = (
         // A node is visible if
         // - One of its children is passing the filter
         // - He is passing the filter
-        const filterTreeNode = (node: GridRowTreeNodeConfig): boolean => {
+        const filterTreeNode = (
+          node: GridRowTreeNodeConfig,
+          isParentMatchingFilters: boolean,
+        ): boolean => {
+          const shouldSkipFilters = props.disableChildrenFiltering && node.depth > 0;
+          const isMatchingFilters = shouldSkipFilters ? null : filteringMethod(node.id);
+
           let visibleDescendantCount = 0;
           node.children?.forEach((childId) => {
             const childNode = rowTree[childId];
-            const isNodeVisible = filterTreeNode(childNode);
+            const isNodeVisible = filterTreeNode(
+              childNode,
+              isMatchingFilters ?? isParentMatchingFilters,
+            );
 
             let childrenVisibleNodeCount = visibleDescendantsCountLookup[childId] ?? 0;
             // TODO: For column grouping, we do not want to count the intermediate depth nodes in the visible descendant count
@@ -223,12 +236,25 @@ export const useGridFilter = (
             visibleDescendantCount += childrenVisibleNodeCount;
           });
 
-          const shouldSkipFilters = props.disableChildrenFiltering && node.depth > 0;
-          const isMatchingFilters = shouldSkipFilters || filteringMethod(node.id);
-          const shouldBeVisible = visibleDescendantCount > 0 || isMatchingFilters;
+          let shouldBeVisible: boolean;
+          switch (isMatchingFilters) {
+            case true: {
+              shouldBeVisible = true;
+              break;
+            }
+            case false: {
+              shouldBeVisible = visibleDescendantCount > 0;
+              break;
+            }
+            default: {
+              shouldBeVisible = isParentMatchingFilters;
+              break;
+            }
+          }
+
           visibleRowsLookup[node.id] = shouldBeVisible;
 
-          if (visibleDescendantCount > 0) {
+          if (shouldBeVisible && visibleDescendantCount > 0) {
             visibleDescendantsCountLookup[node.id] = visibleDescendantCount;
           }
 
@@ -237,7 +263,7 @@ export const useGridFilter = (
 
         Object.values(rowTree).forEach((node) => {
           if (node.depth === 0) {
-            filterTreeNode(node);
+            filterTreeNode(node, true);
           }
         });
       } else {

@@ -99,7 +99,7 @@ export const useGridKeyboardNavigation = (
       const isCtrlPressed = event.ctrlKey || event.metaKey || event.shiftKey;
       const paginatedRowRange = props.pagination
         ? statePaginationRange!
-        : { firstRowIndex: 0, lastRowIndex: visibleSortedRows.length };
+        : { firstRowIndex: 0, lastRowIndex: visibleSortedRows.length - 1 };
       const rowCount = paginatedRowRange.lastRowIndex - paginatedRowRange.firstRowIndex + 1;
 
       let nextCellIndexes: GridCellIndexCoordinates;

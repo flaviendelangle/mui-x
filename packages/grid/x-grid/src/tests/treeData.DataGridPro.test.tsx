@@ -12,6 +12,7 @@ import {
   DataGridPro,
   DataGridProProps,
   GridApiRef,
+  GridLinkOperator,
   GridRowsProp,
   useGridApiRef,
 } from '@mui/x-data-grid-pro';
@@ -19,23 +20,23 @@ import {
 const isJSDOM = /jsdom/.test(window.navigator.userAgent);
 
 const rowsWithoutGap: GridRowsProp = [
-  { name: 'A', value: 10 },
-  { name: 'A.A', value: 4 },
-  { name: 'A.B', value: 6 },
-  { name: 'B', value: 20 },
-  { name: 'B.A', value: 12 },
-  { name: 'B.B', value: 8 },
-  { name: 'B.B.A', value: 8 },
-  { name: 'B.B.A.A', value: 8 },
-  { name: 'C', value: 5 },
+  { name: 'A' },
+  { name: 'A.A' },
+  { name: 'A.B' },
+  { name: 'B' },
+  { name: 'B.A' },
+  { name: 'B.B' },
+  { name: 'B.B.A' },
+  { name: 'B.B.A.A' },
+  { name: 'C' },
 ];
 
 const rowsWithGap: GridRowsProp = [
-  { name: 'A', value: 10 },
-  { name: 'A.B', value: 6 },
-  { name: 'A.A', value: 4 },
-  { name: 'B.A', value: 3 },
-  { name: 'B.B', value: 7 },
+  { name: 'A' },
+  { name: 'A.B' },
+  { name: 'A.A' },
+  { name: 'B.A' },
+  { name: 'B.B' },
 ];
 
 const baselineProps: DataGridProProps = {
@@ -45,10 +46,6 @@ const baselineProps: DataGridProProps = {
     {
       field: 'name',
       width: 200,
-    },
-    {
-      field: 'value',
-      type: 'number',
     },
   ],
   treeData: true,
@@ -75,7 +72,7 @@ describe('<DataGridPro /> - Tree Data', () => {
   describe('prop: treeData', () => {
     it('should support tree data toggling', () => {
       const { setProps } = render(<Test treeData={false} />);
-      expect(getColumnHeadersTextContent()).to.deep.equal(['name', 'value']);
+      expect(getColumnHeadersTextContent()).to.deep.equal(['name']);
       expect(getColumnValues(0)).to.deep.equal([
         'A',
         'A.A',
@@ -88,10 +85,10 @@ describe('<DataGridPro /> - Tree Data', () => {
         'C',
       ]);
       setProps({ treeData: true });
-      expect(getColumnHeadersTextContent()).to.deep.equal(['Group', 'name', 'value']);
+      expect(getColumnHeadersTextContent()).to.deep.equal(['Group', 'name']);
       expect(getColumnValues(1)).to.deep.equal(['A', 'B', 'C']);
       setProps({ treeData: false });
-      expect(getColumnHeadersTextContent()).to.deep.equal(['name', 'value']);
+      expect(getColumnHeadersTextContent()).to.deep.equal(['name']);
       expect(getColumnValues(0)).to.deep.equal([
         'A',
         'A.A',
@@ -107,7 +104,7 @@ describe('<DataGridPro /> - Tree Data', () => {
 
     it('should support enabling treeData after apiRef.current.updateRows has modified the rows', async () => {
       const { setProps } = render(<Test treeData={false} />);
-      expect(getColumnHeadersTextContent()).to.deep.equal(['name', 'value']);
+      expect(getColumnHeadersTextContent()).to.deep.equal(['name']);
       expect(getColumnValues(0)).to.deep.equal([
         'A',
         'A.A',
@@ -131,10 +128,33 @@ describe('<DataGridPro /> - Tree Data', () => {
         'C',
       ]);
       setProps({ treeData: true });
-      expect(getColumnHeadersTextContent()).to.deep.equal(['Group', 'name', 'value']);
+      expect(getColumnHeadersTextContent()).to.deep.equal(['Group', 'name']);
       expect(getColumnValues(1)).to.deep.equal(['A', 'B', 'C']);
       fireEvent.click(getCell(0, 0).querySelector('button'));
       expect(getColumnValues(1)).to.deep.equal(['A', 'A.B', 'B', 'C']);
+    });
+
+    it('should support new dataset', () => {
+      const { setProps } = render(<Test />);
+      setProps({
+        rows: [
+          { nameBis: '1' },
+          { nameBis: '1.1' },
+          { nameBis: '1.2' },
+          { nameBis: '2' },
+          { nameBis: '2.1' },
+        ],
+        columns: [
+          {
+            field: 'nameBis',
+            width: 200,
+          },
+        ],
+        getTreeDataPath: (row) => row.nameBis.split('.'),
+        getRowId: (row) => row.nameBis,
+      });
+      expect(getColumnHeadersTextContent()).to.deep.equal(['Group', 'nameBis']);
+      expect(getColumnValues(1)).to.deep.equal(['1', '2']);
     });
   });
 
@@ -207,15 +227,35 @@ describe('<DataGridPro /> - Tree Data', () => {
   describe('prop: groupingColDef', () => {
     it('should set the custom headerName', () => {
       render(<Test groupingColDef={{ headerName: 'Custom header name' }} />);
-      expect(getColumnHeadersTextContent()).to.deep.equal(['Custom header name', 'name', 'value']);
+      expect(getColumnHeadersTextContent()).to.deep.equal(['Custom header name', 'name']);
     });
   });
 
-  describe('row grouping', () => {
+  describe('row grouping column', () => {
     it('should add a grouping column', () => {
       render(<Test />);
       const columnsHeader = getColumnHeadersTextContent();
-      expect(columnsHeader).to.deep.equal(['Group', 'name', 'value']);
+      expect(columnsHeader).to.deep.equal(['Group', 'name']);
+    });
+
+    it('should render a toggling icon only when a row has children', () => {
+      render(
+        <Test
+          rows={[{ name: 'A' }, { name: 'A.C' }, { name: 'B' }, { name: 'B.A' }]}
+          filterModel={{
+            linkOperator: GridLinkOperator.Or,
+            items: [
+              { columnField: 'name', operatorValue: 'endsWith', value: 'A', id: 0 },
+              { columnField: 'name', operatorValue: 'endsWith', value: 'B', id: 1 },
+            ],
+          }}
+        />,
+      );
+      expect(getColumnValues(1)).to.deep.equal(['A', 'B']);
+      // No children after filtering
+      expect(getCell(0, 0).querySelectorAll('button')).to.have.length(0);
+      // Some children after filtering
+      expect(getCell(1, 0).querySelectorAll('button')).to.have.length(1);
     });
 
     it('should toggle expansion when clicking on grouping column icon', () => {
@@ -254,6 +294,23 @@ describe('<DataGridPro /> - Tree Data', () => {
       expect(getColumnValues(1)).to.deep.equal(['A', 'A.A', 'A.B', 'B']);
       fireEvent.click(screen.getByRole('button', { name: /next page/i }));
       expect(getColumnValues(1)).to.deep.equal(['C']);
+    });
+
+    it('should keep the row expansion when switching page', () => {
+      render(<Test pagination pageSize={1} rowsPerPageOptions={[1]} />);
+      expect(getColumnValues(1)).to.deep.equal(['A']);
+      fireEvent.click(getCell(0, 0).querySelector('button'));
+      expect(getColumnValues(1)).to.deep.equal(['A', 'A.A', 'A.B']);
+      fireEvent.click(screen.getByRole('button', { name: /next page/i }));
+      expect(getColumnValues(1)).to.deep.equal(['B']);
+      fireEvent.click(getCell(3, 0).querySelector('button'));
+      expect(getColumnValues(1)).to.deep.equal(['B', 'B.A', 'B.B']);
+      fireEvent.click(screen.getByRole('button', { name: /previous page/i }));
+      expect(getColumnValues(1)).to.deep.equal(['A', 'A.A', 'A.B']);
+      fireEvent.click(getCell(0, 0).querySelector('button'));
+      expect(getColumnValues(1)).to.deep.equal(['A']);
+      fireEvent.click(screen.getByRole('button', { name: /next page/i }));
+      expect(getColumnValues(1)).to.deep.equal(['B', 'B.A', 'B.B']);
     });
   });
 
@@ -323,8 +380,9 @@ describe('<DataGridPro /> - Tree Data', () => {
       render(
         <TestFilter
           rows={[{ name: 'B' }, { name: 'B.A' }, { name: 'B.B' }]}
-          filterModel={{ items: [{ columnField: 'name', value: 'A', operatorValue: 'endsWith' }] }}
+          filterModel={{ items: [{ columnField: 'name', value: 'B', operatorValue: 'endsWith' }] }}
           disableChildrenFiltering
+          defaultGroupingExpansionDepth={-1}
         />,
       );
 

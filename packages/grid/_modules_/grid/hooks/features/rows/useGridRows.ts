@@ -39,7 +39,16 @@ export type GridRowsInternalCacheState = Pick<GridRowsState, 'idRowsLookup' | 'r
    */
   propGetRowId?: GridRowIdGetter;
 
-  inputRows: GridRowsProp;
+  /**
+   * The rows as they were the last time all the rows have been updated at once
+   * It is used to avoid processing several time the same set of rows
+   */
+  inputRowsBeforeUpdates: GridRowsProp;
+
+  /**
+   * The rows as they were the last time the tree structure has been generated
+   */
+  inputRowsAfterUpdates: GridRowsProp;
 };
 
 export interface GridRowsInternalCache {
@@ -68,7 +77,8 @@ export function convertGridRowsPropToState(
     rowIds: [],
     propRowCount,
     propGetRowId,
-    inputRows,
+    inputRowsBeforeUpdates: inputRows,
+    inputRowsAfterUpdates: inputRows,
   };
 
   inputRows.forEach((rowData) => {
@@ -108,7 +118,8 @@ const INITIAL_GRID_ROWS_INTERNAL_CACHE: GridRowsInternalCache = {
     propRowCount: undefined,
     propGetRowId: undefined,
     rowIds: [],
-    inputRows: [],
+    inputRowsBeforeUpdates: [],
+    inputRowsAfterUpdates: [],
   },
   timeout: null,
   lastUpdateMs: 0,
@@ -255,7 +266,7 @@ export const useGridRows = (
         ...rowsCache.current.state,
         idRowsLookup,
         rowIds,
-        inputRows: rowIds.map((rowId) => idRowsLookup[rowId]),
+        inputRowsAfterUpdates: rowIds.map((rowId) => idRowsLookup[rowId]),
       };
 
       throttledRowsChange(state, true);
@@ -280,10 +291,10 @@ export const useGridRows = (
     [apiRef],
   );
 
-  const setRowExpansion = React.useCallback<GridRowApi['UNSTABLE_setRowExpansion']>(
+  const setRowExpansion = React.useCallback<GridRowApi['unstable_setRowExpansion']>(
     (id, isExpanded) => {
       setGridState((state) => {
-        const node = apiRef.current.UNSTABLE_getRowNode(id);
+        const node = apiRef.current.unstable_getRowNode(id);
         if (!node) {
           throw new Error(`MUI: No row with id #${id} found`);
         }
@@ -302,7 +313,7 @@ export const useGridRows = (
     [apiRef, setGridState, forceUpdate],
   );
 
-  const getRowNode = React.useCallback<GridRowApi['UNSTABLE_getRowNode']>(
+  const getRowNode = React.useCallback<GridRowApi['unstable_getRowNode']>(
     (id) => gridRowTreeSelector(apiRef.current.state)[id] ?? null,
     [apiRef],
   );
@@ -325,6 +336,11 @@ export const useGridRows = (
       return;
     }
 
+    // The new rows have already been applied (most likely in the `GridEvents.rowGroupsPreProcessingChange` listener)
+    if (rowsCache.current.state.inputRowsBeforeUpdates === props.rows) {
+      return;
+    }
+
     logger.debug(`Updating all rows, new length ${props.rows.length}`);
     throttledRowsChange(
       convertGridRowsPropToState(props.rows, props.rowCount, props.getRowId),
@@ -334,11 +350,12 @@ export const useGridRows = (
 
   const handleGroupRows = React.useCallback(() => {
     logger.info(`Row grouping pre-processing have changed, regenerating the row tree`);
-    throttledRowsChange(
-      convertGridRowsPropToState(rowsCache.current.state.inputRows, props.rowCount, props.getRowId),
-      false,
-    );
-  }, [logger, throttledRowsChange, props.rowCount, props.getRowId]);
+    const rows =
+      rowsCache.current.state.inputRowsBeforeUpdates === props.rows
+        ? rowsCache.current.state.inputRowsAfterUpdates
+        : props.rows;
+    throttledRowsChange(convertGridRowsPropToState(rows, props.rowCount, props.getRowId), false);
+  }, [logger, throttledRowsChange, props.rowCount, props.getRowId, props.rows]);
 
   useGridApiEventHandler(apiRef, GridEvents.rowGroupsPreProcessingChange, handleGroupRows);
 
@@ -351,8 +368,8 @@ export const useGridRows = (
     getAllRowIds,
     setRows,
     updateRows,
-    UNSTABLE_setRowExpansion: setRowExpansion,
-    UNSTABLE_getRowNode: getRowNode,
+    unstable_setRowExpansion: setRowExpansion,
+    unstable_getRowNode: getRowNode,
   };
 
   useGridApiMethod(apiRef, rowApi, 'GridRowApi');

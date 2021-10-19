@@ -112,7 +112,8 @@ DataGridRaw.propTypes = {
    */
   componentsProps: PropTypes.object,
   /**
-   * If defined, the row children will be automatically expanded up to this depth
+   * If above 0, the row children will be expanded up to this depth
+   * If equal to -1, all the row children will be expanded
    * @default 0
    */
   defaultGroupingExpansionDepth: PropTypes.number,
@@ -247,6 +248,12 @@ DataGridRaw.propTypes = {
    * @default false
    */
   hideFooterSelectedRowCount: PropTypes.bool,
+  /**
+   * The initial state of the DataGrid.
+   * The data in it will be set in the state on initialization but will not be controlled.
+   * If one of the data in `initialState` is also being controlled, then the control state wins.
+   */
+  initialState: PropTypes.object,
   /**
    * Callback fired when a cell is rendered, returns true if the cell is editable.
    * @param {GridCellParams} params With all properties from [[GridCellParams]].

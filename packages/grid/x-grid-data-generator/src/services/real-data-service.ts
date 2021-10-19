@@ -1,8 +1,8 @@
 import { GridRowData } from '@mui/x-data-grid-pro';
 import asyncWorker from '../asyncWorker';
-import { GridColDefGenerator } from './gridColDefGenerator';
+import { GridColDefGenerator, GridDataGeneratorContext } from './gridColDefGenerator';
 
-export interface GridDemoData {
+export interface GeneratedDemoData {
   rows: GridRowData[];
   columns: GridColDefGenerator[];
 }
@@ -10,10 +10,11 @@ export interface GridDemoData {
 export function getRealData(
   rowLength: number,
   columns: GridColDefGenerator[],
-): Promise<GridDemoData> {
-  return new Promise<GridDemoData>((resolve) => {
+): Promise<GeneratedDemoData> {
+  return new Promise<GeneratedDemoData>((resolve) => {
     const tasks = { current: rowLength };
-    const rows: GridDemoData['rows'] = [];
+    const rows: GeneratedDemoData['rows'] = [];
+    const indexedValues: { [field: string]: { [value: string]: number } } = {};
 
     function work() {
       const row: any = {};
@@ -21,7 +22,18 @@ export function getRealData(
       for (let j = 0; j < columns.length; j += 1) {
         const column = columns[j];
         if (column.generateData) {
-          row[column.field] = column.generateData(row);
+          const context: GridDataGeneratorContext = {};
+          if (column.dataGeneratorUniquenessEnabled) {
+            let fieldValues = indexedValues[column.field];
+            if (!fieldValues) {
+              fieldValues = {};
+              indexedValues[column.field] = fieldValues;
+            }
+
+            context.values = fieldValues;
+          }
+
+          row[column.field] = column.generateData(row, context);
         }
       }
 

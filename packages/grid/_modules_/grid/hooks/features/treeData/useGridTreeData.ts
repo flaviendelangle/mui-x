@@ -98,10 +98,15 @@ export const useGridTreeData = (
       if (cellParams.field === '__tree_data_group__' && isSpaceKey(event.key)) {
         event.stopPropagation();
         event.preventDefault();
-        event.defaultMuiPrevented = true;
-        apiRef.current.UNSTABLE_setRowExpansion(
+
+        const node = apiRef.current.unstable_getRowNode(params.id);
+        if (!node || node.descendantCount === 0) {
+          return;
+        }
+
+        apiRef.current.unstable_setRowExpansion(
           params.id,
-          !apiRef.current.UNSTABLE_getRowNode(params.id)?.expanded,
+          !apiRef.current.unstable_getRowNode(params.id)?.expanded,
         );
       }
     },
