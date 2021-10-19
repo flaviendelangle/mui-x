@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { DataGridPro, DataGridProProps } from '@mui/x-data-grid-pro';
 import { Meta } from '@storybook/react';
-import { DemoDataOptions, DemoDataReturnType, useDemoData } from '@mui/x-data-grid-generator';
+import { UseDemoDataOptions, DemoDataReturnType, useDemoData } from '@mui/x-data-grid-generator';
 
 export default {
   title: 'X-Grid Tests/Row Grouped By Columns',
@@ -11,14 +11,14 @@ export default {
   },
 } as Meta;
 
-interface DemoDataGroupedByColumnsOptions extends DemoDataOptions {
+interface UseDemoDataGroupedByColumnsOptions extends UseDemoDataOptions {
   groupedColumns: string[];
 }
 
 const useGroupedByColumnsDemoData = ({
   groupedColumns,
   ...options
-}: DemoDataGroupedByColumnsOptions): DemoDataReturnType => {
+}: UseDemoDataGroupedByColumnsOptions): DemoDataReturnType => {
   const response = useDemoData(options);
 
   const columns = React.useMemo(
