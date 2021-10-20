@@ -15,18 +15,14 @@ import {
   gridFocusCellSelector,
   gridTabIndexCellSelector,
 } from '../hooks/features/focus/gridFocusStateSelector';
-import { gridSortedVisibleRowEntriesSelector } from '../hooks/features/filter/gridFilterSelector';
 import { gridDensityRowHeightSelector } from '../hooks/features/density/densitySelector';
 import { gridEditRowsStateSelector } from '../hooks/features/editRows/gridEditRowsSelector';
 import { GridEvents } from '../constants/eventsConstants';
-import {
-  gridPaginationRowRangeSelector,
-  gridSortedVisiblePaginatedRowEntriesSelector,
-} from '../hooks/features/pagination/gridPaginationSelector';
 import { useGridApiEventHandler } from '../hooks/utils/useGridApiEventHandler';
 import { getDataGridUtilityClass } from '../gridClasses';
 import { GridComponentProps } from '../GridComponentProps';
 import { GridRowId } from '../models/gridRows';
+import { useRowsInCurrentPage } from '../hooks/utils/useRowsInCurrentPage';
 
 type OwnerState = { classes: GridComponentProps['classes'] };
 
@@ -35,8 +31,8 @@ const useUtilityClasses = (ownerState: OwnerState) => {
 
   const slots = {
     root: ['virtualScroller'],
-    renderingZone: ['renderingZone'],
-    content: ['content'],
+    content: ['virtualScrollerContent'],
+    renderZone: ['virtualScrollerRenderZone'],
   };
 
   return composeClasses(slots, getDataGridUtilityClass, classes);
@@ -47,6 +43,9 @@ const VirtualScrollerRoot = styled('div', {
   slot: 'VirtualScroller',
 })({
   overflow: 'auto',
+  '@media print': {
+    overflow: 'hidden',
+  },
 });
 
 const VirtualScrollerContent = styled('div', {
@@ -57,7 +56,7 @@ const VirtualScrollerContent = styled('div', {
   overflow: 'hidden',
 });
 
-const VirtualScrollerRenderingZone = styled('div', {
+const VirtualScrollerRenderZone = styled('div', {
   name: 'MuiDataGrid',
   slot: 'RenderingZone',
 })({
@@ -105,18 +104,13 @@ const GridVirtualScroller = React.forwardRef<HTMLDivElement, GridVirtualScroller
     const rootProps = useGridRootProps();
     const visibleColumns = useGridSelector(apiRef, visibleGridColumnsSelector);
     const columnsMeta = useGridSelector(apiRef, gridColumnsMetaSelector);
-    const visibleSortedRowEntries = useGridSelector(apiRef, gridSortedVisibleRowEntriesSelector);
-    const paginationRange = useGridSelector(apiRef, gridPaginationRowRangeSelector);
-    const paginatedRowEntries = useGridSelector(
-      apiRef,
-      gridSortedVisiblePaginatedRowEntriesSelector,
-    );
     const rowHeight = useGridSelector(apiRef, gridDensityRowHeightSelector);
     const cellFocus = useGridSelector(apiRef, gridFocusCellSelector);
     const cellTabIndex = useGridSelector(apiRef, gridTabIndexCellSelector);
     const editRowsState = useGridSelector(apiRef, gridEditRowsStateSelector);
     const scrollBarState = useGridSelector(apiRef, gridScrollBarSizeSelector);
-    const renderingZoneRef = React.useRef<HTMLDivElement>(null);
+    const rowsInCurrentPage = useRowsInCurrentPage(apiRef, rootProps);
+    const renderZoneRef = React.useRef<HTMLDivElement>(null);
     const rootRef = React.useRef<HTMLDivElement>(null);
     const handleRef = useForkRef<HTMLDivElement>(ref, rootRef);
     const [renderContext, setRenderContext] = React.useState<RenderContext | null>(null);
@@ -125,25 +119,13 @@ const GridVirtualScroller = React.forwardRef<HTMLDivElement, GridVirtualScroller
     const [containerWidth, setContainerWidth] = React.useState<number | null>(null);
     const ownerState = { classes: rootProps.classes };
     const classes = useUtilityClasses(ownerState);
-
-    const rowsInCurrentPage = React.useMemo(() => {
-      if (rootProps.pagination && rootProps.paginationMode === 'client') {
-        return paginatedRowEntries;
-      }
-
-      return visibleSortedRowEntries;
-    }, [
-      rootProps.pagination,
-      rootProps.paginationMode,
-      visibleSortedRowEntries,
-      paginatedRowEntries,
-    ]);
+    const prevTotalWidth = React.useRef(columnsMeta.totalWidth);
 
     const computeRenderContext = React.useCallback(() => {
       if (disableVirtualization) {
         return {
           firstRowIndex: 0,
-          lastRowIndex: rowsInCurrentPage.length,
+          lastRowIndex: rowsInCurrentPage.rows.length,
           firstColumnIndex: 0,
           lastColumnIndex: visibleColumns.length,
         };
@@ -152,7 +134,7 @@ const GridVirtualScroller = React.forwardRef<HTMLDivElement, GridVirtualScroller
       const { top, left } = scrollPosition.current!;
 
       const numberOfRowsToRender = rootProps.autoHeight
-        ? rowsInCurrentPage.length
+        ? rowsInCurrentPage.rows.length
         : Math.floor(rootRef.current!.clientHeight / rowHeight);
 
       const firstRowIndex = Math.floor(top / rowHeight);
@@ -174,13 +156,13 @@ const GridVirtualScroller = React.forwardRef<HTMLDivElement, GridVirtualScroller
       rootProps.autoHeight,
       disableVirtualization,
       rowHeight,
-      rowsInCurrentPage.length,
+      rowsInCurrentPage.rows.length,
       visibleColumns.length,
     ]);
 
     React.useEffect(() => {
       if (disableVirtualization) {
-        renderingZoneRef.current!.style.transform = `translate3d(0px, 0px, 0px)`;
+        renderZoneRef.current!.style.transform = `translate3d(0px, 0px, 0px)`;
       } else {
         // TODO a scroll reset should not be necessary
         rootRef.current!.scrollLeft = 0;
@@ -237,7 +219,8 @@ const GridVirtualScroller = React.forwardRef<HTMLDivElement, GridVirtualScroller
 
       const shouldSetState =
         rowsScrolledSincePreviousRender >= rootProps.rowThreshold ||
-        columnsScrolledSincePreviousRender >= rootProps.columnThreshold;
+        columnsScrolledSincePreviousRender >= rootProps.columnThreshold ||
+        prevTotalWidth.current !== columnsMeta.totalWidth;
 
       // TODO rename event to a wider name, it's not only fired for row scrolling
       // TODO create a interface to type correctly the params
@@ -250,6 +233,7 @@ const GridVirtualScroller = React.forwardRef<HTMLDivElement, GridVirtualScroller
       if (shouldSetState) {
         setRenderContext(nextRenderContext);
         prevRenderContext.current = nextRenderContext;
+        prevTotalWidth.current = columnsMeta.totalWidth;
 
         const top = Math.max(nextRenderContext.firstRowIndex - rootProps.rowBuffer, 0) * rowHeight;
         const firstColumnToRender = Math.max(
@@ -257,12 +241,12 @@ const GridVirtualScroller = React.forwardRef<HTMLDivElement, GridVirtualScroller
           0,
         );
         const left = columnsMeta.positions[firstColumnToRender];
-        renderingZoneRef.current!.style.transform = `translate3d(${left}px, ${top}px, 0px)`;
+        renderZoneRef.current!.style.transform = `translate3d(${left}px, ${top}px, 0px)`;
       }
     };
 
     const getRows = () => {
-      if (!renderContext || containerWidth == null) {
+      if (!rowsInCurrentPage.range || !renderContext || containerWidth == null) {
         return null;
       }
 
@@ -272,7 +256,7 @@ const GridVirtualScroller = React.forwardRef<HTMLDivElement, GridVirtualScroller
       const firstRowToRender = Math.max(renderContext.firstRowIndex - rowBuffer, 0);
       const lastRowToRender = Math.min(
         renderContext.lastRowIndex! + rowBuffer,
-        rowsInCurrentPage.length,
+        rowsInCurrentPage.rows.length,
       );
 
       const firstColumnToRender = Math.max(renderContext.firstColumnIndex - columnBuffer, 0);
@@ -281,20 +265,19 @@ const GridVirtualScroller = React.forwardRef<HTMLDivElement, GridVirtualScroller
         visibleColumns.length,
       );
 
-      const renderedRows = rowsInCurrentPage.slice(firstRowToRender, lastRowToRender);
+      const renderedRows = rowsInCurrentPage.rows.slice(firstRowToRender, lastRowToRender);
       const renderedColumns = visibleColumns.slice(firstColumnToRender, lastColumnToRender);
-      const startIndex = paginationRange ? paginationRange.firstRowIndex : 0;
 
       const rows: JSX.Element[] = [];
 
       for (let i = 0; i < renderedRows.length; i += 1) {
-        const row = renderedRows[i];
+        const { model, id } = renderedRows[i];
 
         rows.push(
           <rootProps.components.Row
             key={i}
-            row={row.model}
-            rowId={row.id}
+            row={model}
+            rowId={id}
             rowHeight={rowHeight}
             cellFocus={cellFocus} // TODO move to inside the row
             cellTabIndex={cellTabIndex} // TODO move to inside the row
@@ -304,8 +287,8 @@ const GridVirtualScroller = React.forwardRef<HTMLDivElement, GridVirtualScroller
             visibleColumns={visibleColumns}
             firstColumnToRender={firstColumnToRender}
             lastColumnToRender={lastColumnToRender}
-            selected={selectionLookup[row.id] !== undefined}
-            index={startIndex + renderContext.firstRowIndex! + i}
+            selected={selectionLookup[id] !== undefined}
+            index={rowsInCurrentPage.range.firstRowIndex + renderContext.firstRowIndex! + i}
             containerWidth={containerWidth}
             {...rootProps.componentsProps?.row}
           />,
@@ -322,10 +305,10 @@ const GridVirtualScroller = React.forwardRef<HTMLDivElement, GridVirtualScroller
       // In cases where the columns exceed the available width,
       // the horizontal scrollbar should be shown even when there're no rows.
       // Keeping 1px as minimum height ensures that the scrollbar will visible if necessary.
-      height: Math.max(rowsInCurrentPage.length * rowHeight, 1),
+      height: Math.max(rowsInCurrentPage.rows.length * rowHeight, 1),
     };
 
-    if (rootProps.autoHeight && rowsInCurrentPage.length === 0) {
+    if (rootProps.autoHeight && rowsInCurrentPage.rows.length === 0) {
       contentSize.height = 2 * rowHeight; // Give room to show the overlay when there no rows.
     }
 
@@ -337,9 +320,9 @@ const GridVirtualScroller = React.forwardRef<HTMLDivElement, GridVirtualScroller
         {...other}
       >
         <VirtualScrollerContent className={classes.content} style={contentSize}>
-          <VirtualScrollerRenderingZone ref={renderingZoneRef} className={classes.renderingZone}>
+          <VirtualScrollerRenderZone ref={renderZoneRef} className={classes.renderZone}>
             {getRows()}
-          </VirtualScrollerRenderingZone>
+          </VirtualScrollerRenderZone>
         </VirtualScrollerContent>
       </VirtualScrollerRoot>
     );
