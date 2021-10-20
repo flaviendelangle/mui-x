@@ -378,19 +378,26 @@ export const useGridSelection = (
   }, [apiRef, isRowSelectable, isStateControlled]);
 
   const updateColumnsPreProcessing = React.useCallback(() => {
-    const addCheckboxColumn: GridColumnsPreProcessing = (columns) => {
-      if (!props.checkboxSelection) {
-        return columns;
-      }
-
-      const groupingColumn: GridColDef = {
+    const addCheckboxColumn: GridColumnsPreProcessing = (columnsState) => {
+      const selectionColumn: GridColDef = {
         ...GRID_CHECKBOX_SELECTION_COL_DEF,
         cellClassName: classes.cellCheckbox,
         headerClassName: classes.columnHeaderCheckbox,
         headerName: apiRef.current.getLocaleText('checkboxSelectionHeaderName'),
       };
 
-      return [groupingColumn, ...columns];
+      const shouldHaveSelectionColumn = props.checkboxSelection;
+      const haveSelectionColumn = columnsState.lookup[selectionColumn.field] != null;
+
+      if (shouldHaveSelectionColumn && !haveSelectionColumn) {
+        columnsState.lookup[selectionColumn.field] = selectionColumn;
+        columnsState.all = [selectionColumn.field, ...columnsState.all];
+      } else if (!shouldHaveSelectionColumn && haveSelectionColumn) {
+        delete columnsState.lookup[selectionColumn.field];
+        columnsState.all = columnsState.all.filter((field) => field !== selectionColumn.field);
+      }
+
+      return columnsState;
     };
 
     apiRef.current.UNSTABLE_registerColumnPreProcessing('selection', addCheckboxColumn);

@@ -1,6 +1,6 @@
-import { GridColumns } from '../../../models/colDef/gridColDef';
+import { GridRawColumnsState } from '../../../models/colDef/gridColDef';
 
-export type GridColumnsPreProcessing = (columns: GridColumns) => GridColumns;
+export type GridColumnsPreProcessing = (columns: GridRawColumnsState) => GridRawColumnsState;
 
 export interface GridColumnsPreProcessingApi {
   /**
@@ -15,9 +15,9 @@ export interface GridColumnsPreProcessingApi {
   ) => void;
   /**
    * Apply all the columns pre-processing
-   * @param {GridColumns} columns. Columns to pre-process
+   * @param {GridRawColumnsState} columns. Columns to pre-process
    * @returns {GridColumns} The pre-processed columns
    * @ignore - do not document
    */
-  UNSTABLE_applyAllColumnPreProcessing: (columns: GridColumns) => GridColumns;
+  UNSTABLE_applyAllColumnPreProcessing: (columnState: GridRawColumnsState) => GridRawColumnsState;
 }

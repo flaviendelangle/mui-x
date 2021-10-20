@@ -20,6 +20,7 @@ export type DataGridProps = Omit<
   | 'onRowsScrollEnd'
   | 'scrollEndThreshold'
   | 'treeData'
+  | 'rowGroupByColumnPanel'
   | 'signature'
 > & {
   pagination?: true;

@@ -17,60 +17,45 @@ import { gridRowGroupingColumnSelector } from './rowGroupByColumnsSelector';
 import { GridComponentProps } from '../../../GridComponentProps';
 import { GridColDef, GridRowId } from '../../../models';
 import { GRID_ROW_GROUP_BY_COLUMNS_GROUP_COL_DEF } from './gridRowGroupByColumnsGroupColDef';
+import { orderGroupingFields } from './rowGroupByColumnsUtils';
 
-const orderGroupingFields = (groupingColumns: GridColumnLookup) => {
-  const unOrderedGroupingFields = Object.keys(groupingColumns);
-  const shouldApplyExplicitGroupOrder = unOrderedGroupingFields.some(
-    (field) => groupingColumns[field].groupRowIndex != null,
-  );
-
-  if (!shouldApplyExplicitGroupOrder) {
-    return unOrderedGroupingFields;
-  }
-
-  const fieldInitialIndex = Object.fromEntries(
-    unOrderedGroupingFields.map((field, fieldIndex) => [field, fieldIndex]),
-  );
-
-  return unOrderedGroupingFields.sort((a, b) => {
-    const colA = groupingColumns[a];
-    const colB = groupingColumns[b];
-
-    if (colA.groupRowIndex == null && colB.groupRowIndex != null) {
-      return -1;
-    }
-
-    if (colA.groupRowIndex != null && colB.groupRowIndex == null) {
-      return 1;
-    }
-
-    if (colA.groupRowIndex != null && colB.groupRowIndex != null) {
-      return colA.groupRowIndex - colB.groupRowIndex;
-    }
-
-    return fieldInitialIndex[a] - fieldInitialIndex[b];
-  });
-};
-
+/**
+ * Only available in DataGridPro
+ * TODO: Add requirements
+ */
 export const useGridRowGroupByColumns = (
   apiRef: GridApiRef,
   props: Pick<GridComponentProps, 'defaultGroupingExpansionDepth' | 'groupingColDef'>,
 ) => {
-  const updateColumnsPreProcessing = React.useCallback(() => {
-    const addGroupingColumn: GridColumnsPreProcessing = (columns) => {
-      const hasGroupingColumns = columns.some((col) => col.groupRows);
-      if (!hasGroupingColumns) {
-        return columns;
-      }
+  const groupingFieldsOnLastRowPreProcessing = React.useRef<string[]>([]);
 
-      const index = columns[0].type === 'checkboxSelection' ? 1 : 0;
+  const updateColumnsPreProcessing = React.useCallback(() => {
+    const addGroupingColumn: GridColumnsPreProcessing = (columnsState) => {
       const groupingColumn: GridColDef = {
         ...GRID_ROW_GROUP_BY_COLUMNS_GROUP_COL_DEF,
         headerName: apiRef.current.getLocaleText('treeDataGroupingHeaderName'),
         ...props.groupingColDef,
       };
 
-      return [...columns.slice(0, index), groupingColumn, ...columns.slice(index)];
+      const shouldHaveGroupingColumn = columnsState.all.some(
+        (col) => columnsState.lookup[col].groupRows,
+      );
+      const haveGroupingColumn = columnsState.lookup[groupingColumn.field] != null;
+
+      if (shouldHaveGroupingColumn && !haveGroupingColumn) {
+        columnsState.lookup[groupingColumn.field] = groupingColumn;
+        const index = columnsState.lookup[columnsState.all[0]].type === 'checkboxSelection' ? 1 : 0;
+        columnsState.all = [
+          ...columnsState.all.slice(0, index),
+          groupingColumn.field,
+          ...columnsState.all.slice(index),
+        ];
+      } else if (!shouldHaveGroupingColumn && haveGroupingColumn) {
+        delete columnsState.lookup[groupingColumn.field];
+        columnsState.all = columnsState.all.filter((field) => field !== groupingColumn.field);
+      }
+
+      return columnsState;
     };
 
     apiRef.current.UNSTABLE_registerColumnPreProcessing('rowGrouping', addGroupingColumn);
@@ -80,6 +65,7 @@ export const useGridRowGroupByColumns = (
     const groupRows: GridRowGroupingPreProcessing = (params) => {
       const groupingColumns = gridRowGroupingColumnSelector(apiRef.current.state);
       const groupingFields = orderGroupingFields(groupingColumns);
+      groupingFieldsOnLastRowPreProcessing.current = groupingFields;
 
       if (groupingFields.length === 0) {
         return null;
@@ -198,5 +184,19 @@ export const useGridRowGroupByColumns = (
     [apiRef],
   );
 
+  const handleColumnChange = () => {
+    const groupingColumns = gridRowGroupingColumnSelector(apiRef.current.state);
+    const newGroupingFields = orderGroupingFields(groupingColumns);
+    const currentGroupingFields = groupingFieldsOnLastRowPreProcessing.current;
+    const hasGroupingFieldChanged =
+      newGroupingFields.length !== currentGroupingFields.length ||
+      newGroupingFields.some((field, index) => field !== currentGroupingFields[index]);
+
+    if (hasGroupingFieldChanged) {
+      updateRowGrouping();
+    }
+  };
+
   useGridApiEventHandler(apiRef, GridEvents.cellKeyDown, handleCellKeyDown);
+  useGridApiEventHandler(apiRef, GridEvents.columnsChange, handleColumnChange);
 };

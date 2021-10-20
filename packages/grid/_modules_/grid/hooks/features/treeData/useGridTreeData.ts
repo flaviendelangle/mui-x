@@ -24,19 +24,30 @@ export const useGridTreeData = (
   >,
 ) => {
   const updateColumnsPreProcessing = React.useCallback(() => {
-    const addGroupingColumn: GridColumnsPreProcessing = (columns) => {
-      if (!props.treeData) {
-        return columns;
-      }
-
-      const index = columns[0].type === 'checkboxSelection' ? 1 : 0;
+    const addGroupingColumn: GridColumnsPreProcessing = (columnsState) => {
       const groupingColumn: GridColDef = {
         ...GRID_TREE_DATA_GROUP_COL_DEF,
         headerName: apiRef.current.getLocaleText('treeDataGroupingHeaderName'),
         ...props.groupingColDef,
       };
 
-      return [...columns.slice(0, index), groupingColumn, ...columns.slice(index)];
+      const shouldHaveGroupingColumn = props.treeData;
+      const haveGroupingColumn = columnsState.lookup[groupingColumn.field] != null;
+
+      if (shouldHaveGroupingColumn && !haveGroupingColumn) {
+        columnsState.lookup[groupingColumn.field] = groupingColumn;
+        const index = columnsState.lookup[columnsState.all[0]].type === 'checkboxSelection' ? 1 : 0;
+        columnsState.all = [
+          ...columnsState.all.slice(0, index),
+          groupingColumn.field,
+          ...columnsState.all.slice(index),
+        ];
+      } else if (!shouldHaveGroupingColumn && haveGroupingColumn) {
+        delete columnsState.lookup[groupingColumn.field];
+        columnsState.all = columnsState.all.filter((field) => field !== groupingColumn.field);
+      }
+
+      return columnsState;
     };
 
     apiRef.current.UNSTABLE_registerColumnPreProcessing('treeData', addGroupingColumn);

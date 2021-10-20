@@ -6,6 +6,7 @@ import {
   GridColDef,
   GridColumns,
   GridColumnsState,
+  GridRawColumnsState,
   GridStateColDef,
 } from '../../../models/colDef/gridColDef';
 import { GridColumnTypesRecord } from '../../../models/colDef/gridColumnTypesRecord';
@@ -30,10 +31,6 @@ import {
 import { GRID_STRING_COL_DEF } from '../../../models/colDef/gridStringColDef';
 import { GridComponentProps } from '../../../GridComponentProps';
 import { useGridStateInit } from '../../utils/useGridStateInit';
-
-type RawGridColumnsState = Omit<GridColumnsState, 'lookup'> & {
-  lookup: { [field: string]: GridColDef | GridStateColDef };
-};
 
 function hydrateColumnsWidth(
   columns: (GridColDef | GridStateColDef)[],
@@ -96,7 +93,7 @@ function hydrateColumnsType(
 }
 
 const upsertColumnsState = (columnUpdates: GridColDef[], prevColumnsState?: GridColumnsState) => {
-  const newState: RawGridColumnsState = {
+  const newState: GridRawColumnsState = {
     all: [...(prevColumnsState?.all ?? [])],
     lookup: { ...(prevColumnsState?.lookup ?? {}) },
   };
@@ -132,13 +129,14 @@ export function useGridColumns(
 
   useGridStateInit(apiRef, (state) => {
     const hydratedColumns = hydrateColumnsType(props.columns, props.columnTypes);
-    const preProcessedColumns =
-      apiRef.current.UNSTABLE_applyAllColumnPreProcessing(hydratedColumns);
-    const columns = upsertColumnsState(preProcessedColumns);
-    let newColumns: GridColumns = columns.all.map((field) => columns.lookup[field]);
+    const columnsState = upsertColumnsState(hydratedColumns);
+    const preProcessedColumns = apiRef.current.UNSTABLE_applyAllColumnPreProcessing(columnsState);
+    let newColumns: GridColumns = preProcessedColumns.all.map(
+      (field) => preProcessedColumns.lookup[field],
+    );
     newColumns = hydrateColumnsWidth(newColumns, 0);
 
-    const columnState: GridColumnsState = {
+    const fullColumnState: GridColumnsState = {
       all: newColumns.map((col) => col.field),
       lookup: newColumns.reduce((acc, col) => {
         acc[col.field] = col;
@@ -148,7 +146,7 @@ export function useGridColumns(
 
     return {
       ...state,
-      columns: columnState,
+      columns: fullColumnState,
     };
   });
   const [, setGridState, forceUpdate] = useGridState(apiRef);
@@ -210,7 +208,7 @@ export function useGridColumns(
   );
 
   const setColumnsState = React.useCallback(
-    (newState: RawGridColumnsState, emit?: boolean) => {
+    (newState: GridRawColumnsState, emit?: boolean) => {
       logger.debug('updating GridColumns with new state');
 
       // Avoid dependency on gridState to avoid infinite loop
@@ -218,7 +216,7 @@ export function useGridColumns(
       let newColumns: GridColumns = newState.all.map((field) => newState.lookup[field]);
       newColumns = hydrateColumnsWidth(newColumns, viewportWidth);
 
-      const columnState: GridColumnsState = {
+      const columnsState: GridColumnsState = {
         all: newColumns.map((col) => col.field),
         lookup: newColumns.reduce((acc, col) => {
           acc[col.field] = col;
@@ -226,7 +224,7 @@ export function useGridColumns(
         }, {}),
       };
 
-      setGridColumnsState(columnState, emit);
+      setGridColumnsState(columnsState, emit);
     },
     [apiRef, logger, setGridColumnsState],
   );
@@ -235,7 +233,9 @@ export function useGridColumns(
     (columns: GridColDef[]) => {
       // Avoid dependency on gridState to avoid infinite loop
       const columnsState = upsertColumnsState(columns, apiRef.current.state.columns);
-      setColumnsState(columnsState, false);
+      const preProcessedColumnsState =
+        apiRef.current.UNSTABLE_applyAllColumnPreProcessing(columnsState);
+      setColumnsState(preProcessedColumnsState, true);
     },
     [apiRef, setColumnsState],
   );
@@ -332,11 +332,11 @@ export function useGridColumns(
     logger.info(`GridColumns have changed, new length ${props.columns.length}`);
 
     const hydratedColumns = hydrateColumnsType(props.columns, props.columnTypes);
+    const columnsState = upsertColumnsState(hydratedColumns);
+    const preProcessedColumnsState =
+      apiRef.current.UNSTABLE_applyAllColumnPreProcessing(columnsState);
 
-    const preProcessedColumns =
-      apiRef.current.UNSTABLE_applyAllColumnPreProcessing(hydratedColumns);
-    const columnState = upsertColumnsState(preProcessedColumns);
-    setColumnsState(columnState);
+    setColumnsState(preProcessedColumnsState);
   }, [logger, apiRef, setColumnsState, props.columns, props.columnTypes]);
 
   React.useEffect(() => {
@@ -356,10 +356,10 @@ export function useGridColumns(
     logger.info(`Columns pre-processing have changed, regenerating the columns`);
 
     const hydratedColumns = hydrateColumnsType(props.columns, props.columnTypes);
-    const preProcessedColumns =
-      apiRef.current.UNSTABLE_applyAllColumnPreProcessing(hydratedColumns);
-    const columnState = upsertColumnsState(preProcessedColumns);
-    setColumnsState(columnState);
+    const columnsState = upsertColumnsState(hydratedColumns);
+    const preProcessedColumnsState =
+      apiRef.current.UNSTABLE_applyAllColumnPreProcessing(columnsState);
+    setColumnsState(preProcessedColumnsState);
   }, [apiRef, logger, setColumnsState, props.columns, props.columnTypes]);
 
   useGridApiEventHandler(apiRef, GridEvents.columnsPreProcessingChange, handlePreProcessColumns);

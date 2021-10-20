@@ -76,7 +76,7 @@ export function BasicRowGrouping() {
       disableSelectionOnClick
       {...data}
       groupingColDef={groupingColDef}
-      defaultGroupingExpansionDepth={3}
+      rowGroupByColumnPanel
     />
   );
 }

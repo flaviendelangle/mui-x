@@ -224,3 +224,7 @@ export interface GridColumnsState {
   all: string[];
   lookup: GridColumnLookup;
 }
+
+export type GridRawColumnsState = Omit<GridColumnsState, 'lookup'> & {
+  lookup: { [field: string]: GridColDef | GridStateColDef };
+};
