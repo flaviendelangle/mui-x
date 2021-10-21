@@ -8,7 +8,7 @@ import { GridEvents } from '../constants/eventsConstants';
 import { GridColDef, GridColumnHeaderParams } from '../models';
 import { gridRowGroupingColumnSelector } from '../hooks/features/rowGroupByColumns';
 import { orderGroupingFields } from '../hooks/features/rowGroupByColumns/rowGroupByColumnsUtils';
-import { isDeepEqual } from '../utils/utils';
+import { GridDragIcon } from './icons';
 
 const GridGroupRowByColumnPanelRoot = styled('div', {
   name: 'MuiDataGrid',
@@ -30,11 +30,11 @@ const GridGroupingEmptySpace = styled('div')({
 
 /**
  * Only available in DataGridPro
- * TODO: Allow to reorder the chips
  */
 export const GridGroupRowByColumnPanel = () => {
   const apiRef = useGridApiContext();
   const [colHeaderDragField, setColHeaderDragField] = React.useState('');
+  const [chipDragField, setChipDragField] = React.useState('');
   const groupingColumns = useGridSelector(apiRef, gridRowGroupingColumnSelector);
   const groupingFields = React.useMemo(
     () => orderGroupingFields(groupingColumns),
@@ -47,23 +47,43 @@ export const GridGroupRowByColumnPanel = () => {
   );
   const handleColumnReorderStop = React.useCallback(() => setColHeaderDragField(''), []);
 
-  const handleDragEnter = (fieldAfter: string | null) => {
-    if (!colHeaderDragField || colHeaderDragField === fieldAfter) {
+  const handleDragStartChip = (field: string) => setChipDragField(field);
+
+  const handleDragEndChip = () => setChipDragField('');
+
+  const handleDragEnter = (targetField: string | null) => {
+    const dragField = colHeaderDragField || chipDragField;
+
+    if (!dragField || targetField === dragField) {
       return;
     }
 
-    const cleanGroupingFields = groupingFields.filter((field) => field !== colHeaderDragField);
-    const position = fieldAfter
-      ? cleanGroupingFields.findIndex((field) => field === fieldAfter)
-      : cleanGroupingFields.length;
-    const newGroupingFields = [
-      ...cleanGroupingFields.slice(0, position),
-      colHeaderDragField,
-      ...cleanGroupingFields.slice(position),
-    ];
+    let newGroupingFields: string[];
+    if (!targetField) {
+      newGroupingFields = [...groupingFields.filter((field) => field !== dragField), dragField];
+    } else {
+      const currentDragFieldPosition = groupingFields.findIndex((field) => field === dragField);
+      const currentTargetFieldPosition = groupingFields.findIndex((field) => field === targetField);
 
-    if (isDeepEqual(groupingFields, newGroupingFields)) {
-      return;
+      if (currentDragFieldPosition < currentTargetFieldPosition) {
+        newGroupingFields = [
+          ...(currentDragFieldPosition > 0
+            ? groupingFields.slice(0, currentDragFieldPosition)
+            : []),
+          ...groupingFields.slice(currentDragFieldPosition + 1, currentTargetFieldPosition),
+          targetField,
+          dragField,
+          ...groupingFields.slice(currentTargetFieldPosition + 1),
+        ];
+      } else {
+        newGroupingFields = [
+          ...groupingFields.slice(0, currentTargetFieldPosition),
+          ...groupingFields.slice(currentTargetFieldPosition + 1, currentDragFieldPosition),
+          dragField,
+          targetField,
+          ...groupingFields.slice(currentDragFieldPosition + 1),
+        ];
+      }
     }
 
     const colUpdates: GridColDef[] = newGroupingFields.map((field, fieldIndex) => {
@@ -74,8 +94,7 @@ export const GridGroupRowByColumnPanel = () => {
       };
 
       if (field === colHeaderDragField) {
-        // TODO: Allow to hide a col during its drag
-        // col.hide = true
+        col.hide = true;
       }
 
       return col;
@@ -102,7 +121,14 @@ export const GridGroupRowByColumnPanel = () => {
 
         return (
           <GridGroupingChipContainer key={field} onDragEnter={() => handleDragEnter(field)}>
-            <Chip label={label} onDelete={() => handleRemoveGroupingCol(field)} />
+            <Chip
+              label={label}
+              draggable
+              onDragStart={() => handleDragStartChip(field)}
+              onDragEnd={() => handleDragEndChip()}
+              onDelete={() => handleRemoveGroupingCol(field)}
+              icon={<GridDragIcon />}
+            />
           </GridGroupingChipContainer>
         );
       })}
