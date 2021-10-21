@@ -223,6 +223,11 @@ export interface GridSimpleOptions {
    */
   treeData: boolean;
   /**
+   * If `single`, all column we are grouping by will be represented in the same grouping the same column.
+   * If `multiple`, each column we are grouping by will be represented in its own column.
+   */
+  groupingColumnMode: 'single' | 'multiple';
+  /**
    * If `true`, the grid will render a panel above header to enable row grouping by column by dropping a column header in it.
    * @default false
    */
@@ -308,6 +313,7 @@ export const GRID_DEFAULT_SIMPLE_OPTIONS: GridSimpleOptions = {
   rowHeight: 52,
   rowsPerPageOptions: [25, 50, 100],
   treeData: false,
+  groupingColumnMode: 'single',
   rowGroupByColumnPanel: false,
   defaultGroupingExpansionDepth: 0,
   scrollEndThreshold: 80,

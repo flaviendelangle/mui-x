@@ -77,6 +77,7 @@ export function BasicRowGrouping() {
       {...data}
       groupingColDef={groupingColDef}
       rowGroupByColumnPanel
+      groupingColumnMode="multiple"
     />
   );
 }

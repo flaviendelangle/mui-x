@@ -6,8 +6,8 @@ import { useGridApiContext } from '../hooks/utils/useGridApiContext';
 import { useGridSelector } from '../hooks/utils/useGridSelector';
 import { GridEvents } from '../constants/eventsConstants';
 import { GridColDef, GridColumnHeaderParams } from '../models';
-import { gridRowGroupingColumnSelector } from '../hooks/features/rowGroupByColumns';
-import { orderGroupingFields } from '../hooks/features/rowGroupByColumns/rowGroupByColumnsUtils';
+import { gridRowGroupingColumnLookupSelector } from '../hooks/features/rowGroupByColumns';
+import { orderGroupedByFields } from '../hooks/features/rowGroupByColumns/rowGroupByColumnsUtils';
 import { GridDragIcon } from './icons';
 
 const GridGroupRowByColumnPanelRoot = styled('div', {
@@ -35,9 +35,9 @@ export const GridGroupRowByColumnPanel = () => {
   const apiRef = useGridApiContext();
   const [colHeaderDragField, setColHeaderDragField] = React.useState('');
   const [chipDragField, setChipDragField] = React.useState('');
-  const groupingColumns = useGridSelector(apiRef, gridRowGroupingColumnSelector);
+  const groupingColumns = useGridSelector(apiRef, gridRowGroupingColumnLookupSelector);
   const groupingFields = React.useMemo(
-    () => orderGroupingFields(groupingColumns),
+    () => orderGroupedByFields(groupingColumns),
     [groupingColumns],
   );
 

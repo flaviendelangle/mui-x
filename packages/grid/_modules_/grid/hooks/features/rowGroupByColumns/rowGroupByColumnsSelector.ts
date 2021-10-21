@@ -1,14 +1,8 @@
 import { createSelector } from 'reselect';
 import { gridColumnLookupSelector } from '../columns';
-import type { GridColumnLookup } from '../../../models';
+import { getRowGroupingColumnLookup } from './rowGroupByColumnsUtils';
 
-export const gridRowGroupingColumnSelector = createSelector(gridColumnLookupSelector, (lookup) => {
-  const groupingColumns: GridColumnLookup = {};
-  Object.keys(lookup).forEach((key) => {
-    if (lookup[key].groupRows) {
-      groupingColumns[key] = lookup[key];
-    }
-  });
-
-  return groupingColumns;
-});
+export const gridRowGroupingColumnLookupSelector = createSelector(
+  gridColumnLookupSelector,
+  getRowGroupingColumnLookup,
+);

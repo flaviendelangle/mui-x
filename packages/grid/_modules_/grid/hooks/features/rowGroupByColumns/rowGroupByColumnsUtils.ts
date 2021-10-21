@@ -1,6 +1,19 @@
-import type { GridColumnLookup } from '../../../models';
+import type { GridColumnLookup, GridRawColumnLookup } from '../../../models';
 
-export const orderGroupingFields = (groupingColumns: GridColumnLookup) => {
+export const getRowGroupingColumnLookup = <V extends GridColumnLookup | GridRawColumnLookup>(
+  lookup: V,
+) => {
+  const groupingColumns = {} as V;
+  Object.keys(lookup).forEach((key) => {
+    if (lookup[key].groupRows) {
+      groupingColumns[key] = lookup[key];
+    }
+  });
+
+  return groupingColumns;
+};
+
+export const orderGroupedByFields = (groupingColumns: GridRawColumnLookup) => {
   const unOrderedGroupingFields = Object.keys(groupingColumns);
   const shouldApplyExplicitGroupOrder = unOrderedGroupingFields.some(
     (field) => groupingColumns[field].groupRowIndex != null,

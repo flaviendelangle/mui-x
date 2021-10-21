@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { GridInitialState, GridState } from './models/gridState';
 import { GridApiRef } from './models/api/gridApiRef';
-import { GridColDef, GridColumns } from './models/colDef/gridColDef';
+import { GridColumns } from './models/colDef/gridColDef';
+import { GridColDefOverride, GridColDefOverrideCallback } from './models/colDef/gridColDefOverride';
 import {
   GridSimpleOptions,
   GridProcessedMergedOptions,
@@ -501,5 +502,5 @@ interface GridComponentOtherProps {
   /**
    * The grouping column used by the tree data
    */
-  groupingColDef?: Partial<GridColDef>;
+  groupingColDef?: GridColDefOverride | GridColDefOverrideCallback;
 }

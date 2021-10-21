@@ -220,11 +220,13 @@ export interface GridColumnsMeta {
 
 export type GridColumnLookup = { [field: string]: GridStateColDef };
 
+export type GridRawColumnLookup = { [field: string]: GridColDef | GridStateColDef };
+
 export interface GridColumnsState {
   all: string[];
   lookup: GridColumnLookup;
 }
 
 export type GridRawColumnsState = Omit<GridColumnsState, 'lookup'> & {
-  lookup: { [field: string]: GridColDef | GridStateColDef };
+  lookup: GridRawColumnLookup;
 };
