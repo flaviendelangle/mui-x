@@ -55,8 +55,10 @@ const GridRowGroupByColumnsGroupingCell = (props: GridRenderCellParams) => {
     event.stopPropagation();
   };
 
+  const marginLeft = rootProps.groupingColumnMode === 'multiple' ? 0 : rowNode.depth * 4;
+
   return (
-    <Box className={classes.root} sx={{ ml: rowNode.depth * 4 }}>
+    <Box className={classes.root} sx={{ ml: marginLeft }}>
       <div className={classes.toggle}>
         {descendantCount > 0 && (
           <IconButton

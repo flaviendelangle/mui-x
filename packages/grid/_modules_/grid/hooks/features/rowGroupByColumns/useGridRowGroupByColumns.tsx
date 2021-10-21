@@ -19,7 +19,7 @@ import { GridEvents } from '../../../constants/eventsConstants';
 import { gridRowGroupingColumnLookupSelector } from './rowGroupByColumnsSelector';
 import { GridComponentProps } from '../../../GridComponentProps';
 import { orderGroupedByFields, getRowGroupingColumnLookup } from './rowGroupByColumnsUtils';
-import { isFunction } from '../../../utils/utils';
+import { isDeepEqual, isFunction } from '../../../utils/utils';
 import { GRID_ROW_GROUP_BY_COLUMNS_GROUP_COL_DEF } from './gridRowGroupByColumnsGroupColDef';
 import { GridRowGroupByColumnsGroupingCell } from '../../../components/cell/GridRowGroupByColumnsGroupingCell';
 
@@ -250,7 +250,7 @@ export const useGridRowGroupByColumns = (
   const handleCellKeyDown = React.useCallback(
     (params: GridCellParams, event: MuiEvent<React.KeyboardEvent>) => {
       const cellParams = apiRef.current.getCellParams(params.id, params.field);
-      if (cellParams.field === '__row_group_by_columns_group' && isSpaceKey(event.key)) {
+      if (cellParams.colDef.type === 'rowGroupByColumnsGroup' && isSpaceKey(event.key)) {
         event.stopPropagation();
         apiRef.current.unstable_setRowExpansion(
           params.id,
@@ -265,11 +265,8 @@ export const useGridRowGroupByColumns = (
     const groupingColumns = gridRowGroupingColumnLookupSelector(apiRef.current.state);
     const newGroupingFields = orderGroupedByFields(groupingColumns);
     const currentGroupingFields = groupingFieldsOnLastRowPreProcessing.current;
-    const hasGroupingFieldChanged =
-      newGroupingFields.length !== currentGroupingFields.length ||
-      newGroupingFields.some((field, index) => field !== currentGroupingFields[index]);
 
-    if (hasGroupingFieldChanged) {
+    if (!isDeepEqual(currentGroupingFields, newGroupingFields)) {
       updateRowGrouping();
     }
   };
