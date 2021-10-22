@@ -11,7 +11,7 @@ import { useGridApiMethod } from '../../utils/useGridApiMethod';
 
 const getFlatRowTree: GridRowGroupingPreProcessing = (params) => {
   const tree: GridRowTreeConfig = {};
-  params.rowIds.forEach((rowId) => {
+  params.ids.forEach((rowId) => {
     tree[rowId] = { id: rowId, depth: 0, parent: null, groupingValue: '' };
   });
 
@@ -19,7 +19,7 @@ const getFlatRowTree: GridRowGroupingPreProcessing = (params) => {
     tree,
     treeDepth: 1,
     idRowsLookup: params.idRowsLookup,
-    rowIds: params.rowIds,
+    ids: params.ids,
   };
 };
 
@@ -29,7 +29,7 @@ export const useGridRowGroupsPreProcessing = (apiRef: GridApiRef) => {
   );
 
   const registerRowGroupsBuilder = React.useCallback<
-    GridRowGroupsPreProcessingApi['UNSTABLE_registerRowGroupsBuilder']
+    GridRowGroupsPreProcessingApi['unstable_registerRowGroupsBuilder']
   >(
     (processingName, rowGroupingPreProcessing) => {
       const rowGroupingPreProcessingBefore =
@@ -43,7 +43,7 @@ export const useGridRowGroupsPreProcessing = (apiRef: GridApiRef) => {
     [apiRef],
   );
 
-  const groupRows = React.useCallback<GridRowGroupsPreProcessingApi['UNSTABLE_groupRows']>(
+  const groupRows = React.useCallback<GridRowGroupsPreProcessingApi['unstable_groupRows']>(
     (...params) => {
       let response: GridRowGroupingResult | null = null;
       const preProcessingList = Array.from(rowGroupsPreProcessingRef.current.values());
@@ -66,8 +66,8 @@ export const useGridRowGroupsPreProcessing = (apiRef: GridApiRef) => {
   );
 
   const rowGroupsPreProcessingApi: GridRowGroupsPreProcessingApi = {
-    UNSTABLE_registerRowGroupsBuilder: registerRowGroupsBuilder,
-    UNSTABLE_groupRows: groupRows,
+    unstable_registerRowGroupsBuilder: registerRowGroupsBuilder,
+    unstable_groupRows: groupRows,
   };
 
   useGridApiMethod(apiRef, rowGroupsPreProcessingApi, 'GridRowGroupsPreProcessing');

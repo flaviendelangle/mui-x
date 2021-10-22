@@ -17,12 +17,15 @@ interface TempRowTreeNode extends Omit<GridRowTreeNodeConfig, 'children'> {
   children?: Record<GridRowId, GridRowId>;
 }
 
-type TempRowTree = Record<GridRowId, TempRowTreeNode>;
-
+/**
+ * Transform a list of rows into a tree structure where each row references its parent and children.
+ * Add the auto generated row to the `ids` and `idRowsLookup`.
+ */
 export const buildRowTree = (params: GenerateRowTreeParams): GridRowGroupingResult => {
-  const tempTree: TempRowTree = {};
+  // During the build, we store the children as a Record to avoid linear complexity when checking if a children is already defined.
+  const tempTree: Record<GridRowId, TempRowTreeNode> = {};
   let treeDepth = 1;
-  const rowIds = [...params.rowIds];
+  const ids = [...params.ids];
   const idRowsLookup = { ...params.idRowsLookup };
 
   const nodeNameToIdTree: GridNodeNameToIdTree = {};
@@ -67,7 +70,7 @@ export const buildRowTree = (params: GenerateRowTreeParams): GridRowGroupingResu
 
           tempTree[nodeId] = node;
           idRowsLookup[nodeId] = {};
-          rowIds.push(nodeId);
+          ids.push(nodeId);
         }
 
         node.descendantCount = (node.descendantCount ?? 0) + 1;
@@ -96,7 +99,7 @@ export const buildRowTree = (params: GenerateRowTreeParams): GridRowGroupingResu
   });
 
   const tree: GridRowTreeConfig = {};
-  rowIds.forEach((rowId) => {
+  ids.forEach((rowId) => {
     const tempNode = tempTree[rowId];
     tree[rowId] = {
       ...tempNode,
@@ -107,7 +110,7 @@ export const buildRowTree = (params: GenerateRowTreeParams): GridRowGroupingResu
   return {
     tree,
     treeDepth,
-    rowIds,
+    ids,
     idRowsLookup,
   };
 };

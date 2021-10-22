@@ -215,7 +215,7 @@ DataGridRaw.propTypes = {
    */
   getRowClassName: PropTypes.func,
   /**
-   * Return the id of a given [[GridRowData]].
+   * Return the id of a given [[GridRowModel]].
    */
   getRowId: PropTypes.func,
   /**
@@ -227,7 +227,7 @@ DataGridRaw.propTypes = {
   /**
    * The grouping column used by the tree data
    */
-  groupingColDef: PropTypes.object,
+  groupingColDef: PropTypes.oneOfType([PropTypes.func, PropTypes.object]),
   /**
    * Set the height in pixel of the column headers in the grid.
    * @default 56
@@ -522,7 +522,7 @@ DataGridRaw.propTypes = {
   page: PropTypes.number,
   /**
    * Set the number of rows in one page.
-   * If some of the rows have children (for instance in the tree data), this number represents the amount of top level rows.
+   * If some of the rows have children (for instance in the tree data), this number represents the amount of top level rows wanted on each page.
    * @default 100
    */
   pageSize: chainPropTypes(PropTypes.number, (props: any) => {

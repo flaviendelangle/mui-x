@@ -233,7 +233,14 @@ DataGridProRaw.propTypes = {
    * Set it to 'server' if you would like to handle filtering on the server-side.
    * @default "client"
    */
-  filterMode: PropTypes.oneOf(['client', 'server']),
+  filterMode: chainPropTypes(PropTypes.oneOf(['client', 'server']), (props: any) => {
+    if (props.treeData && props.filterMode === 'server') {
+      return new Error(
+        'MUI: The `filterMode="server"` prop is not available when the `treeData` is enabled.',
+      );
+    }
+    return null;
+  }),
   /**
    * Set the filter model of the grid.
    */
@@ -261,7 +268,7 @@ DataGridProRaw.propTypes = {
    */
   getRowClassName: PropTypes.func,
   /**
-   * Return the id of a given [[GridRowData]].
+   * Return the id of a given [[GridRowModel]].
    */
   getRowId: PropTypes.func,
   /**
@@ -273,7 +280,7 @@ DataGridProRaw.propTypes = {
   /**
    * The grouping column used by the tree data
    */
-  groupingColDef: PropTypes.object,
+  groupingColDef: PropTypes.oneOfType([PropTypes.func, PropTypes.object]),
   /**
    * Set the height in pixel of the column headers in the grid.
    * @default 56
@@ -588,7 +595,7 @@ DataGridProRaw.propTypes = {
   page: PropTypes.number,
   /**
    * Set the number of rows in one page.
-   * If some of the rows have children (for instance in the tree data), this number represents the amount of top level rows.
+   * If some of the rows have children (for instance in the tree data), this number represents the amount of top level rows wanted on each page.
    * @default 100
    */
   pageSize: PropTypes.number,

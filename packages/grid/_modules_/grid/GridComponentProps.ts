@@ -395,7 +395,7 @@ interface GridComponentOtherProps {
   onPageChange?: (page: number, details: GridCallbackDetails) => void;
   /**
    * Set the number of rows in one page.
-   * If some of the rows have children (for instance in the tree data), this number represents the amount of top level rows.
+   * If some of the rows have children (for instance in the tree data), this number represents the amount of top level rows wanted on each page.
    * @default 100
    */
   pageSize?: number;
@@ -470,7 +470,7 @@ interface GridComponentOtherProps {
    */
   error?: any;
   /**
-   * Return the id of a given [[GridRowData]].
+   * Return the id of a given [[GridRowModel]].
    */
   getRowId?: GridRowIdGetter;
   /**

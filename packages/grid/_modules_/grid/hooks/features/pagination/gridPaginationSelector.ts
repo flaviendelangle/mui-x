@@ -1,8 +1,9 @@
 import { createSelector } from 'reselect';
 import { GridState } from '../../../models/gridState';
 import {
-  gridSortedVisibleRowEntriesSelector,
-  gridSortedVisibleTopLevelRowEntriesSelector,
+  gridVisibleSortedRowEntriesSelector,
+  gridVisibleSortedRowIdsSelector,
+  gridVisibleSortedTopLevelRowEntriesSelector,
 } from '../filter/gridFilterSelector';
 import { GridPaginationState } from './gridPaginationState';
 import { gridRowTreeDepthSelector, gridRowTreeSelector } from '../rows/gridRowsSelector';
@@ -23,8 +24,8 @@ export const gridPaginationRowRangeSelector = createSelector(
   gridPaginationSelector,
   gridRowTreeSelector,
   gridRowTreeDepthSelector,
-  gridSortedVisibleRowEntriesSelector,
-  gridSortedVisibleTopLevelRowEntriesSelector,
+  gridVisibleSortedRowEntriesSelector,
+  gridVisibleSortedTopLevelRowEntriesSelector,
   (pagination, rowTree, rowTreeDepth, visibleSortedRowEntries, visibleSortedTopLevelRowEntries) => {
     const visibleTopLevelRowCount = visibleSortedTopLevelRowEntries.length;
     const topLevelFirstRowIndex = Math.min(
@@ -72,8 +73,8 @@ export const gridPaginationRowRangeSelector = createSelector(
   },
 );
 
-export const gridSortedVisiblePaginatedRowEntriesSelector = createSelector(
-  gridSortedVisibleRowEntriesSelector,
+export const gridPaginatedVisibleSortedGridRowEntriesSelector = createSelector(
+  gridVisibleSortedRowEntriesSelector,
   gridPaginationRowRangeSelector,
   (visibleSortedRowEntries, paginationRange) => {
     if (!paginationRange) {
@@ -81,6 +82,21 @@ export const gridSortedVisiblePaginatedRowEntriesSelector = createSelector(
     }
 
     return visibleSortedRowEntries.slice(
+      paginationRange.firstRowIndex,
+      paginationRange.lastRowIndex + 1,
+    );
+  },
+);
+
+export const gridPaginatedVisibleSortedGridRowIdsSelector = createSelector(
+  gridVisibleSortedRowIdsSelector,
+  gridPaginationRowRangeSelector,
+  (visibleSortedRowIds, paginationRange) => {
+    if (!paginationRange) {
+      return [];
+    }
+
+    return visibleSortedRowIds.slice(
       paginationRange.firstRowIndex,
       paginationRange.lastRowIndex + 1,
     );

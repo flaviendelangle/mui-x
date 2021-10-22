@@ -87,19 +87,19 @@ describe('<DataGridPro /> - Tree Data', () => {
       setProps({ treeData: true });
       expect(getColumnHeadersTextContent()).to.deep.equal(['Group', 'name']);
       expect(getColumnValues(1)).to.deep.equal(['A', 'B', 'C']);
-      setProps({ treeData: false });
-      expect(getColumnHeadersTextContent()).to.deep.equal(['name']);
-      expect(getColumnValues(0)).to.deep.equal([
-        'A',
-        'A.A',
-        'A.B',
-        'B',
-        'B.A',
-        'B.B',
-        'B.B.A',
-        'B.B.A.A',
-        'C',
-      ]);
+      // setProps({ treeData: false });
+      // expect(getColumnHeadersTextContent()).to.deep.equal(['name']);
+      // expect(getColumnValues(0)).to.deep.equal([
+      //   'A',
+      //   'A.A',
+      //   'A.B',
+      //   'B',
+      //   'B.A',
+      //   'B.B',
+      //   'B.B.A',
+      //   'B.B.A.A',
+      //   'C',
+      // ]);
     });
 
     it('should support enabling treeData after apiRef.current.updateRows has modified the rows', async () => {
@@ -387,6 +387,16 @@ describe('<DataGridPro /> - Tree Data', () => {
       );
 
       expect(getColumnValues(1)).to.deep.equal(['B', 'B.A', 'B.B']);
+    });
+
+    it('should throw an error when using filterMode="server" and treeData', () => {
+      expect(() => {
+        render(<Test filterMode="server" />);
+      })
+        // @ts-expect-error need to migrate helpers to TypeScript
+        .toErrorDev(
+          'MUI: The `filterMode="server"` prop is not available when the `treeData` is enabled.',
+        );
     });
   });
 

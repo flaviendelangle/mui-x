@@ -71,12 +71,12 @@ export const useGridTreeData = (
       return columnsState;
     };
 
-    apiRef.current.UNSTABLE_registerColumnPreProcessing('treeData', addGroupingColumn);
+    apiRef.current.unstable_registerColumnPreProcessing('treeData', addGroupingColumn);
   }, [apiRef, props.treeData, groupingColDef]);
 
   const updateRowGrouping = React.useCallback(() => {
     if (!props.treeData) {
-      return apiRef.current.UNSTABLE_registerRowGroupsBuilder('treeData', null);
+      return apiRef.current.unstable_registerRowGroupsBuilder('treeData', null);
     }
 
     const groupRows: GridRowGroupingPreProcessing = (params) => {
@@ -84,7 +84,7 @@ export const useGridTreeData = (
         throw new Error('MUI: No getTreeDataPath given.');
       }
 
-      const rows = params.rowIds
+      const rows = params.ids
         .map((rowId) => ({
           id: rowId,
           path: props.getTreeDataPath!(params.idRowsLookup[rowId]),
@@ -98,7 +98,7 @@ export const useGridTreeData = (
       });
     };
 
-    return apiRef.current.UNSTABLE_registerRowGroupsBuilder('treeData', groupRows);
+    return apiRef.current.unstable_registerRowGroupsBuilder('treeData', groupRows);
   }, [apiRef, props.getTreeDataPath, props.treeData, props.defaultGroupingExpansionDepth]);
 
   useFirstRender(() => {
@@ -127,7 +127,7 @@ export const useGridTreeData = (
   const handleCellKeyDown = React.useCallback(
     (params: GridCellParams, event: MuiEvent<React.KeyboardEvent>) => {
       const cellParams = apiRef.current.getCellParams(params.id, params.field);
-      if (cellParams.field === '__tree_data_group__' && isSpaceKey(event.key)) {
+      if (cellParams.colDef.type === 'treeDataGroup' && isSpaceKey(event.key)) {
         event.stopPropagation();
         event.preventDefault();
 

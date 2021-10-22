@@ -135,7 +135,7 @@ export const useGridRowGroupByColumns = (
       return columnsState;
     };
 
-    apiRef.current.UNSTABLE_registerColumnPreProcessing('rowGrouping', addGroupingColumn);
+    apiRef.current.unstable_registerColumnPreProcessing('rowGrouping', addGroupingColumn);
   }, [apiRef, getGroupingColDefs]);
 
   const updateRowGrouping = React.useCallback(() => {
@@ -178,7 +178,7 @@ export const useGridRowGroupByColumns = (
         return value;
       };
 
-      params.rowIds.forEach((rowId) => {
+      params.ids.forEach((rowId) => {
         const row = params.idRowsLookup[rowId];
 
         groupedByFields.forEach((groupedByField) => {
@@ -197,7 +197,7 @@ export const useGridRowGroupByColumns = (
         });
       });
 
-      const rows = params.rowIds.map((rowId) => {
+      const rows = params.ids.map((rowId) => {
         const row = params.idRowsLookup[rowId];
         const parentPath = groupedByFields.map((groupingField) =>
           getCellKey({
@@ -221,7 +221,7 @@ export const useGridRowGroupByColumns = (
       });
     };
 
-    return apiRef.current.UNSTABLE_registerRowGroupsBuilder('rowGrouping', groupRows);
+    return apiRef.current.unstable_registerRowGroupsBuilder('rowGrouping', groupRows);
   }, [apiRef, props.defaultGroupingExpansionDepth]);
 
   useFirstRender(() => {

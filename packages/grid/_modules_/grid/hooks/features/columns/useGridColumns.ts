@@ -130,7 +130,7 @@ export function useGridColumns(
   useGridStateInit(apiRef, (state) => {
     const hydratedColumns = hydrateColumnsType(props.columns, props.columnTypes);
     const columnsState = upsertColumnsState(hydratedColumns);
-    const preProcessedColumns = apiRef.current.UNSTABLE_applyAllColumnPreProcessing(columnsState);
+    const preProcessedColumns = apiRef.current.unstable_applyAllColumnPreProcessing(columnsState);
     let newColumns: GridColumns = preProcessedColumns.all.map(
       (field) => preProcessedColumns.lookup[field],
     );
@@ -234,7 +234,7 @@ export function useGridColumns(
       // Avoid dependency on gridState to avoid infinite loop
       const columnsState = upsertColumnsState(columns, apiRef.current.state.columns);
       const preProcessedColumnsState =
-        apiRef.current.UNSTABLE_applyAllColumnPreProcessing(columnsState);
+        apiRef.current.unstable_applyAllColumnPreProcessing(columnsState);
       setColumnsState(preProcessedColumnsState, true);
     },
     [apiRef, setColumnsState],
@@ -334,7 +334,7 @@ export function useGridColumns(
     const hydratedColumns = hydrateColumnsType(props.columns, props.columnTypes);
     const columnsState = upsertColumnsState(hydratedColumns);
     const preProcessedColumnsState =
-      apiRef.current.UNSTABLE_applyAllColumnPreProcessing(columnsState);
+      apiRef.current.unstable_applyAllColumnPreProcessing(columnsState);
 
     setColumnsState(preProcessedColumnsState);
   }, [logger, apiRef, setColumnsState, props.columns, props.columnTypes]);
@@ -358,7 +358,7 @@ export function useGridColumns(
     const hydratedColumns = hydrateColumnsType(props.columns, props.columnTypes);
     const columnsState = upsertColumnsState(hydratedColumns);
     const preProcessedColumnsState =
-      apiRef.current.UNSTABLE_applyAllColumnPreProcessing(columnsState);
+      apiRef.current.unstable_applyAllColumnPreProcessing(columnsState);
     setColumnsState(preProcessedColumnsState);
   }, [apiRef, logger, setColumnsState, props.columns, props.columnTypes]);
 
