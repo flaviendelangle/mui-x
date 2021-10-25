@@ -96,6 +96,11 @@ const frFRGrid: Partial<GridLocaleText> = {
 
   // Actions cell more text
   actionsCellMore: 'Plus',
+
+  // Tree Data
+  treeDataGroupingHeaderName: 'Groupe',
+  treeDataExpand: 'afficher les enfants',
+  treeDataCollapse: 'masquer les enfants',
 };
 
 export const frFR: Localization = getGridLocalization(frFRGrid, frFRCore);

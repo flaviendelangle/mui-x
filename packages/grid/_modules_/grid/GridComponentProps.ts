@@ -1,14 +1,14 @@
 import * as React from 'react';
 import { GridInitialState, GridState } from './models/gridState';
 import { GridApiRef } from './models/api/gridApiRef';
-import { GridColumns } from './models/colDef/gridColDef';
+import { GridColDef, GridColDefOverrideParams, GridColumns } from './models/colDef/gridColDef';
 import {
   GridSimpleOptions,
   GridProcessedMergedOptions,
   GridMergedOptions,
 } from './models/gridOptions';
 import { MuiEvent } from './models/muiEvent';
-import { GridRowId, GridRowIdGetter, GridRowsProp } from './models/gridRows';
+import { GridRowId, GridRowIdGetter, GridRowModel, GridRowsProp } from './models/gridRows';
 import { ElementSize } from './models/elementSize';
 import { GridColumnTypesRecord } from './models/colDef/gridColumnTypesRecord';
 import { GridSortModel } from './models/gridSortModel';
@@ -68,6 +68,7 @@ interface GridComponentOtherProps {
   columnTypes?: GridColumnTypesRecord;
   /**
    * Set the total number of rows, if it is different than the length of the value `rows` prop.
+   * If some of the rows have children (for instance in the tree data), this number represents the amount of top level rows.
    */
   rowCount?: number;
   /**
@@ -98,6 +99,12 @@ interface GridComponentOtherProps {
    * @returns {boolean} A boolean indicating if the cell is selectable.
    */
   isRowSelectable?: (params: GridRowParams) => boolean;
+  /**
+   * Determines the path of a row in the tree data
+   * @param {GridRowModel} row The row from which we want the path.
+   * @returns {string[]} the path to the row
+   */
+  getTreeDataPath?: (row: GridRowModel) => string[];
   /**
    * Callback fired when the edit cell value changes.
    * @param {GridEditCellPropsParams} params With all properties from [[GridEditCellPropsParams]].
@@ -383,6 +390,7 @@ interface GridComponentOtherProps {
   onPageChange?: (page: number, details: GridCallbackDetails) => void;
   /**
    * Set the number of rows in one page.
+   * If some of the rows have children (for instance in the tree data), this number represents the amount of top level rows wanted on each page.
    * @default 100
    */
   pageSize?: number;
@@ -486,4 +494,10 @@ interface GridComponentOtherProps {
    * Overrideable components props dynamically passed to the component at rendering.
    */
   componentsProps?: GridSlotsComponentsProps;
+  /**
+   * The grouping column used by the tree data
+   */
+  groupingColDef?:
+    | Partial<GridColDef>
+    | ((params: GridColDefOverrideParams) => Partial<GridColDef>);
 }

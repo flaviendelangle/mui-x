@@ -135,10 +135,26 @@ DataGridProRaw.propTypes = {
    */
   componentsProps: PropTypes.object,
   /**
+   * If above 0, the row children will be expanded up to this depth
+   * If equal to -1, all the row children will be expanded
+   * @default 0
+   */
+  defaultGroupingExpansionDepth: PropTypes.number,
+  /**
    * Set the density of the grid.
    * @default "standard"
    */
   density: PropTypes.oneOf(['comfortable', 'compact', 'standard']),
+  /**
+   * If `true`, the filtering will only be applied to the top level rows
+   * @default false
+   */
+  disableChildrenFiltering: PropTypes.bool,
+  /**
+   * If `true`, the sorting will only be applied to the top level rows
+   * @default false
+   */
+  disableChildrenSorting: PropTypes.bool,
   /**
    * If `true`, column filters are disabled.
    * @default false
@@ -217,7 +233,14 @@ DataGridProRaw.propTypes = {
    * Set it to 'server' if you would like to handle filtering on the server-side.
    * @default "client"
    */
-  filterMode: PropTypes.oneOf(['client', 'server']),
+  filterMode: chainPropTypes(PropTypes.oneOf(['client', 'server']), (props: any) => {
+    if (props.treeData && props.filterMode === 'server') {
+      return new Error(
+        'MUI: The `filterMode="server"` prop is not available when the `treeData` is enabled.',
+      );
+    }
+    return null;
+  }),
   /**
    * Set the filter model of the grid.
    */
@@ -248,6 +271,16 @@ DataGridProRaw.propTypes = {
    * Return the id of a given [[GridRowModel]].
    */
   getRowId: PropTypes.func,
+  /**
+   * Determines the path of a row in the tree data
+   * @param {GridRowModel} row The row from which we want the path.
+   * @returns {string[]} the path to the row
+   */
+  getTreeDataPath: PropTypes.func,
+  /**
+   * The grouping column used by the tree data
+   */
+  groupingColDef: PropTypes.oneOfType([PropTypes.func, PropTypes.object]),
   /**
    * Set the height in pixel of the column headers in the grid.
    * @default 56
@@ -562,6 +595,7 @@ DataGridProRaw.propTypes = {
   page: PropTypes.number,
   /**
    * Set the number of rows in one page.
+   * If some of the rows have children (for instance in the tree data), this number represents the amount of top level rows wanted on each page.
    * @default 100
    */
   pageSize: PropTypes.number,
@@ -584,6 +618,7 @@ DataGridProRaw.propTypes = {
   rowBuffer: PropTypes.number,
   /**
    * Set the total number of rows, if it is different than the length of the value `rows` prop.
+   * If some of the rows have children (for instance in the tree data), this number represents the amount of top level rows.
    */
   rowCount: PropTypes.number,
   /**
@@ -662,4 +697,9 @@ DataGridProRaw.propTypes = {
    * @default 0
    */
   throttleRowsMs: PropTypes.number,
+  /**
+   * If `true`, the rows will be gathered in a tree structure, following the `getTreeDataPath` prop
+   * @default false
+   */
+  treeData: PropTypes.bool,
 } as any;

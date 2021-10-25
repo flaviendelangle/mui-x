@@ -1,4 +1,4 @@
-import { GridRowModel } from '@mui/x-data-grid-pro';
+import { DataGridProProps, GridRowModel } from '@mui/x-data-grid-pro';
 import { GridDemoData } from './real-data-service';
 import { randomArrayItem } from './random-generator';
 
@@ -22,14 +22,9 @@ export interface AddPathToDemoDataOptions {
   averageChildren?: number;
 }
 
-/**
- * TODO: Use `Pick<DataGridProProps, 'getTreeDataPath' | 'treeData' | 'groupingColDef'>` once the tree data PR has been merged
- */
-export interface DemoTreeDataValue extends GridDemoData {
-  getTreeDataPath?: any;
-  groupingColDef?: any;
-  treeData?: boolean;
-}
+export interface DemoTreeDataValue
+  extends Pick<DataGridProProps, 'getTreeDataPath' | 'treeData' | 'groupingColDef'>,
+    GridDemoData {}
 
 interface RowWithParentIndex {
   value: GridRowModel;

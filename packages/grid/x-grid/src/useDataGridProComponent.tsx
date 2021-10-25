@@ -27,10 +27,12 @@ import { useGridScroll } from '../../_modules_/grid/hooks/features/scroll/useGri
 import { useGridEvents } from '../../_modules_/grid/hooks/features/events/useGridEvents';
 import { useGridContainerProps } from '../../_modules_/grid/hooks/features/container/useGridContainerProps';
 import { useGridResizeContainer } from '../../_modules_/grid/hooks/features/resize/useGridResizeContainer';
+import { useGridTreeData } from '../../_modules_/grid/hooks/features/treeData';
 
 export const useDataGridProComponent = (apiRef: GridApiRef, props: GridComponentProps) => {
   useGridInitialization(apiRef, props);
   useGridResizeContainer(apiRef, props);
+  useGridTreeData(apiRef, props);
   useGridSelection(apiRef, props);
   useGridColumns(apiRef, props);
   useGridRows(apiRef, props);

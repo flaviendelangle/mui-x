@@ -1,9 +1,9 @@
 import { createSelector } from 'reselect';
 import { GridFilterItem } from '../../../models/gridFilterItem';
 import { GridState } from '../../../models/gridState';
-import { gridRowCountSelector } from '../rows/gridRowsSelector';
 import { gridSortedRowEntriesSelector } from '../sorting/gridSortingSelector';
 import { gridColumnLookupSelector } from '../columns/gridColumnsSelector';
+import { gridRowTreeDepthSelector, gridRowTreeSelector } from '../rows';
 
 export const gridFilterStateSelector = (state: GridState) => state.filter;
 
@@ -12,9 +12,19 @@ export const gridFilterModelSelector = createSelector(
   (filterState) => filterState.filterModel,
 );
 
+export const gridVisibleRowsSelector = createSelector(
+  gridFilterStateSelector,
+  (filterState) => filterState.visibleRows,
+);
+
 export const gridVisibleRowsLookupSelector = createSelector(
   gridFilterStateSelector,
   (filterState) => filterState.visibleRowsLookup,
+);
+
+export const gridVisibleDescendantCountLookupSelector = createSelector(
+  gridFilterStateSelector,
+  (filterState) => filterState.visibleDescendantsCountLookup,
 );
 
 export const gridVisibleSortedRowEntriesSelector = createSelector(
@@ -29,15 +39,27 @@ export const gridVisibleSortedRowIdsSelector = createSelector(
   (visibleSortedRowEntries) => visibleSortedRowEntries.map((row) => row.id),
 );
 
-export const gridVisibleRowCountSelector = createSelector(
-  gridFilterStateSelector,
-  gridRowCountSelector,
-  (filterState, totalRowsCount) => {
-    if (filterState.visibleRows == null) {
-      return totalRowsCount;
+export const gridVisibleSortedTopLevelRowEntriesSelector = createSelector(
+  gridVisibleSortedRowEntriesSelector,
+  gridRowTreeSelector,
+  gridRowTreeDepthSelector,
+  (sortedVisibleRows, rowTree, rowTreeDepth) => {
+    if (rowTreeDepth < 2) {
+      return sortedVisibleRows;
     }
-    return filterState.visibleRows.length;
+
+    return sortedVisibleRows.filter((row) => rowTree[row.id]?.depth === 0);
   },
+);
+
+export const gridVisibleRowCountSelector = createSelector(
+  gridVisibleSortedRowEntriesSelector,
+  (sortedVisibleRows) => sortedVisibleRows.length,
+);
+
+export const gridVisibleTopLevelRowCountSelector = createSelector(
+  gridVisibleSortedTopLevelRowEntriesSelector,
+  (sortedVisibleTopLevelRows) => sortedVisibleTopLevelRows.length,
 );
 
 export const gridFilterActiveItemsSelector = createSelector(
