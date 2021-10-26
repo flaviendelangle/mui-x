@@ -24,7 +24,7 @@ const useStyles = makeStyles({
 
 export interface GridTreeDataGroupingCellValue {
   label: string;
-  visibleDescendantCount: number;
+  filteredDescendantCount: number;
   depth: number;
   expanded: boolean;
 }
@@ -58,7 +58,7 @@ const GridTreeDataGroupingCell = (props: GridRenderCellParams<GridTreeDataGroupi
   return (
     <Box className={classes.root} sx={{ ml: value.depth * 4 }}>
       <div className={classes.toggle}>
-        {value.visibleDescendantCount > 0 && (
+        {value.filteredDescendantCount > 0 && (
           <IconButton
             size="small"
             onClick={handleClick}
@@ -76,7 +76,7 @@ const GridTreeDataGroupingCell = (props: GridRenderCellParams<GridTreeDataGroupi
       </div>
       <span>
         {value.label}
-        {value.visibleDescendantCount > 0 ? ` (${value.visibleDescendantCount})` : ''}
+        {value.filteredDescendantCount > 0 ? ` (${value.filteredDescendantCount})` : ''}
       </span>
     </Box>
   );
@@ -109,8 +109,8 @@ GridTreeDataGroupingCell.propTypes = {
   formattedValue: PropTypes.shape({
     depth: PropTypes.number.isRequired,
     expanded: PropTypes.bool.isRequired,
+    filteredDescendantCount: PropTypes.number.isRequired,
     label: PropTypes.string.isRequired,
-    visibleDescendantCount: PropTypes.number.isRequired,
   }).isRequired,
   /**
    * Get the cell value of a row and field.
@@ -160,8 +160,8 @@ GridTreeDataGroupingCell.propTypes = {
   value: PropTypes.shape({
     depth: PropTypes.number.isRequired,
     expanded: PropTypes.bool.isRequired,
+    filteredDescendantCount: PropTypes.number.isRequired,
     label: PropTypes.string.isRequired,
-    visibleDescendantCount: PropTypes.number.isRequired,
   }).isRequired,
 } as any;
 

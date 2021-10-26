@@ -132,14 +132,11 @@ export const useGridTreeData = (
         event.preventDefault();
 
         const node = apiRef.current.unstable_getRowNode(params.id);
-        if (!node || node.descendantCount === 0) {
+        if (!node?.descendantCount) {
           return;
         }
 
-        apiRef.current.unstable_setRowExpansion(
-          params.id,
-          !apiRef.current.unstable_getRowNode(params.id)?.expanded,
-        );
+        apiRef.current.unstable_setRowExpansion(params.id, !node.expanded);
       }
     },
     [apiRef],

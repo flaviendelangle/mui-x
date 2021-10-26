@@ -11,6 +11,8 @@ import { GridRowScrollEndParams } from '../../../models/params/gridRowScrollEndP
 import { visibleGridColumnsSelector } from '../columns/gridColumnsSelector';
 import { GridComponentProps } from '../../../GridComponentProps';
 import { GridScrollParams } from '../../../models/params/gridScrollParams';
+import { gridDensityRowHeightSelector } from '../density/densitySelector';
+import { useCurrentPageRows } from '../../utils/useCurrentPageRows';
 
 /**
  * Only available in DataGridPro
@@ -20,10 +22,16 @@ import { GridScrollParams } from '../../../models/params/gridScrollParams';
  */
 export const useGridInfiniteLoader = (
   apiRef: GridApiRef,
-  props: Pick<GridComponentProps, 'onRowsScrollEnd' | 'scrollEndThreshold'>,
+  props: Pick<
+    GridComponentProps,
+    'onRowsScrollEnd' | 'scrollEndThreshold' | 'pagination' | 'paginationMode'
+  >,
 ): void => {
   const containerSizes = useGridSelector(apiRef, gridContainerSizesSelector);
   const visibleColumns = useGridSelector(apiRef, visibleGridColumnsSelector);
+  const currentPage = useCurrentPageRows(apiRef, props);
+  const rowHeight = useGridSelector(apiRef, gridDensityRowHeightSelector);
+  const contentHeight = Math.max(currentPage.rows.length * rowHeight, 1);
 
   const isInScrollBottomArea = React.useRef<boolean>(false);
 
@@ -33,15 +41,14 @@ export const useGridInfiniteLoader = (
         return;
       }
 
-      const scrollPositionBottom =
-        scrollPosition.top + containerSizes.windowSizes.height + props.scrollEndThreshold;
+      const scrollPositionBottom = scrollPosition.top + containerSizes.windowSizes.height;
 
-      if (scrollPositionBottom < containerSizes.dataContainerSizes.height) {
+      if (scrollPositionBottom < contentHeight - props.scrollEndThreshold) {
         isInScrollBottomArea.current = false;
       }
 
       if (
-        scrollPositionBottom >= containerSizes.dataContainerSizes.height &&
+        scrollPositionBottom >= contentHeight - props.scrollEndThreshold &&
         !isInScrollBottomArea.current
       ) {
         const rowScrollEndParam: GridRowScrollEndParams = {
@@ -53,7 +60,7 @@ export const useGridInfiniteLoader = (
         isInScrollBottomArea.current = true;
       }
     },
-    [apiRef, props.scrollEndThreshold, visibleColumns, containerSizes],
+    [containerSizes, contentHeight, props.scrollEndThreshold, visibleColumns, apiRef],
   );
 
   const handleGridScroll = React.useCallback(

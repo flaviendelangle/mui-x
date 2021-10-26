@@ -112,26 +112,10 @@ DataGridRaw.propTypes = {
    */
   componentsProps: PropTypes.object,
   /**
-   * If above 0, the row children will be expanded up to this depth
-   * If equal to -1, all the row children will be expanded
-   * @default 0
-   */
-  defaultGroupingExpansionDepth: PropTypes.number,
-  /**
    * Set the density of the grid.
    * @default "standard"
    */
   density: PropTypes.oneOf(['comfortable', 'compact', 'standard']),
-  /**
-   * If `true`, the filtering will only be applied to the top level rows
-   * @default false
-   */
-  disableChildrenFiltering: PropTypes.bool,
-  /**
-   * If `true`, the sorting will only be applied to the top level rows
-   * @default false
-   */
-  disableChildrenSorting: PropTypes.bool,
   /**
    * If `true`, column filters are disabled.
    * @default false
@@ -218,16 +202,6 @@ DataGridRaw.propTypes = {
    * Return the id of a given [[GridRowModel]].
    */
   getRowId: PropTypes.func,
-  /**
-   * Determines the path of a row in the tree data
-   * @param {GridRowModel} row The row from which we want the path.
-   * @returns {string[]} the path to the row
-   */
-  getTreeDataPath: PropTypes.func,
-  /**
-   * The grouping column used by the tree data
-   */
-  groupingColDef: PropTypes.oneOfType([PropTypes.func, PropTypes.object]),
   /**
    * Set the height in pixel of the column headers in the grid.
    * @default 56
@@ -344,7 +318,7 @@ DataGridRaw.propTypes = {
   /**
    * Callback fired when the cell value changed.
    * @param {GridEditCellValueParams} params With all properties from [[GridEditCellValueParams]].
-   * @param {MuiEvent<{}>} event The event object.
+   * @param {MuiEvent} event The event object.
    * @param {GridCallbackDetails} details Additional details for this callback.
    */
   onCellValueChange: PropTypes.func,
@@ -393,28 +367,28 @@ DataGridRaw.propTypes = {
   /**
    * Callback fired when a column is reordered.
    * @param {GridColumnOrderChangeParams} params With all properties from [[GridColumnOrderChangeParams]].
-   * @param {MuiEvent<{}>} event The event object.
+   * @param {MuiEvent} event The event object.
    * @param {GridCallbackDetails} details Additional details for this callback.
    */
   onColumnOrderChange: PropTypes.func,
   /**
    * Callback fired while a column is being resized.
    * @param {GridColumnResizeParams} params With all properties from [[GridColumnResizeParams]].
-   * @param {MuiEvent<{}>} event The event object.
+   * @param {MuiEvent} event The event object.
    * @param {GridCallbackDetails} details Additional details for this callback.
    */
   onColumnResize: PropTypes.func,
   /**
    * Callback fired when a column visibility changes.
    * @param {GridColumnVisibilityChangeParams} params With all properties from [[GridColumnVisibilityChangeParams]].
-   * @param {MuiEvent<{}>} event The event object.
+   * @param {MuiEvent} event The event object.
    * @param {GridCallbackDetails} details Additional details for this callback.
    */
   onColumnVisibilityChange: PropTypes.func,
   /**
    * Callback fired when the width of a column is changed.
    * @param {GridCallbackDetails} params With all properties from [[GridColumnResizeParams]].
-   * @param {MuiEvent<{}>} event The event object.
+   * @param {MuiEvent} event The event object.
    * @param {GridCallbackDetails} details Additional details for this callback.
    */
   onColumnWidthChange: PropTypes.func,
@@ -434,7 +408,7 @@ DataGridRaw.propTypes = {
   /**
    * Callback fired when an exception is thrown in the grid.
    * @param {any} args The arguments passed to the `showError` call.
-   * @param {MuiEvent<{}>} event The event object.
+   * @param {MuiEvent} event The event object.
    * @param {GridCallbackDetails} details Additional details for this callback.
    */
   onError: PropTypes.func,
@@ -459,7 +433,7 @@ DataGridRaw.propTypes = {
   /**
    * Callback fired when the grid is resized.
    * @param {ElementSize} containerSize With all properties from [[ElementSize]].
-   * @param {MuiEvent<{}>} event The event object.
+   * @param {MuiEvent} event The event object.
    * @param {GridCallbackDetails} details Additional details for this callback.
    */
   onResize: PropTypes.func,
@@ -510,7 +484,7 @@ DataGridRaw.propTypes = {
   /**
    * Callback fired when the state of the grid is updated.
    * @param {GridState} state The new state.
-   * @param {MuiEvent<{}>} event The event object.
+   * @param {MuiEvent} event The event object.
    * @param {GridCallbackDetails} details Additional details for this callback.
    * @internal
    */

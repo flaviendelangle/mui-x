@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { GridComponentProps } from '../../GridComponentProps';
 import {
   gridPaginationRowRangeSelector,
@@ -13,7 +14,7 @@ import { useGridState } from './useGridState';
  * - If the row tree has several layers, it contains up to `state.pageSize` top level rows and all their descendants
  * - If the row tree is flat, it only contains up to `state.pageSize` rows
  */
-export const useRowsInCurrentPage = (
+export const useCurrentPageRows = (
   apiRef: GridApiRef,
   props: Pick<GridComponentProps, 'pagination' | 'paginationMode'>,
 ) => {
@@ -34,8 +35,11 @@ export const useRowsInCurrentPage = (
     }
   }
 
-  return {
-    rows,
-    range,
-  };
+  return React.useMemo(
+    () => ({
+      rows,
+      range,
+    }),
+    [rows, range],
+  );
 };

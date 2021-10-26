@@ -12,19 +12,14 @@ export const gridFilterModelSelector = createSelector(
   (filterState) => filterState.filterModel,
 );
 
-export const gridVisibleRowsSelector = createSelector(
-  gridFilterStateSelector,
-  (filterState) => filterState.visibleRows,
-);
-
 export const gridVisibleRowsLookupSelector = createSelector(
   gridFilterStateSelector,
   (filterState) => filterState.visibleRowsLookup,
 );
 
-export const gridVisibleDescendantCountLookupSelector = createSelector(
+export const gridFilteredDescendantCountLookupSelector = createSelector(
   gridFilterStateSelector,
-  (filterState) => filterState.visibleDescendantsCountLookup,
+  (filterState) => filterState.filteredDescendantCountLookup,
 );
 
 export const gridVisibleSortedRowEntriesSelector = createSelector(
@@ -39,27 +34,32 @@ export const gridVisibleSortedRowIdsSelector = createSelector(
   (visibleSortedRowEntries) => visibleSortedRowEntries.map((row) => row.id),
 );
 
+/**
+ * @deprecated Use `gridVisibleSortedRowIdsSelector` instead
+ */
+export const gridVisibleRowsSelector = gridVisibleSortedRowIdsSelector;
+
 export const gridVisibleSortedTopLevelRowEntriesSelector = createSelector(
   gridVisibleSortedRowEntriesSelector,
   gridRowTreeSelector,
   gridRowTreeDepthSelector,
-  (sortedVisibleRows, rowTree, rowTreeDepth) => {
+  (visibleSortedRows, rowTree, rowTreeDepth) => {
     if (rowTreeDepth < 2) {
-      return sortedVisibleRows;
+      return visibleSortedRows;
     }
 
-    return sortedVisibleRows.filter((row) => rowTree[row.id]?.depth === 0);
+    return visibleSortedRows.filter((row) => rowTree[row.id]?.depth === 0);
   },
 );
 
 export const gridVisibleRowCountSelector = createSelector(
   gridVisibleSortedRowEntriesSelector,
-  (sortedVisibleRows) => sortedVisibleRows.length,
+  (visibleSortedRows) => visibleSortedRows.length,
 );
 
 export const gridVisibleTopLevelRowCountSelector = createSelector(
   gridVisibleSortedTopLevelRowEntriesSelector,
-  (sortedVisibleTopLevelRows) => sortedVisibleTopLevelRows.length,
+  (visibleSortedTopLevelRows) => visibleSortedTopLevelRows.length,
 );
 
 export const gridFilterActiveItemsSelector = createSelector(
