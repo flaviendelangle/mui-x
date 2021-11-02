@@ -136,14 +136,13 @@ GridTreeDataGroupingCell.propTypes = {
    */
   row: PropTypes.any.isRequired,
   /**
-   * The node of the row that the current cell belongs to
+   * The node of the row that the current cell belongs to.
    */
   rowNode: PropTypes.shape({
     children: PropTypes.arrayOf(
       PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
     ),
     depth: PropTypes.number.isRequired,
-    descendantCount: PropTypes.number,
     expanded: PropTypes.bool,
     groupingValue: PropTypes.string.isRequired,
     id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
