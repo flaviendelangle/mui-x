@@ -45,6 +45,10 @@ export const GridBooleanCell = React.memo((props: GridRenderCellParams & SvgIcon
     [rootProps.components.BooleanCellFalseIcon, rootProps.components.BooleanCellTrueIcon, value],
   );
 
+  if (value == null) {
+    return null;
+  }
+
   return (
     <Icon
       fontSize="small"

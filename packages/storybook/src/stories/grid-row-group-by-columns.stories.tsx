@@ -4,7 +4,7 @@ import { Meta } from '@storybook/react';
 import { UseDemoDataOptions, DemoDataReturnType, useDemoData } from '@mui/x-data-grid-generator';
 
 export default {
-  title: 'X-Grid Tests/Row Grouped By Columns',
+  title: 'DataGridPro Test/Row Grouped By Columns',
   component: DataGridPro,
   parameters: {
     options: { selectedPanel: 'storybook/storysource/panel' },
