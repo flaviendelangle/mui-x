@@ -4,7 +4,8 @@ import { GridCellClassNamePropType } from '../gridCellClass';
 import { GridColumnHeaderClassNamePropType } from '../gridColumnHeaderClass';
 import { GridFilterOperator } from '../gridFilterOperator';
 import {
-  GridCellParams, GridKeyGetterParams,
+  GridCellParams,
+  GridKeyGetterParams,
   GridRenderCellParams,
   GridRenderEditCellParams,
   GridValueFormatterParams,
@@ -29,7 +30,7 @@ type ValueOptions = string | number | { value: any; label: string };
 /**
  * Value that can be used as a key for grouping rows
  */
-export type GridKeyValue = string | number | boolean
+export type GridKeyValue = string | number | boolean;
 
 /**
  * Column Definition interface.
@@ -109,7 +110,7 @@ export interface GridColDef {
    * @param {GridKeyGetterParams} params Object containing parameters for the getter.
    * @returns {GridKeyValue} The cell key.
    */
-  keyGetter?: (params: GridKeyGetterParams) => GridKeyValue
+  keyGetter?: (params: GridKeyGetterParams) => GridKeyValue;
   /**
    * Function that allows to customize how the entered value is stored in the row.
    * It only works with cell/row editing.
@@ -193,12 +194,12 @@ export interface GridColDef {
    * If `true`, the rows will be grouped according to the value of this column.
    * @default false
    */
-  groupRows?: boolean
+  groupRows?: boolean;
   /**
    * Allows to define the grouping order when several columns are used to group rows.
    * But default the grouping order will be the definition order in the columns.
    */
-  groupRowIndex?: number
+  groupRowIndex?: number;
 }
 
 export interface GridActionsColDef extends GridColDef {
@@ -233,7 +234,7 @@ export interface GridColumnsMeta {
 
 export type GridColumnLookup = { [field: string]: GridStateColDef };
 
-export type GridRawColumnLookup = { [field: string]: GridStateColDef | GridColDef }
+export type GridRawColumnLookup = { [field: string]: GridStateColDef | GridColDef };
 
 export interface GridColumnsState {
   all: string[];
