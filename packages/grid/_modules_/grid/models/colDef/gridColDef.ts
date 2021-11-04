@@ -4,7 +4,7 @@ import { GridCellClassNamePropType } from '../gridCellClass';
 import { GridColumnHeaderClassNamePropType } from '../gridColumnHeaderClass';
 import { GridFilterOperator } from '../gridFilterOperator';
 import {
-  GridCellParams,
+  GridCellParams, GridKeyGetterParams,
   GridRenderCellParams,
   GridRenderEditCellParams,
   GridValueFormatterParams,
@@ -25,6 +25,12 @@ import { GridRowModel } from '../gridRows';
 export type GridAlignment = 'left' | 'right' | 'center';
 
 type ValueOptions = string | number | { value: any; label: string };
+
+/**
+ * Value that can be used as a key for grouping rows
+ */
+export type GridKeyValue = string | number | boolean
+
 /**
  * Column Definition interface.
  */
@@ -98,6 +104,12 @@ export interface GridColDef {
    * @returns {GridCellValue} The cell value.
    */
   valueGetter?: (params: GridValueGetterParams) => GridCellValue;
+  /**
+   * Function that transform a complex cell value into a key that be used for grouping the rows.
+   * @param {GridKeyGetterParams} params Object containing parameters for the getter.
+   * @returns {GridKeyValue} The cell key.
+   */
+  keyGetter?: (params: GridKeyGetterParams) => GridKeyValue
   /**
    * Function that allows to customize how the entered value is stored in the row.
    * It only works with cell/row editing.
@@ -177,6 +189,16 @@ export interface GridColDef {
    * @default false
    */
   disableExport?: boolean;
+  /**
+   * If `true`, the rows will be grouped according to the value of this column.
+   * @default false
+   */
+  groupRows?: boolean
+  /**
+   * Allows to define the grouping order when several columns are used to group rows.
+   * But default the grouping order will be the definition order in the columns.
+   */
+  groupRowIndex?: number
 }
 
 export interface GridActionsColDef extends GridColDef {
@@ -211,9 +233,16 @@ export interface GridColumnsMeta {
 
 export type GridColumnLookup = { [field: string]: GridStateColDef };
 
+export type GridRawColumnLookup = { [field: string]: GridStateColDef | GridColDef }
+
 export interface GridColumnsState {
   all: string[];
   lookup: GridColumnLookup;
+}
+
+export interface GridRawColumnsState {
+  all: string[];
+  lookup: GridRawColumnLookup;
 }
 
 export type GridColDefOverride = Omit<Partial<GridColDef>, 'field'>;
@@ -225,4 +254,9 @@ export interface GridColDefOverrideParams {
    * The column we are generating before the override.
    */
   colDef: GridColDef;
+
+  /**
+   * The base columns this column is grouping
+   */
+  sources: GridColDef[];
 }

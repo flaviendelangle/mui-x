@@ -20,4 +20,3 @@ export * from './gridStringColDef';
 export * from './gridColType';
 export * from './gridColumnTypesRecord';
 export * from './gridDefaultColumnTypes';
-export * from './gridColDefOverride';

@@ -22,7 +22,7 @@ export const GRID_TREE_DATA_GROUP_COL_DEF: GridColDef = {
   align: 'left',
   width: 200,
   valueGetter: ({ rowNode, api }): GridTreeDataGroupingCellValue => ({
-    label: rowNode.groupingValue,
+    label: rowNode.groupingValue.toString(),
     depth: rowNode.depth,
     expanded: rowNode.expanded ?? false,
     filteredDescendantCount: gridFilteredDescendantCountLookupSelector(api.state)[rowNode.id] ?? 0,
