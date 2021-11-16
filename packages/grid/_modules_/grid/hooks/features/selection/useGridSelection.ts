@@ -21,11 +21,11 @@ import { gridVisibleSortedRowIdsSelector } from '../filter/gridFilterSelector';
 import { GridHeaderSelectionCheckboxParams } from '../../../models/params/gridHeaderSelectionCheckboxParams';
 import { GridCellParams } from '../../../models/params/gridCellParams';
 import { GridRowSelectionCheckboxParams } from '../../../models/params/gridRowSelectionCheckboxParams';
-import { GridColumnsPreProcessing } from '../../core/columnsPreProcessing';
-import { GRID_CHECKBOX_SELECTION_COL_DEF, GridColDef } from '../../../models';
+import { GRID_CHECKBOX_SELECTION_COL_DEF, GridColDef, GridRawColumnsState } from '../../../models';
 import { getDataGridUtilityClass } from '../../../gridClasses';
 import { useGridStateInit } from '../../utils/useGridStateInit';
 import { useFirstRender } from '../../utils/useFirstRender';
+import { GridPreProcessingGroup } from '../../core/preProcessing';
 
 type OwnerState = { classes: GridComponentProps['classes'] };
 
@@ -376,7 +376,7 @@ export const useGridSelection = (
   }, [apiRef, isRowSelectable, isStateControlled]);
 
   const updateColumnsPreProcessing = React.useCallback(() => {
-    const addCheckboxColumn: GridColumnsPreProcessing = (columnsState) => {
+    const addCheckboxColumn = (columnsState: GridRawColumnsState) => {
       const selectionColumn: GridColDef = {
         ...GRID_CHECKBOX_SELECTION_COL_DEF,
         cellClassName: classes.cellCheckbox,
@@ -398,7 +398,11 @@ export const useGridSelection = (
       return columnsState;
     };
 
-    apiRef.current.unstable_registerColumnPreProcessing('selection', addCheckboxColumn);
+    apiRef.current.unstable_registerPreProcessor(
+      GridPreProcessingGroup.hydrateColumns,
+      'selection',
+      addCheckboxColumn,
+    );
   }, [apiRef, props.checkboxSelection, classes]);
 
   useFirstRender(() => {
@@ -411,7 +415,6 @@ export const useGridSelection = (
       isFirstRender.current = false;
       return;
     }
-
     updateColumnsPreProcessing();
   }, [updateColumnsPreProcessing]);
 };

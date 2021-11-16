@@ -39,7 +39,7 @@
     "getCellClassName": "Function that applies CSS classes dynamically on cells.<br><br><strong>Signature:</strong><br><code>function(params: GridCellParams) =&gt; string</code><br><em>params:</em> With all properties from <a href=\"/api/data-grid/grid-cell-params/\">GridCellParams</a>.<br> <em>returns</em> (string): The CSS class to apply to the cell.",
     "getRowClassName": "Function that applies CSS classes dynamically on rows.<br><br><strong>Signature:</strong><br><code>function(params: GridRowParams) =&gt; string</code><br><em>params:</em> With all properties from <a href=\"/api/data-grid/grid-row-params/\">GridRowParams</a>.<br> <em>returns</em> (string): The CSS class to apply to the row.",
     "getRowId": "Return the id of a given GridRowModel.",
-    "getTreeDataPath": "Determines the path of a row in the tree data. For instance, a row with the path [&quot;A&quot;, &quot;B&quot;] is the child of the row with the path [&quot;A&quot;]. Note than all paths must contain at least one element.<br><br><strong>Signature:</strong><br><code>function(row: GridRowModel) =&gt; Array&lt;string&gt;</code><br><em>row:</em> The row from which we want the path.<br> <em>returns</em> (Array<string>): the path to the row.",
+    "getTreeDataPath": "Determines the path of a row in the tree data. For instance, a row with the path [&quot;A&quot;, &quot;B&quot;] is the child of the row with the path [&quot;A&quot;]. Note that all paths must contain at least one element.<br><br><strong>Signature:</strong><br><code>function(row: GridRowModel) =&gt; Array&lt;string&gt;</code><br><em>row:</em> The row from which we want the path.<br> <em>returns</em> (Array<string>): The path to the row.",
     "groupingColDef": "The grouping column used by the tree data.",
     "headerHeight": "Set the height in pixel of the column headers in the grid.",
     "hideFooter": "If <code>true</code>, the footer component is hidden.",
@@ -387,11 +387,19 @@
       "description": "Styles applied to {{nodeName}} if {{conditions}}.",
       "nodeName": "both the cell and the column header",
       "conditions": "<code>showColumnRightBorder={true}</code>"
+    },
+    "treeDataGroupingCell": {
+      "description": "Styles applied to {{nodeName}}.",
+      "nodeName": "the root of the grouping column of the tree data"
+    },
+    "treeDataGroupingCellToggle": {
+      "description": "Styles applied to {{nodeName}}.",
+      "nodeName": "the toggle of the grouping column of the tree data"
     }
   },
   "slotDescriptions": {
     "Cell": "Component rendered for each cell.",
-    "Checkbox": "The custom Checkbox component used in the grid for both header and cells.",
+    "BaseCheckbox": "The custom Checkbox component used in the grid for both header and cells.",
     "ColumnMenu": "Column menu component rendered by clicking on the 3 dots &quot;kebab&quot; icon in column headers.",
     "ErrorOverlay": "Error overlay component rendered above the grid when an error is caught.",
     "Footer": "Footer component rendered at the bottom of the grid viewport.",

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { makeStyles } from '@mui/styles';
+import { unstable_composeClasses as composeClasses } from '@mui/core';
 import IconButton from '@mui/material/IconButton';
 import Box from '@mui/material/Box';
 import { useGridRootProps } from '../../hooks/utils/useGridRootProps';
@@ -8,19 +8,21 @@ import { useGridApiContext } from '../../hooks/utils/useGridApiContext';
 import { GridRenderCellParams } from '../../models/params/gridCellParams';
 import { isNavigationKey, isSpaceKey } from '../../utils/keyboardUtils';
 import { GridEvents } from '../../constants';
+import { getDataGridUtilityClass } from '../../gridClasses';
+import { GridComponentProps } from '../../GridComponentProps';
 
-const useStyles = makeStyles({
-  root: {
-    display: 'flex',
-    alignItems: 'center',
-    width: '100%',
-  },
-  toggle: {
-    flex: '0 0 28px',
-    alignSelf: 'stretch',
-    marginRight: 16,
-  },
-});
+type OwnerState = { classes: GridComponentProps['classes'] };
+
+const useUtilityClasses = (ownerState: OwnerState) => {
+  const { classes } = ownerState;
+
+  const slots = {
+    root: ['treeDataGroupingCell'],
+    toggle: ['treeDataGroupingCellToggle'],
+  };
+
+  return composeClasses(slots, getDataGridUtilityClass, classes);
+};
 
 export interface GridTreeDataGroupingCellValue {
   label: string;
@@ -34,7 +36,8 @@ const GridTreeDataGroupingCell = (props: GridRenderCellParams<GridTreeDataGroupi
 
   const rootProps = useGridRootProps();
   const apiRef = useGridApiContext();
-  const classes = useStyles();
+  const ownerState: OwnerState = { classes: rootProps.classes };
+  const classes = useUtilityClasses(ownerState);
 
   const Icon = value.expanded
     ? rootProps.components.TreeDataCollapseIcon

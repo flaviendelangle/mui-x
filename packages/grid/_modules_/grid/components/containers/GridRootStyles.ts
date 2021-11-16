@@ -42,6 +42,8 @@ export const GridRootStyles = styled('div', {
     { [`& .${gridClasses.row}`]: styles.row },
     { [`& .${gridClasses.sortIcon}`]: styles.sortIcon },
     { [`& .${gridClasses.withBorder}`]: styles.withBorder },
+    { [`& .${gridClasses.treeDataGroupingCell}`]: styles.treeDataGroupingCell },
+    { [`& .${gridClasses.treeDataGroupingCellToggle}`]: styles.treeDataGroupingCellToggle },
     styles.root,
   ],
 })(({ theme }) => {
@@ -50,7 +52,7 @@ export const GridRootStyles = styled('div', {
       ? lighten(alpha(theme.palette.divider, 1), 0.88)
       : darken(alpha(theme.palette.divider, 1), 0.68);
 
-  let gridStyle: CSSInterpolation = {
+  const gridStyle: CSSInterpolation = {
     flex: 1,
     boxSizing: 'border-box',
     position: 'relative',
@@ -288,40 +290,17 @@ export const GridRootStyles = styled('div', {
       borderRadius: theme.shape.borderRadius,
       opacity: theme.palette.action.disabledOpacity,
     },
+    [`& .${gridClasses.treeDataGroupingCell}`]: {
+      display: 'flex',
+      alignItems: 'center',
+      width: '100%',
+    },
+    [`& .${gridClasses.treeDataGroupingCellToggle}`]: {
+      flex: '0 0 28px',
+      alignSelf: 'stretch',
+      marginRight: 16,
+    },
   };
 
-  if (theme.palette.mode === 'dark') {
-    // Values coming from mac OS.
-    const track = '#202022';
-    const thumb = '#585859';
-    const active = '#838384';
-
-    // We style the scroll bar for dark mode.
-    gridStyle = {
-      ...gridStyle,
-      scrollbarColor: `${thumb} ${track}`,
-      '& *::-webkit-scrollbar': {
-        backgroundColor: track,
-      },
-      '& *::-webkit-scrollbar-thumb': {
-        borderRadius: 8,
-        backgroundColor: thumb,
-        minHeight: 24,
-        border: `3px solid ${track}`,
-      },
-      '& *::-webkit-scrollbar-thumb:focus': {
-        backgroundColor: active,
-      },
-      '& *::-webkit-scrollbar-thumb:active': {
-        backgroundColor: active,
-      },
-      '& *::-webkit-scrollbar-thumb:hover': {
-        backgroundColor: active,
-      },
-      '& *::-webkit-scrollbar-corner': {
-        backgroundColor: track,
-      },
-    };
-  }
   return gridStyle;
 });

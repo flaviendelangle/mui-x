@@ -8,8 +8,8 @@ import type {
   GridRowId,
   GridColDef,
   GridRawColumnLookup,
+  GridRawColumnsState,
 } from '../../../models';
-import { GridColumnsPreProcessing } from '../../core/columnsPreProcessing';
 import { GridRowGroupingPreProcessing } from '../../core/rowGroupsPerProcessing';
 import { useFirstRender } from '../../utils/useFirstRender';
 import { isSpaceKey } from '../../../utils/keyboardUtils';
@@ -22,6 +22,7 @@ import { orderGroupedByFields, getRowGroupingColumnLookup } from './rowGroupByCo
 import { isDeepEqual, isFunction } from '../../../utils/utils';
 import { GRID_ROW_GROUP_BY_COLUMNS_GROUP_COL_DEF } from './gridRowGroupByColumnsGroupColDef';
 import { GridRowGroupByColumnsGroupingCell } from '../../../components/cell/GridRowGroupByColumnsGroupingCell';
+import { GridPreProcessingGroup, useGridRegisterPreProcessor } from '../../core/preProcessing';
 
 /**
  * Only available in DataGridPro
@@ -105,45 +106,6 @@ export const useGridRowGroupByColumns = (
   );
 
   const groupingFieldsOnLastRowPreProcessing = React.useRef<string[]>([]);
-
-  const updateColumnsPreProcessing = React.useCallback(() => {
-    const addGroupingColumn: GridColumnsPreProcessing = (columnsState) => {
-      const groupedByColDefs = getRowGroupingColumnLookup(columnsState.lookup);
-      const orderedGroupedByFields = orderGroupedByFields(groupedByColDefs);
-      const groupingColDefs = getGroupingColDefs(groupedByColDefs, orderedGroupedByFields);
-
-      if (columnsState.all.length === 0) {
-        return columnsState;
-      }
-
-      // We remove the grouping columns
-      const newColumnFields: string[] = [];
-      columnsState.all.forEach((field) => {
-        if (columnsState.lookup[field].type === 'rowGroupByColumnsGroup') {
-          delete columnsState.lookup[field];
-        } else {
-          newColumnFields.push(field);
-        }
-      });
-      columnsState.all = newColumnFields;
-
-      // We add the grouping column
-      groupingColDefs.forEach((groupingColDef) => {
-        columnsState.lookup[groupingColDef.field] = groupingColDef;
-      });
-      const startIndex =
-        columnsState.lookup[columnsState.all[0]].type === 'checkboxSelection' ? 1 : 0;
-      columnsState.all = [
-        ...columnsState.all.slice(0, startIndex),
-        ...groupingColDefs.map((colDef) => colDef.field),
-        ...columnsState.all.slice(startIndex),
-      ];
-
-      return columnsState;
-    };
-
-    apiRef.current.unstable_registerColumnPreProcessing('rowGrouping', addGroupingColumn);
-  }, [apiRef, getGroupingColDefs]);
 
   const updateRowGrouping = React.useCallback(() => {
     const groupRows: GridRowGroupingPreProcessing = (params) => {
@@ -232,19 +194,48 @@ export const useGridRowGroupByColumns = (
   }, [apiRef, props.defaultGroupingExpansionDepth]);
 
   useFirstRender(() => {
-    updateColumnsPreProcessing();
     updateRowGrouping();
   });
 
+  const addGroupingColumn = React.useCallback(
+    (columnsState: GridRawColumnsState) => {
+      const groupedByColDefs = getRowGroupingColumnLookup(columnsState.lookup);
+      const orderedGroupedByFields = orderGroupedByFields(groupedByColDefs);
+      const groupingColDefs = getGroupingColDefs(groupedByColDefs, orderedGroupedByFields);
+
+      if (columnsState.all.length === 0) {
+        return columnsState;
+      }
+
+      // We remove the grouping columns
+      const newColumnFields: string[] = [];
+      columnsState.all.forEach((field) => {
+        if (columnsState.lookup[field].type === 'rowGroupByColumnsGroup') {
+          delete columnsState.lookup[field];
+        } else {
+          newColumnFields.push(field);
+        }
+      });
+      columnsState.all = newColumnFields;
+
+      // We add the grouping column
+      groupingColDefs.forEach((groupingColDef) => {
+        columnsState.lookup[groupingColDef.field] = groupingColDef;
+      });
+      const startIndex =
+        columnsState.lookup[columnsState.all[0]].type === 'checkboxSelection' ? 1 : 0;
+      columnsState.all = [
+        ...columnsState.all.slice(0, startIndex),
+        ...groupingColDefs.map((colDef) => colDef.field),
+        ...columnsState.all.slice(startIndex),
+      ];
+
+      return columnsState;
+    },
+    [getGroupingColDefs],
+  );
+
   const isFirstRender = React.useRef(true);
-  React.useEffect(() => {
-    if (isFirstRender.current) {
-      return;
-    }
-
-    updateColumnsPreProcessing();
-  }, [updateColumnsPreProcessing]);
-
   React.useEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false;
@@ -253,6 +244,8 @@ export const useGridRowGroupByColumns = (
 
     updateRowGrouping();
   }, [updateRowGrouping]);
+
+  useGridRegisterPreProcessor(apiRef, GridPreProcessingGroup.hydrateColumns, addGroupingColumn);
 
   const handleCellKeyDown = React.useCallback(
     (params: GridCellParams, event: MuiEvent<React.KeyboardEvent>) => {

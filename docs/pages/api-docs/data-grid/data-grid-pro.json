@@ -59,7 +59,7 @@
     "filterModel": {
       "type": {
         "name": "shape",
-        "description": "{ items: Array&lt;{ columnField?: string, id?: number<br>&#124;&nbsp;string, operatorValue?: string, value?: any }&gt;, linkOperator?: 'and'<br>&#124;&nbsp;'or' }"
+        "description": "{ items: Array&lt;{ columnField: string, id?: number<br>&#124;&nbsp;string, operatorValue?: string, value?: any }&gt;, linkOperator?: 'and'<br>&#124;&nbsp;'or' }"
       }
     },
     "getCellClassName": { "type": { "name": "func" } },
@@ -113,7 +113,11 @@
     "onColumnResize": { "type": { "name": "func" } },
     "onColumnVisibilityChange": { "type": { "name": "func" } },
     "onColumnWidthChange": { "type": { "name": "func" } },
-    "onEditCellPropsChange": { "type": { "name": "func" } },
+    "onEditCellPropsChange": {
+      "type": { "name": "func" },
+      "deprecated": true,
+      "deprecationInfo": "use <code>preProcessEditCellProps</code> from the <a href=\"/api/data-grid/grid-col-def/\"><code>GridColDef</code></a>"
+    },
     "onEditRowsModelChange": { "type": { "name": "func" } },
     "onError": { "type": { "name": "func" } },
     "onFilterModelChange": { "type": { "name": "func" } },
@@ -172,10 +176,10 @@
     "treeData": { "type": { "name": "bool" } }
   },
   "slots": {
+    "BaseCheckbox": { "default": "Checkbox", "type": { "name": "elementType" } },
     "BooleanCellFalseIcon": { "default": "GridCloseIcon", "type": { "name": "elementType" } },
     "BooleanCellTrueIcon": { "default": "GridCheckIcon", "type": { "name": "elementType" } },
     "Cell": { "type": { "name": "elementType" } },
-    "Checkbox": { "default": "Checkbox", "type": { "name": "elementType" } },
     "ColumnFilteredIcon": { "default": "GridFilterAltIcon", "type": { "name": "elementType" } },
     "ColumnMenu": { "default": "GridColumnMenu", "type": { "name": "elementType" } },
     "ColumnMenuIcon": {
@@ -292,12 +296,14 @@
       "sortIcon",
       "toolbarContainer",
       "toolbarFilterList",
-      "withBorder"
+      "withBorder",
+      "treeDataGroupingCell",
+      "treeDataGroupingCellToggle"
     ],
     "globalClasses": {},
     "name": "MuiDataGrid"
   },
   "forwardsRefTo": "GridRoot",
-  "filename": "/packages/grid/x-grid/src/DataGridPro.tsx",
+  "filename": "/packages/grid/x-data-grid-pro/src/DataGridPro.tsx",
   "demos": "<ul><li><a href=\"/components/data-grid#commercial-version\">DataGridPro</a></li></ul>"
 }

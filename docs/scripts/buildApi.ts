@@ -579,6 +579,8 @@ async function buildDocs(options: {
         /\.isRequired/.test(prop.type.raw) ||
         (chainedPropType !== false && chainedPropType.required);
 
+      const deprecation = (propDescriptor.description || '').match(/@deprecated(\s+(?<info>.*))?/);
+
       return [
         propName,
         {
@@ -590,6 +592,9 @@ async function buildDocs(options: {
           default: defaultValue,
           // undefined values are not serialized => saving some bytes
           required: requiredProp || undefined,
+          deprecated: !!deprecation || undefined,
+          deprecationInfo:
+            renderMarkdownInline(deprecation?.groups?.info || '').trim() || undefined,
         },
       ];
     }),
@@ -753,8 +758,8 @@ async function run(argv: { outputDirectory?: string }) {
   const tsconfig = ttp.loadConfig(path.resolve(__dirname, '../../tsconfig.json'));
 
   const componentsToGenerateDocs = [
-    path.resolve(__dirname, '../../packages/grid/data-grid/src/DataGrid.tsx'),
-    path.resolve(__dirname, '../../packages/grid/x-grid/src/DataGridPro.tsx'),
+    path.resolve(__dirname, '../../packages/grid/x-data-grid/src/DataGrid.tsx'),
+    path.resolve(__dirname, '../../packages/grid/x-data-grid-pro/src/DataGridPro.tsx'),
   ];
 
   const indexPath = path.resolve(__dirname, '../../packages/grid/_modules_/index.ts');
@@ -826,9 +831,9 @@ async function run(argv: { outputDirectory?: string }) {
   app.options.addReader(new TypeDoc.TSConfigReader());
   app.options.addReader(new TypeDoc.TypeDocReader());
   app.bootstrap({
-    entryPoints: ['packages/grid/data-grid/src/index.ts'],
+    entryPoints: ['packages/grid/x-data-grid/src/index.ts'],
     exclude: ['**/*.test.ts'],
-    tsconfig: 'packages/grid/data-grid/tsconfig.json',
+    tsconfig: 'packages/grid/x-data-grid/tsconfig.json',
   });
   const project = app.convert()!;
 

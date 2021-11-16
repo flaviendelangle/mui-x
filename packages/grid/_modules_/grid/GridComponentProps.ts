@@ -106,9 +106,9 @@ interface GridComponentOtherProps {
   /**
    * Determines the path of a row in the tree data.
    * For instance, a row with the path ["A", "B"] is the child of the row with the path ["A"].
-   * Note than all paths must contain at least one element.
+   * Note that all paths must contain at least one element.
    * @param {GridRowModel} row The row from which we want the path.
-   * @returns {string[]} the path to the row.
+   * @returns {string[]} The path to the row.
    */
   getTreeDataPath?: (row: GridRowModel) => string[];
   /**
@@ -116,6 +116,7 @@ interface GridComponentOtherProps {
    * @param {GridEditCellPropsParams} params With all properties from [[GridEditCellPropsParams]].
    * @param {MuiEvent} event The event that caused this prop to be called.
    * @param {GridCallbackDetails} details Additional details for this callback.
+   * @deprecated use `preProcessEditCellProps` from the [`GridColDef`](/api/data-grid/grid-col-def/)
    */
   onEditCellPropsChange?: (
     params: GridEditCellPropsParams,
