@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useEventCallback } from '@mui/material/utils';
 import { GridEvents } from '../../../constants/eventsConstants';
 import { GridComponentProps } from '../../../GridComponentProps';
-import { GridApiRef } from '../../../models/api/gridApiRef';
+import { GridPrivateApiRef } from '../../../models/api/gridApiRef';
 import { GridRowId } from '../../../models/gridRows';
 import { GridEditRowApi } from '../../../models/api/gridEditRowApi';
 import { GridCellMode } from '../../../models/gridCell';
@@ -30,6 +30,7 @@ import {
   isKeyboardEvent,
 } from '../../../utils/keyboardUtils';
 import {
+  GridSignature,
   useGridApiEventHandler,
   useGridApiOptionHandler,
 } from '../../utils/useGridApiEventHandler';
@@ -52,7 +53,7 @@ function isPromise(promise: any): promise is Promise<GridEditCellProps> {
  * @requires useGridControlState (method)
  */
 export function useGridEditRows(
-  apiRef: GridApiRef,
+  apiRef: GridPrivateApiRef,
   props: Pick<
     GridComponentProps,
     | 'editRowsModel'
@@ -66,6 +67,7 @@ export function useGridEditRows(
     | 'onRowEditStop'
     | 'isCellEditable'
     | 'editMode'
+    | 'signature'
   >,
 ) {
   const logger = useGridLogger(apiRef, 'useGridEditRows');
@@ -612,6 +614,19 @@ export function useGridEditRows(
   useGridApiOptionHandler(apiRef, GridEvents.rowEditCommit, props.onRowEditCommit);
   useGridApiOptionHandler(apiRef, GridEvents.rowEditStart, props.onRowEditStart);
   useGridApiOptionHandler(apiRef, GridEvents.rowEditStop, props.onRowEditStop);
+
+  const isAdvancedApiPublic = props.signature !== GridSignature.DataGrid;
+
+  apiRef.current.registerMethod('setCellMode', true, setCellMode);
+  apiRef.current.registerMethod('getCellMode', true, getCellMode);
+  apiRef.current.registerMethod('setRowMode', true, setRowMode);
+  apiRef.current.registerMethod('getRowMode', true, getRowMode);
+  apiRef.current.registerMethod('isCellEditable', true, isCellEditable);
+  apiRef.current.registerMethod('commitCellChange', isAdvancedApiPublic, commitCellChange);
+  apiRef.current.registerMethod('commitRowChange', isAdvancedApiPublic, commitRowChange);
+  apiRef.current.registerMethod('setEditRowsModel', isAdvancedApiPublic, setEditRowsModel);
+  apiRef.current.registerMethod('setEditRowsModel', isAdvancedApiPublic, getEditRowsModel);
+  apiRef.current.registerMethod('setEditCellValue', isAdvancedApiPublic, setEditCellValue);
 
   useGridApiMethod<GridEditRowApi>(
     apiRef,
