@@ -11,7 +11,6 @@ export interface GridPreProcessingPrivateApi {
    * @param {number} id An unique and static identifier of the pre-processor.
    * @param {PreProcessorCallback} callback The pre-processor to register.
    * @returns {() => void} A function to unregister the pre-processor.
-   * @ignore - do not document.
    */
   registerPreProcessor: (
     group: GridPreProcessingGroup,
@@ -24,7 +23,6 @@ export interface GridPreProcessingPrivateApi {
    * @param {any} value The value to pass to the first pre-processor.
    * @param {any} params Additional paramas to pass to the pre-processors.
    * @returns {any} The value after passing through all pre-processors.
-   * @ignore - do not document.
    */
   applyPreProcessors: (group: GridPreProcessingGroup, value: any, params?: any) => any;
 }
