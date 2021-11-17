@@ -34,7 +34,6 @@ import {
   useGridApiEventHandler,
   useGridApiOptionHandler,
 } from '../../utils/useGridApiEventHandler';
-import { useGridApiMethod } from '../../utils/useGridApiMethod';
 import { allGridColumnsSelector } from '../columns/gridColumnsSelector';
 import { useGridLogger } from '../../utils/useGridLogger';
 import { useGridState } from '../../utils/useGridState';
@@ -625,25 +624,8 @@ export function useGridEditRows(
   apiRef.current.registerMethod('commitCellChange', isAdvancedApiPublic, commitCellChange);
   apiRef.current.registerMethod('commitRowChange', isAdvancedApiPublic, commitRowChange);
   apiRef.current.registerMethod('setEditRowsModel', isAdvancedApiPublic, setEditRowsModel);
-  apiRef.current.registerMethod('setEditRowsModel', isAdvancedApiPublic, getEditRowsModel);
+  apiRef.current.registerMethod('getEditRowsModel', isAdvancedApiPublic, getEditRowsModel);
   apiRef.current.registerMethod('setEditCellValue', isAdvancedApiPublic, setEditCellValue);
-
-  useGridApiMethod<GridEditRowApi>(
-    apiRef,
-    {
-      setCellMode,
-      getCellMode,
-      setRowMode,
-      getRowMode,
-      isCellEditable,
-      commitCellChange,
-      commitRowChange,
-      setEditRowsModel,
-      getEditRowsModel,
-      setEditCellValue,
-    },
-    'EditRowApi',
-  );
 
   React.useEffect(() => {
     if (props.editRowsModel !== undefined) {
