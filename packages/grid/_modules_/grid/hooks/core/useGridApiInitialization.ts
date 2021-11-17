@@ -14,6 +14,7 @@ const isSyntheticEvent = (event: any): event is React.SyntheticEvent => {
 
 const wrapPublicApi = (publicApi: GridApi) => {
   const privateOnlyApi = {
+    getPublicApi: () => publicApi,
     registerMethod: (methodName: string, isPublic: boolean, method: (...args: any[]) => any) => {
       if (isPublic) {
         publicApi[methodName] = method;

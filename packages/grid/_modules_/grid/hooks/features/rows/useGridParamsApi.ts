@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { GridApiRef } from '../../../models/api/gridApiRef';
+import { GridPrivateApiRef } from '../../../models/api/gridApiRef';
 import { GridParamsApi } from '../../../models/api/gridParamsApi';
 import { GridRowId } from '../../../models/gridRows';
 import { GridCellParams, GridValueGetterParams } from '../../../models/params/gridCellParams';
@@ -32,7 +32,7 @@ function warnMissingColumn(field) {
  * TODO: Impossible priority - useGridEditRows also needs to be after useGridParamsApi
  * TODO: Impossible priority - useGridFocus also needs to be after useGridParamsApi
  */
-export function useGridParamsApi(apiRef: GridApiRef) {
+export function useGridParamsApi(apiRef: GridPrivateApiRef) {
   const getColumnHeaderParams = React.useCallback(
     (field: string): GridColumnHeaderParams => ({
       field,
@@ -81,7 +81,7 @@ export function useGridParamsApi(apiRef: GridApiRef) {
         colDef: apiRef.current.getColumn(field),
         cellMode: apiRef.current.getCellMode(id, field),
         getValue: apiRef.current.getCellValue,
-        api: apiRef.current,
+        api: apiRef.current.getPublicApi(),
         hasFocus: cellFocus !== null && cellFocus.field === field && cellFocus.id === id,
         tabIndex: cellTabIndex && cellTabIndex.field === field && cellTabIndex.id === id ? 0 : -1,
       };
@@ -123,7 +123,7 @@ export function useGridParamsApi(apiRef: GridApiRef) {
           id,
           field: params.field,
           value: params.value,
-          api: apiRef.current,
+          api: apiRef.current.getPublicApi(),
         });
       }
       params.isEditable = colDef && apiRef.current.isCellEditable(params);

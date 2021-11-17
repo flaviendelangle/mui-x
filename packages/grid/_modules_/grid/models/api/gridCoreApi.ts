@@ -2,7 +2,7 @@ import * as React from 'react';
 import { GridEventListener } from '../gridEventListener';
 import { EventManager, EventListenerOptions } from '../../utils/EventManager';
 import { MuiEvent } from '../muiEvent';
-import type { GridPrivateApi } from './gridApi';
+import type { GridApi, GridPrivateApi } from './gridApi';
 
 /**
  * The core API interface that is available in the grid `apiRef`.
@@ -79,5 +79,19 @@ export interface GridCoreApi {
 }
 
 export interface GridCorePrivateApi {
+  /**
+   * Registers a method on the public or the private API.
+   * @param {keyof GridPrivateApi} methodName Name of the method to register.
+   * @param {boolean} isPublic If `true`, the method will be accessible via `useGridApiRef` and `useGridApiContext`.
+   * @param {Function} method Method to register.
+   */
   registerMethod: (methodName: keyof GridPrivateApi, isPublic: boolean, method: Function) => void;
+
+  /**
+   * Returns the public API.
+   * Can be useful on a feature hook if we want to pass the `apiRef` to a callback.
+   * Do not use it to access the public method in private parts of the codebase.
+   * @returns {GridApi} The public api.
+   */
+  getPublicApi: () => GridApi;
 }
