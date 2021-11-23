@@ -407,7 +407,6 @@ interface GridComponentOtherProps {
    * @param {GridCallbackDetails} details Additional details for this callback.
    */
   onPageSizeChange?: (pageSize: number, details: GridCallbackDetails) => void;
-
   /**
    * Set the edit rows model of the grid.
    */
@@ -504,5 +503,7 @@ interface GridComponentOtherProps {
   /**
    * The grouping column used by the tree data.
    */
-  groupingColDef?: GridColDefOverride | GridColDefOverrideCallback;
+  groupingColDef?:
+    | GridColDefOverride<'field' | 'editable'>
+    | GridColDefOverrideCallback<'field' | 'editable'>;
 }

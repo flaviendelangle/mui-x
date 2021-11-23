@@ -1,23 +1,20 @@
 import * as React from 'react';
 import { GridApiRef } from '../../../models/api/gridApiRef';
 import { GridComponentProps } from '../../../GridComponentProps';
-import { GRID_TREE_DATA_GROUP_COL_DEF } from './gridTreeDataGroupColDef';
+import {
+  GRID_TREE_DATA_GROUP_COL_DEF,
+  GRID_TREE_DATA_GROUP_COL_DEF_FORCED_FIELDS,
+} from './gridTreeDataGroupColDef';
 import { useGridApiEventHandler } from '../../utils/useGridApiEventHandler';
 import { GridEvents } from '../../../constants';
-import {
-  GridCellParams,
-  GridColDef,
-  GridColDefOverrideParams,
-  GridColumns,
-  GridRawColumnsState,
-  MuiEvent,
-} from '../../../models';
+import { GridCellParams, GridColDef, GridColDefOverrideParams, MuiEvent } from '../../../models';
 import { isSpaceKey } from '../../../utils/keyboardUtils';
 import { useFirstRender } from '../../utils/useFirstRender';
 import { buildRowTree } from '../../../utils/rowTreeUtils';
 import { GridRowGroupingPreProcessing } from '../../core/rowGroupsPerProcessing';
 import { gridFilteredDescendantCountLookupSelector } from '../filter';
 import { GridPreProcessingGroup, useGridRegisterPreProcessor } from '../../core/preProcessing';
+import { GridColumnsRawState } from '../columns/gridColumnsState';
 
 /**
  * Only available in DataGridPro
@@ -37,6 +34,7 @@ export const useGridTreeData = (
     const baseColDef: GridColDef = {
       ...GRID_TREE_DATA_GROUP_COL_DEF,
       headerName: apiRef.current.getLocaleText('treeDataGroupingHeaderName'),
+      ...GRID_TREE_DATA_GROUP_COL_DEF_FORCED_FIELDS,
     };
     let colDefOverride: Partial<GridColDef>;
 
@@ -58,13 +56,13 @@ export const useGridTreeData = (
   }, [apiRef, props.groupingColDef]);
 
   const addGroupingColumn = React.useCallback(
-    (columnsState: GridRawColumnsState) => {
+    (columnsState: GridColumnsRawState) => {
       const shouldHaveGroupingColumn = props.treeData;
       const haveGroupingColumn = columnsState.lookup[groupingColDef.field] != null;
 
       if (shouldHaveGroupingColumn && !haveGroupingColumn) {
         columnsState.lookup[groupingColDef.field] = groupingColDef;
-        const index = columnsState.lookup[columnsState.all[0]].type === 'checkboxSelection' ? 1 : 0;
+        const index = columnsState.all?.[0] === '__check__' ? 1 : 0;
         columnsState.all = [
           ...columnsState.all.slice(0, index),
           groupingColDef.field,
@@ -130,7 +128,7 @@ export const useGridTreeData = (
         event.stopPropagation();
         event.preventDefault();
 
-        const node = apiRef.current.unstable_getRowNode(params.id);
+        const node = apiRef.current.getRowNode(params.id);
         const filteredDescendantCount =
           gridFilteredDescendantCountLookupSelector(apiRef.current.state)[params.id] ?? 0;
 
@@ -138,7 +136,7 @@ export const useGridTreeData = (
           return;
         }
 
-        apiRef.current.unstable_setRowExpansion(params.id, !node.expanded);
+        apiRef.current.setRowChildrenExpansion(params.id, !node.childrenExpanded);
       }
     },
     [apiRef],

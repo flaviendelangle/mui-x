@@ -26,6 +26,7 @@ import { getDataGridUtilityClass } from '../../../gridClasses';
 import { useGridStateInit } from '../../utils/useGridStateInit';
 import { useFirstRender } from '../../utils/useFirstRender';
 import { GridPreProcessingGroup } from '../../core/preProcessing';
+import { GridColumnsRawState } from '../columns/gridColumnsState';
 
 type OwnerState = { classes: GridComponentProps['classes'] };
 
@@ -376,7 +377,7 @@ export const useGridSelection = (
   }, [apiRef, isRowSelectable, isStateControlled]);
 
   const updateColumnsPreProcessing = React.useCallback(() => {
-    const addCheckboxColumn = (columnsState: GridRawColumnsState) => {
+    const addCheckboxColumn = (columnsState: GridColumnsRawState) => {
       const selectionColumn: GridColDef = {
         ...GRID_CHECKBOX_SELECTION_COL_DEF,
         cellClassName: classes.cellCheckbox,

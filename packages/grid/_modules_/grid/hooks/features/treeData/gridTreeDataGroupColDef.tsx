@@ -11,9 +11,8 @@ import { GridRenderCellParams } from '../../../models';
 /**
  * TODO: Add sorting and filtering on the value and the filteredDescendantCount
  */
-export const GRID_TREE_DATA_GROUP_COL_DEF: GridColDef = {
+export const GRID_TREE_DATA_GROUP_COL_DEF: Omit<GridColDef, 'field' | 'editable'> = {
   ...GRID_STRING_COL_DEF,
-  field: '__tree_data_group__',
   type: 'treeDataGroup',
   sortable: false,
   filterable: false,
@@ -24,10 +23,15 @@ export const GRID_TREE_DATA_GROUP_COL_DEF: GridColDef = {
   valueGetter: ({ rowNode, api }): GridTreeDataGroupingCellValue => ({
     label: rowNode.groupingValue.toString(),
     depth: rowNode.depth,
-    expanded: rowNode.expanded ?? false,
+    expanded: rowNode.childrenExpanded ?? false,
     filteredDescendantCount: gridFilteredDescendantCountLookupSelector(api.state)[rowNode.id] ?? 0,
   }),
   renderCell: (params: GridRenderCellParams<GridTreeDataGroupingCellValue>) => (
     <GridTreeDataGroupingCell {...params} />
   ),
+};
+
+export const GRID_TREE_DATA_GROUP_COL_DEF_FORCED_FIELDS: Pick<GridColDef, 'field' | 'editable'> = {
+  field: '__tree_data_group__',
+  editable: false,
 };
