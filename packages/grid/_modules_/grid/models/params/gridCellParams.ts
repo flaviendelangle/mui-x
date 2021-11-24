@@ -143,7 +143,7 @@ export interface GridPreProcessEditCellProps {
 /**
  * Object passed as parameter in the column [[GridColDef]] key getter callback.
  */
-export interface GridKeyGetterParams {
+export interface GridKeyGetterParams<V = any> {
   /**
    * The grid row id.
    */
@@ -155,5 +155,5 @@ export interface GridKeyGetterParams {
   /**
    * The cell value (if the column has valueGetter, this is the value returned by it)
    */
-  value: GridCellValue;
+  value: V;
 }

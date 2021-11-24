@@ -128,8 +128,8 @@ To enable the grouping, you simply have to set the `groupRows` property in `Grid
 
 ```tsx
 const columns: GridColDef[] = [
-  { field: 'id' },
-  { field: 'country', groupRows: true },
+  { field: 'director', groupRows: true },
+  { field: 'company', groupRows: true },
 ];
 ```
 
@@ -145,11 +145,29 @@ To have a grouping column for each grouping fields, set the `groupingColumnMode`
 
 {{"demo": "pages/components/data-grid/group-pivot/row-group-by-columns/MultipleGroupingColumn.js", "bg": "inline", "defaultCodeOpen": false}}
 
+### Group order
+
+By default, the rows are grouped based on the order of the columns.
+To manually set a grouping order, you can use the `groupRowIndex` property in `GridColDef`
+
+```tsx
+const columns: GridColDef[] = [
+  { field: 'director', groupRows: true, groupRowIndex: 1 },
+  { field: 'company', groupRows: true, groupRowIndex: 0 },
+];
+```
+
+{{"demo": "pages/components/data-grid/group-pivot/row-group-by-columns/CustomGroupOrder.js", "bg": "inline", "defaultCodeOpen": false}}
+
 ### Grouping panel
 
 To enable the grouping panel, you simply have to use the `rowGroupByColumnPanel` prop:
 
 {{"demo": "pages/components/data-grid/group-pivot/row-group-by-columns/RowGroupingPanel.js", "bg": "inline", "defaultCodeOpen": false}}
+
+### Full Example
+
+{{"demo": "pages/components/data-grid/group-pivot/row-group-by-columns/RowGroupingFullExample.js", "bg": "inline", "defaultCodeOpen": false}}
 
 ## 🚧 Aggregation [<span class="premium"></span>](https://mui.com/store/items/material-ui-pro/)
 

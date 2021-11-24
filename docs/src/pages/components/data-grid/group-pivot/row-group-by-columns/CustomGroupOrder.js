@@ -100,12 +100,14 @@ const columns = [
     headerName: 'Company',
     groupRows: true,
     hide: true,
+    groupRowIndex: 1,
   },
   {
     field: 'director',
     headerName: 'Director',
     groupRows: true,
     hide: true,
+    groupRowIndex: 0,
   },
   {
     field: 'year',
@@ -115,7 +117,7 @@ const columns = [
 
 const getRowId = (row) => row.title;
 
-export default function SingleGroupingColumn() {
+export default function CustomGroupOrder() {
   return (
     <div style={{ height: 400, width: '100%' }}>
       <DataGridPro

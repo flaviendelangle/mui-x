@@ -107,6 +107,10 @@ const columns = [
     groupRows: true,
     hide: true,
   },
+  {
+    field: 'year',
+    headerName: 'Year',
+  },
 ];
 
 const getRowId = (row) => row.title;

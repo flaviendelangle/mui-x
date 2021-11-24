@@ -1,15 +1,10 @@
+import {
+  DemoDataReturnType,
+  useDemoData,
+  UseDemoDataOptions,
+} from '@mui/x-data-grid-generator';
 import * as React from 'react';
 import { DataGridPro, DataGridProProps } from '@mui/x-data-grid-pro';
-import { Meta } from '@storybook/react';
-import { UseDemoDataOptions, DemoDataReturnType, useDemoData } from '@mui/x-data-grid-generator';
-
-export default {
-  title: 'DataGridPro Test/Row Grouped By Columns',
-  component: DataGridPro,
-  parameters: {
-    options: { selectedPanel: 'storybook/storysource/panel' },
-  },
-} as Meta;
 
 interface UseDemoDataGroupedByColumnsOptions extends UseDemoDataOptions {
   groupedColumns: string[];
@@ -55,7 +50,7 @@ const useGroupedByColumnsDemoData = ({
   };
 };
 
-export function BasicRowGrouping() {
+export default function RowGroupingFullExample() {
   const { data, loading } = useGroupedByColumnsDemoData({
     dataSet: 'Commodity',
     rowLength: 100,
@@ -71,13 +66,15 @@ export function BasicRowGrouping() {
   );
 
   return (
-    <DataGridPro
-      loading={loading}
-      disableSelectionOnClick
-      {...data}
-      groupingColDef={groupingColDef}
-      rowGroupByColumnPanel
-      groupingColumnMode="multiple"
-    />
+    <div style={{ height: 400, width: '100%' }}>
+      <DataGridPro
+        loading={loading}
+        disableSelectionOnClick
+        {...data}
+        groupingColDef={groupingColDef}
+        rowGroupByColumnPanel
+        groupingColumnMode="multiple"
+      />
+    </div>
   );
 }
