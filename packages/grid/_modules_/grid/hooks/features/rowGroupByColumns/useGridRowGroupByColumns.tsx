@@ -1,19 +1,17 @@
 import * as React from 'react';
 import type {
   GridApiRef,
-  GridCellParams,
   GridRowModel,
-  MuiEvent,
   GridColDefOverrideParams,
   GridRowId,
   GridColDef,
 } from '../../../models';
+import { GridEvents, GridEventListener } from '../../../models/events';
 import { GridRowGroupingPreProcessing } from '../../core/rowGroupsPerProcessing';
 import { useFirstRender } from '../../utils/useFirstRender';
 import { isSpaceKey } from '../../../utils/keyboardUtils';
 import { buildRowTree } from '../../../utils/rowTreeUtils';
 import { useGridApiEventHandler } from '../../utils/useGridApiEventHandler';
-import { GridEvents } from '../../../constants/eventsConstants';
 import { gridRowGroupingColumnLookupSelector } from './rowGroupByColumnsSelector';
 import { GridComponentProps } from '../../../GridComponentProps';
 import { orderGroupedByFields, getRowGroupingColumnLookup } from './rowGroupByColumnsUtils';
@@ -242,8 +240,8 @@ export const useGridRowGroupByColumns = (
 
   useGridRegisterPreProcessor(apiRef, GridPreProcessingGroup.hydrateColumns, updateGroupingColumn);
 
-  const handleCellKeyDown = React.useCallback(
-    (params: GridCellParams, event: MuiEvent<React.KeyboardEvent>) => {
+  const handleCellKeyDown = React.useCallback<GridEventListener<GridEvents.cellKeyDown>>(
+    (params, event) => {
       const cellParams = apiRef.current.getCellParams(params.id, params.field);
       if (cellParams.colDef.type === 'rowGroupByColumnsGroup' && isSpaceKey(event.key)) {
         event.stopPropagation();
@@ -256,7 +254,7 @@ export const useGridRowGroupByColumns = (
     [apiRef],
   );
 
-  const handleColumnChange = () => {
+  const handleColumnChange = React.useCallback<GridEventListener<GridEvents.columnsChange>>(() => {
     const groupingColumns = gridRowGroupingColumnLookupSelector(apiRef.current.state);
     const newGroupingFields = orderGroupedByFields(groupingColumns);
     const currentGroupingFields = groupingFieldsOnLastRowPreProcessing.current;
@@ -264,7 +262,7 @@ export const useGridRowGroupByColumns = (
     if (!isDeepEqual(currentGroupingFields, newGroupingFields)) {
       updateRowGrouping();
     }
-  };
+  }, [apiRef])
 
   useGridApiEventHandler(apiRef, GridEvents.cellKeyDown, handleCellKeyDown);
   useGridApiEventHandler(apiRef, GridEvents.columnsChange, handleColumnChange);
