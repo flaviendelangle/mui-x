@@ -208,6 +208,11 @@ DataGridRaw.propTypes = {
    */
   getRowId: PropTypes.func,
   /**
+   * If `single`, all column we are grouping by will be represented in the same grouping the same column.
+   * If `multiple`, each column we are grouping by will be represented in its own column.
+   */
+  groupingColumnMode: PropTypes.oneOf(['multiple', 'single']),
+  /**
    * Set the height in pixel of the column headers in the grid.
    * @default 56
    */

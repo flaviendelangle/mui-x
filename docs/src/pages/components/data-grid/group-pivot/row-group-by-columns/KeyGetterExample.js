@@ -130,8 +130,6 @@ const columns = [
   {
     field: 'director',
     headerName: 'Director',
-    groupRows: true,
-    hide: true,
   },
   {
     field: 'year',
