@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { useFirstRender } from '../../utils/useFirstRender';
-import { GridApiRef } from '../../../models/api/gridApiRef';
+import { GridPrivateApiRef } from '../../../models/api/gridApiRef';
 import { GridPreProcessingGroup, PreProcessorCallback } from './gridPreProcessingApi';
 
 export const useGridRegisterPreProcessor = (
-  apiRef: GridApiRef,
+  apiRef: GridPrivateApiRef,
   group: GridPreProcessingGroup,
   callback: PreProcessorCallback,
 ) => {
@@ -12,7 +12,7 @@ export const useGridRegisterPreProcessor = (
   const id = React.useRef(`mui-${Math.round(Math.random() * 1e9)}`);
 
   const registerPreProcessor = React.useCallback(() => {
-    cleanup.current = apiRef.current.unstable_registerPreProcessor(group, id.current, callback);
+    cleanup.current = apiRef.current.registerPreProcessor(group, id.current, callback);
   }, [apiRef, callback, group]);
 
   useFirstRender(() => {

@@ -3,7 +3,6 @@ import { GridApiRef, GridPrivateApiRef } from '../../models/api/gridApiRef';
 import { GridApi, GridPrivateApi } from '../../models/api/gridApi';
 import { useGridLogger } from '../utils/useGridLogger';
 import { GridEvents } from '../../constants/eventsConstants';
-import { useGridApiMethod } from '../utils/useGridApiMethod';
 import { GridSignature } from '../utils/useGridApiEventHandler';
 import { GridComponentProps } from '../../GridComponentProps';
 import { GridCoreApi } from '../../models';
@@ -90,7 +89,7 @@ export function useGridApiInitialization(
     [privateApiRef],
   );
 
-  useGridApiMethod(privateApiRef, { subscribeEvent, publishEvent, showError }, 'GridCoreApi');
+  privateApiRef.current.register('public', { subscribeEvent, publishEvent, showError });
 
   React.useEffect(() => {
     logger.debug('Initializing grid api.');

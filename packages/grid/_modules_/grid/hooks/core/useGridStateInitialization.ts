@@ -14,6 +14,18 @@ export const useGridStateInitialization = (
   const controlStateMapRef = React.useRef<Record<string, GridControlStateItem<any>>>({});
   const [, rawForceUpdate] = React.useState<GridState>();
 
+  const updateControlState = React.useCallback<GridStatePrivateApi['updateControlState']>(
+    (controlStateItem) => {
+      const { stateId, ...others } = controlStateItem;
+
+      controlStateMapRef.current[stateId] = {
+        ...others,
+        stateId,
+      };
+    },
+    [],
+  );
+
   const setState = React.useCallback<GridStateApi['setState']>(
     (state) => {
       let newState: GridState;
@@ -27,42 +39,6 @@ export const useGridStateInitialization = (
         return false;
       }
 
-      const { ignoreSetState, postUpdate } = apiRef.current.applyControlStateConstraint(newState);
-
-      if (!ignoreSetState) {
-        // We always assign it as we mutate rows for perf reason.
-        apiRef.current.state = newState;
-
-        if (apiRef.current.publishEvent) {
-          apiRef.current.publishEvent(GridEvents.stateChange, newState);
-        }
-      }
-
-      postUpdate();
-
-      return !ignoreSetState;
-    },
-    [apiRef],
-  );
-
-  const forceUpdate = React.useCallback(() => rawForceUpdate(() => apiRef.current.state), [apiRef]);
-
-  const updateControlState = React.useCallback<GridStatePrivateApi['updateControlState']>(
-    (controlStateItem) => {
-      const { stateId, ...others } = controlStateItem;
-
-      controlStateMapRef.current[stateId] = {
-        ...others,
-        stateId,
-      };
-    },
-    [],
-  );
-
-  const applyControlStateConstraint = React.useCallback<
-    GridStatePrivateApi['applyControlStateConstraint']
-  >(
-    (newState) => {
       let ignoreSetState = false;
       const updatedStateIds: string[] = [];
       const controlStateMap = controlStateMapRef.current!;
@@ -99,26 +75,34 @@ export const useGridStateInitialization = (
         );
       }
 
-      return {
-        ignoreSetState,
-        postUpdate: () => {
-          updatedStateIds.forEach((stateId) => {
-            const controlState = controlStateMap[stateId];
-            const model = controlStateMap[stateId].stateSelector(newState);
+      if (!ignoreSetState) {
+        // We always assign it as we mutate rows for perf reason.
+        apiRef.current.state = newState;
 
-            if (controlState.propOnChange) {
-              const details =
-                props.signature === GridSignature.DataGridPro ? { api: apiRef.current } : {};
-              controlState.propOnChange(model, details);
-            }
+        if (apiRef.current.publishEvent) {
+          apiRef.current.publishEvent(GridEvents.stateChange, newState);
+        }
+      }
 
-            apiRef.current.publishEvent(controlState.changeEvent, model);
-          });
-        },
-      };
+      updatedStateIds.forEach((stateId) => {
+        const controlState = controlStateMap[stateId];
+        const model = controlStateMap[stateId].stateSelector(newState);
+
+        if (controlState.propOnChange) {
+          const details =
+            props.signature === GridSignature.DataGridPro ? { api: apiRef.current } : {};
+          controlState.propOnChange(model, details);
+        }
+
+        apiRef.current.publishEvent(controlState.changeEvent, model);
+      });
+
+      return !ignoreSetState;
     },
     [apiRef, props.signature],
   );
+
+  const forceUpdate = React.useCallback(() => rawForceUpdate(() => apiRef.current.state), [apiRef]);
 
   const statePublicApi: Omit<GridStateApi, 'state'> = {
     setState,
@@ -127,7 +111,6 @@ export const useGridStateInitialization = (
 
   const statePrivateApi: GridStatePrivateApi = {
     updateControlState,
-    applyControlStateConstraint,
   };
 
   apiRef.current.register('public', statePublicApi);

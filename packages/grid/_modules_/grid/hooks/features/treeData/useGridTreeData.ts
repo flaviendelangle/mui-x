@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { GridApiRef } from '../../../models/api/gridApiRef';
+import { GridPrivateApiRef } from '../../../models/api/gridApiRef';
 import { GridComponentProps } from '../../../GridComponentProps';
 import {
   GRID_TREE_DATA_GROUP_COL_DEF,
@@ -27,7 +27,7 @@ import { GridPreProcessingGroup, useGridRegisterPreProcessor } from '../../core/
  * @requires useGridRowGroupsPreProcessing (method)
  */
 export const useGridTreeData = (
-  apiRef: GridApiRef,
+  apiRef: GridPrivateApiRef,
   props: Pick<
     GridComponentProps,
     'treeData' | 'getTreeDataPath' | 'groupingColDef' | 'defaultGroupingExpansionDepth'
