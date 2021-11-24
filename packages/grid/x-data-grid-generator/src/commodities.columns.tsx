@@ -51,7 +51,6 @@ import {
 } from './services/static-data';
 
 import { GridColDefGenerator } from './services/gridColDefGenerator';
-import { GridKeyGetterParams } from '../../_modules_';
 
 export const getCommodityColumns = (editable = false): GridColDefGenerator[] => [
   {

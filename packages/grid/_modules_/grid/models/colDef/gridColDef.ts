@@ -21,7 +21,6 @@ import { GridValueOptionsParams } from '../params/gridValueOptionsParams';
 import { GridActionsCellItemProps } from '../../components/cell/GridActionsCellItem';
 import { GridRowModel } from '../gridRows';
 import { GridEditCellProps } from '../gridEditRowModel';
-import { GridColumnRawLookup } from '../../hooks/features/columns/gridColumnsState';
 
 /**
  * Alignment used in position elements in Cells.
