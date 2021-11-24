@@ -11,7 +11,7 @@ export interface GridStateApi {
    */
   forceUpdate: () => void;
   /**
-   * Updates the state
+   * Sets the whole state of the grid.
    * @param {GridState | (oldState: GridState) => GridState} state The new state or the callback creating the new state.
    * @returns {boolean} Has the state been updated.
    */
