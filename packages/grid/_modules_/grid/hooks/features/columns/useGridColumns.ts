@@ -9,6 +9,7 @@ import { useGridState } from '../../utils/useGridState';
 import {
   allGridColumnsFieldsSelector,
   allGridColumnsSelector,
+  gridColumnLookupSelector,
   gridColumnsMetaSelector,
   gridColumnsSelector,
   visibleGridColumnsSelector,
@@ -59,21 +60,18 @@ export function useGridColumns(
   const [, setGridState, forceUpdate] = useGridState(apiRef);
 
   const setGridColumnsState = React.useCallback(
-    (columnsState: GridColumnsState, emit = true) => {
+    (columnsState: GridColumnsState) => {
       logger.debug('Updating columns state.');
 
       setGridState((state) => ({ ...state, columns: columnsState }));
       forceUpdate();
-
-      if (emit) {
-        apiRef.current.publishEvent(GridEvents.columnsChange, columnsState.all);
-      }
+      apiRef.current.publishEvent(GridEvents.columnsChange, columnsState.all);
     },
     [logger, setGridState, forceUpdate, apiRef],
   );
 
   const getColumn = React.useCallback<GridColumnApi['getColumn']>(
-    (field) => apiRef.current.state.columns.lookup[field],
+    (field) => gridColumnLookupSelector(apiRef.current.state)[field],
     [apiRef],
   );
 
@@ -81,17 +79,19 @@ export function useGridColumns(
     () => allGridColumnsSelector(apiRef.current.state),
     [apiRef],
   );
+
   const getVisibleColumns = React.useCallback<GridColumnApi['getVisibleColumns']>(
     () => visibleGridColumnsSelector(apiRef.current.state),
     [apiRef],
   );
+
   const getColumnsMeta = React.useCallback<GridColumnApi['getColumnsMeta']>(
     () => gridColumnsMetaSelector(apiRef.current.state),
     [apiRef],
   );
 
-  const getColumnIndex = React.useCallback(
-    (field: string, useVisibleColumns: boolean = true): number => {
+  const getColumnIndex = React.useCallback<GridColumnApi['getColumnIndex']>(
+    (field, useVisibleColumns = true) => {
       const columns = useVisibleColumns
         ? visibleGridColumnsSelector(apiRef.current.state)
         : allGridColumnsSelector(apiRef.current.state);
@@ -101,7 +101,7 @@ export function useGridColumns(
     [apiRef],
   );
 
-  const getColumnPosition: (field: string) => number = React.useCallback(
+  const getColumnPosition = React.useCallback<GridColumnApi['getColumnPosition']>(
     (field) => {
       const index = getColumnIndex(field);
       return gridColumnsMetaSelector(apiRef.current.state).positions[index];
@@ -117,7 +117,7 @@ export function useGridColumns(
         columnsToUpsert: columns,
         reset: false,
       });
-      setGridColumnsState(columnsState, false);
+      setGridColumnsState(columnsState);
     },
     [apiRef, setGridColumnsState, columnsTypes],
   );
@@ -127,8 +127,8 @@ export function useGridColumns(
     [updateColumns],
   );
 
-  const setColumnVisibility = React.useCallback(
-    (field: string, isVisible: boolean) => {
+  const setColumnVisibility = React.useCallback<GridColumnApi['setColumnVisibility']>(
+    (field, isVisible) => {
       const column = getColumn(field);
       const newColumn = { ...column, hide: !isVisible };
 
@@ -143,8 +143,8 @@ export function useGridColumns(
     [apiRef, getColumn, updateColumns],
   );
 
-  const setColumnIndex = React.useCallback(
-    (field: string, targetIndexPosition: number) => {
+  const setColumnIndex = React.useCallback<GridColumnApi['setColumnIndex']>(
+    (field, targetIndexPosition) => {
       const allColumns = allGridColumnsFieldsSelector(apiRef.current.state);
       const oldIndexPosition = allColumns.findIndex((col) => col === field);
       if (oldIndexPosition === targetIndexPosition) {
@@ -169,8 +169,8 @@ export function useGridColumns(
     [apiRef, logger, setGridColumnsState],
   );
 
-  const setColumnWidth = React.useCallback(
-    (field: string, width: number) => {
+  const setColumnWidth = React.useCallback<GridColumnApi['setColumnWidth']>(
+    (field, width) => {
       logger.debug(`Updating column ${field} width to ${width}`);
 
       const column = apiRef.current.getColumn(field);
@@ -233,12 +233,12 @@ export function useGridColumns(
       const columnsState = createColumnsState({
         apiRef,
         columnsTypes,
-        columnsToUpsert: props.columns,
-        reset: true,
+        columnsToUpsert: [],
+        reset: false,
       });
       setGridColumnsState(columnsState);
     },
-    [apiRef, logger, setGridColumnsState, props.columns, columnsTypes],
+    [apiRef, logger, setGridColumnsState, columnsTypes],
   );
 
   const prevInnerWidth = React.useRef<number | null>(null);
@@ -246,7 +246,7 @@ export function useGridColumns(
     if (prevInnerWidth.current !== viewportInnerSize.width) {
       prevInnerWidth.current = viewportInnerSize.width;
       setGridColumnsState(
-        hydrateColumnsWidth(apiRef.current.state.columns, viewportInnerSize.width),
+        hydrateColumnsWidth(gridColumnsSelector(apiRef.current.state), viewportInnerSize.width),
       );
     }
   };
