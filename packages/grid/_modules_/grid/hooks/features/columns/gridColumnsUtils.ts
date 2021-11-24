@@ -1,15 +1,16 @@
 import { GridColumnLookup, GridColumnsState, GridColumnsRawState } from './gridColumnsState';
 import {
   DEFAULT_GRID_COL_TYPE_KEY,
-  getGridColDef,
   getGridDefaultColumnTypes,
   GRID_STRING_COL_DEF,
   GridApiRef,
   GridColDef,
+  GridColType,
   GridColumnTypesRecord,
   GridStateColDef,
 } from '../../../models';
 import { GridPreProcessingGroup } from '../../core/preProcessing';
+import { gridColumnsSelector } from './gridColumnsSelector';
 
 export const computeColumnTypes = (customColumnTypes: GridColumnTypesRecord = {}) => {
   const allColumnTypes = { ...getGridDefaultColumnTypes(), ...customColumnTypes };
@@ -75,21 +76,32 @@ export const hydrateColumnsWidth = (
   };
 };
 
-interface CreateColumnsStateOptions {
-  columnsToUpsert: GridColDef[];
-  columnsTypes: GridColumnTypesRecord;
-  apiRef: GridApiRef;
-  reset: boolean;
-}
+/**
+ * @deprecated Should have been internal only, you can inline the logic.
+ */
+export const getGridColDef = (
+  columnTypes: GridColumnTypesRecord,
+  type: GridColType | undefined,
+) => {
+  if (!type) {
+    return columnTypes[DEFAULT_GRID_COL_TYPE_KEY];
+  }
+  return columnTypes[type];
+};
 
 export const createColumnsState = ({
   columnsToUpsert,
   columnsTypes,
   apiRef,
   reset,
-}: CreateColumnsStateOptions) => {
+}: {
+  columnsToUpsert: GridColDef[];
+  columnsTypes: GridColumnTypesRecord;
+  apiRef: GridApiRef;
+  reset: boolean;
+}) => {
   const columnsWithTypes = columnsToUpsert.map((column) => ({
-    ...getGridColDef(columnsTypes, column.type),
+    ...getGridColDef(columnsTypes, column.type), // TODO v6: Inline `getGridColDef`
     ...column,
   }));
 
@@ -100,7 +112,7 @@ export const createColumnsState = ({
       lookup: {},
     };
   } else {
-    const currentState = apiRef.current.state.columns;
+    const currentState = gridColumnsSelector(apiRef.current.state);
     columnsState = {
       all: [...currentState.all],
       lookup: { ...currentState.lookup },

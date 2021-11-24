@@ -7,14 +7,19 @@ import {
 } from './gridTreeDataGroupColDef';
 import { useGridApiEventHandler } from '../../utils/useGridApiEventHandler';
 import { GridEvents } from '../../../constants';
-import { GridCellParams, GridColDef, GridColDefOverrideParams, MuiEvent } from '../../../models';
+import {
+  GridCellParams,
+  GridColDef,
+  GridColDefOverrideParams,
+  GridColumns,
+  MuiEvent,
+} from '../../../models';
 import { isSpaceKey } from '../../../utils/keyboardUtils';
 import { useFirstRender } from '../../utils/useFirstRender';
 import { buildRowTree } from '../../../utils/rowTreeUtils';
 import { GridRowGroupingPreProcessing } from '../../core/rowGroupsPerProcessing';
 import { gridFilteredDescendantCountLookupSelector } from '../filter';
 import { GridPreProcessingGroup, useGridRegisterPreProcessor } from '../../core/preProcessing';
-import { GridColumnsRawState } from '../columns/gridColumnsState';
 
 /**
  * Only available in DataGridPro
@@ -56,24 +61,14 @@ export const useGridTreeData = (
   }, [apiRef, props.groupingColDef]);
 
   const addGroupingColumn = React.useCallback(
-    (columnsState: GridColumnsRawState) => {
-      const shouldHaveGroupingColumn = props.treeData;
-      const haveGroupingColumn = columnsState.lookup[groupingColDef.field] != null;
-
-      if (shouldHaveGroupingColumn && !haveGroupingColumn) {
-        columnsState.lookup[groupingColDef.field] = groupingColDef;
-        const index = columnsState.all?.[0] === '__check__' ? 1 : 0;
-        columnsState.all = [
-          ...columnsState.all.slice(0, index),
-          groupingColDef.field,
-          ...columnsState.all.slice(index),
-        ];
-      } else if (!shouldHaveGroupingColumn && haveGroupingColumn) {
-        delete columnsState.lookup[groupingColDef.field];
-        columnsState.all = columnsState.all.filter((field) => field !== groupingColDef.field);
+    (columns: GridColumns) => {
+      if (!props.treeData) {
+        return columns;
       }
 
-      return columnsState;
+      const index = columns[0]?.field === '__check__' ? 1 : 0;
+
+      return [...columns.slice(0, index), groupingColDef, ...columns.slice(index)];
     },
     [props.treeData, groupingColDef],
   );
