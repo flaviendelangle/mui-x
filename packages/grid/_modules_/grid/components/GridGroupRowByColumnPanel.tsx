@@ -4,8 +4,8 @@ import Chip from '@mui/material/Chip';
 import { useGridApiEventHandler } from '../hooks/utils/useGridApiEventHandler';
 import { useGridApiContext } from '../hooks/utils/useGridApiContext';
 import { useGridSelector } from '../hooks/utils/useGridSelector';
-import { GridEvents } from '../constants/eventsConstants';
-import { GridColDef, GridColumnHeaderParams } from '../models';
+import { GridEventListener, GridEvents } from '../models/events';
+import { GridColDef } from '../models';
 import { gridRowGroupingColumnLookupSelector } from '../hooks/features/rowGroupByColumns';
 import { orderGroupedByFields } from '../hooks/features/rowGroupByColumns/rowGroupByColumnsUtils';
 import { GridDragIcon } from './icons';
@@ -41,11 +41,13 @@ export const GridGroupRowByColumnPanel = () => {
     [groupingColumns],
   );
 
-  const handleColumnReorderStart = React.useCallback(
-    (params: GridColumnHeaderParams) => setColHeaderDragField(params.field),
-    [],
-  );
-  const handleColumnReorderStop = React.useCallback(() => setColHeaderDragField(''), []);
+  const handleColumnReorderStart = React.useCallback<
+    GridEventListener<GridEvents.columnHeaderDragStart>
+  >((params) => setColHeaderDragField(params.field), []);
+
+  const handleColumnReorderStop = React.useCallback<
+    GridEventListener<GridEvents.columnHeaderDragEnd>
+  >(() => setColHeaderDragField(''), []);
 
   const handleDragStartChip = (field: string) => setChipDragField(field);
 

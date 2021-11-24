@@ -1,0 +1,7 @@
+<DataGridPro
+    rows={rows}
+    columns={columns}
+    groupingColDef={{ width: 350 }}
+    getRowId={getRowId}
+    groupingColumnMode='multiple'
+/>

@@ -53,30 +53,30 @@ const rows: GridRowsProp = [
 />;
 ```
 
-{{"demo": "pages/components/data-grid/group-pivot/BasicTreeData.js", "bg": "inline", "defaultCodeOpen": false}}
+{{"demo": "pages/components/data-grid/group-pivot/tree-data/BasicTreeData.js", "bg": "inline", "defaultCodeOpen": false}}
 
 ### Custom grouping column
 
 Use the `groupingColDef` prop to customize the rendering of the grouping column.
 
-{{"demo": "pages/components/data-grid/group-pivot/CustomGroupingColumnTreeData.js", "bg": "inline", "defaultCodeOpen": false}}
+{{"demo": "pages/components/data-grid/group-pivot/tree-data/CustomGroupingColumnTreeData.js", "bg": "inline", "defaultCodeOpen": false}}
 
 ### Group expansion
 
 Use the `defaultGroupingExpansionDepth` prop to expand all the groups up to a given depth when loading the data.
 If you want to expand the whole tree, set `defaultGroupingExpansionDepth = -1`
 
-{{"demo": "pages/components/data-grid/group-pivot/DefaultGroupingExpansionDepthTreeData.js", "bg": "inline", "defaultCodeOpen": false}}
+{{"demo": "pages/components/data-grid/group-pivot/tree-data/DefaultGroupingExpansionDepthTreeData.js", "bg": "inline", "defaultCodeOpen": false}}
 
 Use the `setRowChildrenExpansion` method on `apiRef` to programmatically set the expansion of a row.
 
-{{"demo": "pages/components/data-grid/group-pivot/SetRowExpansionTreeData.js", "bg": "inline", "defaultCodeOpen": false}}
+{{"demo": "pages/components/data-grid/group-pivot/tree-data/SetRowExpansionTreeData.js", "bg": "inline", "defaultCodeOpen": false}}
 
 ### Gaps in the tree
 
 If some entries are missing to build the full tree, the `DataGridPro` will automatically create rows to fill those gaps.
 
-{{"demo": "pages/components/data-grid/group-pivot/TreeDataWithGap.js", "bg": "inline", "defaultCodeOpen": false}}
+{{"demo": "pages/components/data-grid/group-pivot/tree-data/TreeDataWithGap.js", "bg": "inline", "defaultCodeOpen": false}}
 
 ### Filtering
 
@@ -88,14 +88,14 @@ A node is included if one of the following criteria is met:
 By default, the filtering is applied to every depth of the tree.
 You can limit the filtering to the top level rows with the `disableChildrenFiltering` prop.
 
-{{"demo": "pages/components/data-grid/group-pivot/DisableChildrenFilteringTreeData.js", "bg": "inline", "defaultCodeOpen": false}}
+{{"demo": "pages/components/data-grid/group-pivot/tree-data/DisableChildrenFilteringTreeData.js", "bg": "inline", "defaultCodeOpen": false}}
 
 ### Sorting
 
 By default, the sorting is applied to every depth of the tree.
 You can limit the sorting to the top level rows with the `disableChildrenSorting` prop.
 
-{{"demo": "pages/components/data-grid/group-pivot/DisableChildrenSortingTreeData.js", "bg": "inline", "defaultCodeOpen": false}}
+{{"demo": "pages/components/data-grid/group-pivot/tree-data/DisableChildrenSortingTreeData.js", "bg": "inline", "defaultCodeOpen": false}}
 
 > If you are using `sortingMode="server"`, you need to always put the children of a row after its parent.
 > For instance:
@@ -110,7 +110,7 @@ You can limit the sorting to the top level rows with the `disableChildrenSorting
 
 ### Full Example
 
-{{"demo": "pages/components/data-grid/group-pivot/TreeDataFullExample.js", "bg": "inline", "defaultCodeOpen": false}}
+{{"demo": "pages/components/data-grid/group-pivot/tree-data/TreeDataFullExample.js", "bg": "inline", "defaultCodeOpen": false}}
 
 ## 🚧 Master detail [<span class="pro"></span>](https://mui.com/store/items/material-ui-pro/)
 
@@ -120,13 +120,36 @@ You can limit the sorting to the top level rows with the `disableChildrenSorting
 
 The feature allows to display row details on an expandable pane.
 
-## 🚧 Grouping [<span class="premium"></span>](https://mui.com/store/items/material-ui-pro/)
+## 🚧 Row Grouping [<span class="premium"></span>](https://mui.com/store/items/material-ui-pro/)
 
-> ⚠️ This feature isn't implemented yet. It's coming.
->
-> 👍 Upvote [issue #212](https://github.com/mui-org/material-ui-x/issues/212) if you want to see it land faster.
+> This feature is currently available in beta on the pro plan but will be moved to the premium plan once it is launched.
 
-Group rows together that share a column value, this creates a visible header for each group and allows the end-user to collapse groups that they don't want to see.
+To enable the grouping, you simply have to set the `groupRows` property in `GridColDef`
+
+```tsx
+const columns: GridColDef[] = [
+  { field: 'id' },
+  { field: 'country', groupRows: true },
+];
+```
+
+### Single grouping column
+
+By default, the grid will create only one grouping column even if you have several grouping fields:
+
+{{"demo": "pages/components/data-grid/group-pivot/row-group-by-columns/SingleGroupingColumn.js", "bg": "inline", "defaultCodeOpen": false}}
+
+### Multiple grouping column
+
+To have a grouping column for each grouping fields, set the `groupingColumnMode` prop to `multiple`:
+
+{{"demo": "pages/components/data-grid/group-pivot/row-group-by-columns/MultipleGroupingColumn.js", "bg": "inline", "defaultCodeOpen": false}}
+
+### Grouping panel
+
+To enable the grouping panel, you simply have to use the `rowGroupByColumnPanel` prop:
+
+{{"demo": "pages/components/data-grid/group-pivot/row-group-by-columns/RowGroupingPanel.js", "bg": "inline", "defaultCodeOpen": false}}
 
 ## 🚧 Aggregation [<span class="premium"></span>](https://mui.com/store/items/material-ui-pro/)
 

@@ -262,7 +262,7 @@ export const useGridRowGroupByColumns = (
     if (!isDeepEqual(currentGroupingFields, newGroupingFields)) {
       updateRowGrouping();
     }
-  }, [apiRef, updateRowGrouping])
+  }, [apiRef, updateRowGrouping]);
 
   useGridApiEventHandler(apiRef, GridEvents.cellKeyDown, handleCellKeyDown);
   useGridApiEventHandler(apiRef, GridEvents.columnsChange, handleColumnChange);
