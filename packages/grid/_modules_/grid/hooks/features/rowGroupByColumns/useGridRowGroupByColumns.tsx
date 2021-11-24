@@ -21,7 +21,7 @@ import { isDeepEqual, isFunction } from '../../../utils/utils';
 import { GRID_ROW_GROUP_BY_COLUMNS_GROUP_COL_DEF } from './gridRowGroupByColumnsGroupColDef';
 import { GridRowGroupByColumnsGroupingCell } from '../../../components/cell/GridRowGroupByColumnsGroupingCell';
 import { GridPreProcessingGroup, useGridRegisterPreProcessor } from '../../core/preProcessing';
-import { GridColumnRawLookup, GridColumnsRawState } from '../columns/gridColumnsState';
+import { GridColumnsRawState } from '../columns/gridColumnsState';
 
 /**
  * Only available in DataGridPro
@@ -35,8 +35,11 @@ export const useGridRowGroupByColumns = (
   >,
 ) => {
   const getGroupingColDefs = React.useCallback(
-    (groupedByColDefs: GridColumnRawLookup, orderedGroupedByFields: string[]) => {
+    (columnsState: GridColumnsRawState) => {
       const propGroupingColDef = props.groupingColDef;
+      const groupedByColDefs = getRowGroupingColumnLookup(columnsState.lookup);
+      const orderedGroupedByFields = orderGroupedByFields(groupedByColDefs);
+
       if (orderedGroupedByFields.length === 0) {
         return [];
       }
@@ -192,19 +195,9 @@ export const useGridRowGroupByColumns = (
     return apiRef.current.unstable_registerRowGroupsBuilder('rowGrouping', groupRows);
   }, [apiRef, props.defaultGroupingExpansionDepth]);
 
-  useFirstRender(() => {
-    updateRowGrouping();
-  });
-
-  const addGroupingColumn = React.useCallback(
+  const updateGroupingColumn = React.useCallback(
     (columnsState: GridColumnsRawState) => {
-      const groupedByColDefs = getRowGroupingColumnLookup(columnsState.lookup);
-      const orderedGroupedByFields = orderGroupedByFields(groupedByColDefs);
-      const groupingColDefs = getGroupingColDefs(groupedByColDefs, orderedGroupedByFields);
-
-      if (columnsState.all.length === 0) {
-        return columnsState;
-      }
+      const groupingColDefs = getGroupingColDefs(columnsState);
 
       // We remove the grouping columns
       const newColumnFields: string[] = [];
@@ -221,8 +214,7 @@ export const useGridRowGroupByColumns = (
       groupingColDefs.forEach((groupingColDef) => {
         columnsState.lookup[groupingColDef.field] = groupingColDef;
       });
-      const startIndex =
-        columnsState.lookup[columnsState.all[0]].type === 'checkboxSelection' ? 1 : 0;
+      const startIndex = columnsState.all[0] === '__check__' ? 1 : 0;
       columnsState.all = [
         ...columnsState.all.slice(0, startIndex),
         ...groupingColDefs.map((colDef) => colDef.field),
@@ -234,6 +226,10 @@ export const useGridRowGroupByColumns = (
     [getGroupingColDefs],
   );
 
+  useFirstRender(() => {
+    updateRowGrouping();
+  });
+
   const isFirstRender = React.useRef(true);
   React.useEffect(() => {
     if (isFirstRender.current) {
@@ -244,7 +240,7 @@ export const useGridRowGroupByColumns = (
     updateRowGrouping();
   }, [updateRowGrouping]);
 
-  useGridRegisterPreProcessor(apiRef, GridPreProcessingGroup.hydrateColumns, addGroupingColumn);
+  useGridRegisterPreProcessor(apiRef, GridPreProcessingGroup.hydrateColumns, updateGroupingColumn);
 
   const handleCellKeyDown = React.useCallback(
     (params: GridCellParams, event: MuiEvent<React.KeyboardEvent>) => {
