@@ -26,9 +26,11 @@ import { useGridSorting } from '../../_modules_/grid/hooks/features/sorting/useG
 import { useGridScroll } from '../../_modules_/grid/hooks/features/scroll/useGridScroll';
 import { useGridEvents } from '../../_modules_/grid/hooks/features/events/useGridEvents';
 import { useGridDimensions } from '../../_modules_/grid/hooks/features/dimensions/useGridDimensions';
+import { useGridTreeData } from '../../_modules_/grid/hooks/features/treeData/useGridTreeData';
 
 export const useDataGridProComponent = (apiRef: GridApiRef, props: GridComponentProps) => {
   const privateApiRef = useGridInitialization(apiRef, props);
+  useGridTreeData(privateApiRef, props);
   useGridSelection(privateApiRef, props);
   useGridColumns(privateApiRef, props);
   useGridRows(privateApiRef, props);
