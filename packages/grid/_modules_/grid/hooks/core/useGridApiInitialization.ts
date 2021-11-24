@@ -13,9 +13,9 @@ const isSyntheticEvent = (event: any): event is React.SyntheticEvent => {
 };
 
 const wrapPublicApi = (publicApi: GridApi) => {
-  const privateOnlyApi = {
-    getPublicApi: () => publicApi,
-  } as Omit<GridPrivateApi, keyof GridApi>;
+  const privateOnlyApi = {} as Omit<GridPrivateApi, keyof GridApi>;
+
+  privateOnlyApi.getPublicApi = () => publicApi;
 
   privateOnlyApi.register = (visibility, methods) => {
     Object.keys(methods).forEach((methodName) => {
