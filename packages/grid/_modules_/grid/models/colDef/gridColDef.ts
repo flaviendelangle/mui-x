@@ -21,6 +21,7 @@ import { GridValueOptionsParams } from '../params/gridValueOptionsParams';
 import { GridActionsCellItemProps } from '../../components/cell/GridActionsCellItem';
 import { GridRowModel } from '../gridRows';
 import { GridEditCellProps } from '../gridEditRowModel';
+import { GridColumnRawLookup } from '../../hooks/features/columns/gridColumnsState';
 
 /**
  * Alignment used in position elements in Cells.
@@ -247,11 +248,6 @@ export type GridColDefOverride<ForcedFields extends keyof GridColDef> = Omit<
   Partial<GridColDef>,
   ForcedFields
 >;
-
-export interface GridRawColumnsState {
-  all: string[];
-  lookup: GridRawColumnLookup;
-}
 
 export type GridColDefOverrideCallback<ForcedFields extends keyof GridColDef> = (
   params: GridColDefOverrideParams,

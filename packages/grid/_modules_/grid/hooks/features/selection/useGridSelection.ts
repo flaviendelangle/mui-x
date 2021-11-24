@@ -21,7 +21,7 @@ import { gridVisibleSortedRowIdsSelector } from '../filter/gridFilterSelector';
 import { GridHeaderSelectionCheckboxParams } from '../../../models/params/gridHeaderSelectionCheckboxParams';
 import { GridCellParams } from '../../../models/params/gridCellParams';
 import { GridRowSelectionCheckboxParams } from '../../../models/params/gridRowSelectionCheckboxParams';
-import { GRID_CHECKBOX_SELECTION_COL_DEF, GridColDef, GridRawColumnsState } from '../../../models';
+import { GRID_CHECKBOX_SELECTION_COL_DEF, GridColDef } from '../../../models';
 import { getDataGridUtilityClass } from '../../../gridClasses';
 import { useGridStateInit } from '../../utils/useGridStateInit';
 import { useFirstRender } from '../../utils/useFirstRender';

@@ -7,8 +7,6 @@ import type {
   GridColDefOverrideParams,
   GridRowId,
   GridColDef,
-  GridRawColumnLookup,
-  GridRawColumnsState,
 } from '../../../models';
 import { GridRowGroupingPreProcessing } from '../../core/rowGroupsPerProcessing';
 import { useFirstRender } from '../../utils/useFirstRender';
@@ -23,6 +21,7 @@ import { isDeepEqual, isFunction } from '../../../utils/utils';
 import { GRID_ROW_GROUP_BY_COLUMNS_GROUP_COL_DEF } from './gridRowGroupByColumnsGroupColDef';
 import { GridRowGroupByColumnsGroupingCell } from '../../../components/cell/GridRowGroupByColumnsGroupingCell';
 import { GridPreProcessingGroup, useGridRegisterPreProcessor } from '../../core/preProcessing';
+import { GridColumnRawLookup, GridColumnsRawState } from '../columns/gridColumnsState';
 
 /**
  * Only available in DataGridPro
@@ -36,7 +35,7 @@ export const useGridRowGroupByColumns = (
   >,
 ) => {
   const getGroupingColDefs = React.useCallback(
-    (groupedByColDefs: GridRawColumnLookup, orderedGroupedByFields: string[]) => {
+    (groupedByColDefs: GridColumnRawLookup, orderedGroupedByFields: string[]) => {
       const propGroupingColDef = props.groupingColDef;
       if (orderedGroupedByFields.length === 0) {
         return [];
@@ -198,7 +197,7 @@ export const useGridRowGroupByColumns = (
   });
 
   const addGroupingColumn = React.useCallback(
-    (columnsState: GridRawColumnsState) => {
+    (columnsState: GridColumnsRawState) => {
       const groupedByColDefs = getRowGroupingColumnLookup(columnsState.lookup);
       const orderedGroupedByFields = orderGroupedByFields(groupedByColDefs);
       const groupingColDefs = getGroupingColDefs(groupedByColDefs, orderedGroupedByFields);
@@ -252,9 +251,9 @@ export const useGridRowGroupByColumns = (
       const cellParams = apiRef.current.getCellParams(params.id, params.field);
       if (cellParams.colDef.type === 'rowGroupByColumnsGroup' && isSpaceKey(event.key)) {
         event.stopPropagation();
-        apiRef.current.unstable_setRowExpansion(
+        apiRef.current.setRowChildrenExpansion(
           params.id,
-          !apiRef.current.unstable_getRowNode(params.id)?.expanded,
+          !apiRef.current.getRowNode(params.id)?.childrenExpanded,
         );
       }
     },
