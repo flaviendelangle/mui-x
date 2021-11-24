@@ -15,12 +15,12 @@ export const useGridStateInitialization = (
   const [, rawForceUpdate] = React.useState<GridState>();
 
   const setState = React.useCallback<GridStateApi['setState']>(
-    (stateUpdaterFn) => {
+    (state) => {
       let newState: GridState;
-      if (typeof stateUpdaterFn === 'function') {
-        newState = stateUpdaterFn(apiRef.current.state);
+      if (typeof state === 'function') {
+        newState = state(apiRef.current.state);
       } else {
-        newState = stateUpdaterFn;
+        newState = state;
       }
 
       if (apiRef.current.state === newState) {

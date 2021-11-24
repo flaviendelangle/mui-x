@@ -12,10 +12,10 @@ export interface GridStateApi {
   forceUpdate: () => void;
   /**
    * Updates the state
-   * @param {GridState | (oldState: GridState) => GridState} stateOrFunc The new state or the callback creating the new state.
+   * @param {GridState | (oldState: GridState) => GridState} state The new state or the callback creating the new state.
    * @returns {boolean} Has the state been updated.
    */
-  setState: (stateOrFunc: GridState | ((oldState: GridState) => GridState)) => boolean;
+  setState: (state: GridState | ((previousState: GridState) => GridState)) => boolean;
 }
 
 export interface GridStatePrivateApi {
