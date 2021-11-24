@@ -122,7 +122,8 @@ The feature allows to display row details on an expandable pane.
 
 ## 🚧 Row Grouping [<span class="premium"></span>](https://mui.com/store/items/material-ui-pro/)
 
-> This feature is currently available in beta on the pro plan but will be moved to the premium plan once it is launched.
+> ⚠️ This feature is temporarily available in beta on the pro plan.
+> It will be moved to the premium plan once available.
 
 To enable the grouping, you simply have to set the `groupRows` property in `GridColDef`
 
@@ -158,6 +159,14 @@ const columns: GridColDef[] = [
 ```
 
 {{"demo": "pages/components/data-grid/group-pivot/row-group-by-columns/CustomGroupOrder.js", "bg": "inline", "defaultCodeOpen": false}}
+
+### Group with object values
+
+If you want to group according to a column which values are objects, you can use the `keyGetter` property in `GridColDef` to transform this object into a serializable value.
+
+> For now, the row grouping is not using the `valueGetter` property in `GridColDef`. In the future, it should use it and the `keyGetter` property would only be necessary when the value returned by `valueGetter` is an object.
+
+{{"demo": "pages/components/data-grid/group-pivot/row-group-by-columns/KeyGetterExample.js", "bg": "inline", "defaultCodeOpen": false}}
 
 ### Grouping panel
 

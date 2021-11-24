@@ -1,8 +1,8 @@
 <DataGridPro
-    loading={loading}
-    disableSelectionOnClick
-    {...data}
-    groupingColDef={groupingColDef}
-    rowGroupByColumnPanel
-    groupingColumnMode="multiple"
+  loading={loading}
+  disableSelectionOnClick
+  {...data}
+  groupingColDef={groupingColDef}
+  rowGroupByColumnPanel
+  groupingColumnMode="multiple"
 />
