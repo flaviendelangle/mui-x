@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { ownerDocument } from '@mui/material/utils';
 import { GridEvents } from '../../../constants/eventsConstants';
-import { GridApiRef } from '../../../models/api/gridApiRef';
+import { GridPrivateApiRef } from '../../../models/api/gridApiRef';
 import { GridFocusApi } from '../../../models/api/gridFocusApi';
 import { GridRowId } from '../../../models/gridRows';
 import { GridCellParams } from '../../../models/params/gridCellParams';
@@ -18,7 +18,10 @@ import { useGridStateInit } from '../../utils/useGridStateInit';
  * @requires useGridRows (method)
  * @requires useGridEditRows (event)
  */
-export const useGridFocus = (apiRef: GridApiRef, props: Pick<GridComponentProps, 'rows'>): void => {
+export const useGridFocus = (
+  apiRef: GridPrivateApiRef,
+  props: Pick<GridComponentProps, 'rows'>,
+): void => {
   const logger = useGridLogger(apiRef, 'useGridFocus');
 
   useGridStateInit(apiRef, (state) => ({

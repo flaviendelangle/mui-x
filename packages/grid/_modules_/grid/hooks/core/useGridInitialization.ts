@@ -4,7 +4,7 @@ import type { GridComponentProps } from '../../GridComponentProps';
 import { useGridLoggerFactory } from './useGridLoggerFactory';
 import { useGridApiInitialization } from './useGridApiInitialization';
 import { useGridErrorHandler } from './useGridErrorHandler';
-import { useGridControlState } from './useGridControlState';
+import { useGridStateInitialization } from './useGridStateInitialization';
 import { useGridLocaleText } from './useGridLocaleText';
 import { useGridPreProcessing } from './preProcessing';
 import { useGridRowGroupsPreProcessing } from './rowGroupsPerProcessing';
@@ -16,7 +16,7 @@ export const useGridInitialization = (apiRef: GridApiRef, props: GridComponentPr
   useGridLoggerFactory(apiRef, props);
   const privateApiRef = useGridApiInitialization(apiRef, props);
   useGridErrorHandler(privateApiRef, props);
-  useGridControlState(privateApiRef, props);
+  useGridStateInitialization(privateApiRef, props);
   useGridPreProcessing(privateApiRef);
   useGridRowGroupsPreProcessing(privateApiRef);
   useGridLocaleText(privateApiRef, props);

@@ -3,6 +3,9 @@ import { GridApiRef } from '../../models/api/gridApiRef';
 import { GridApi } from '../../models/api/gridApi';
 import { useGridLogger } from './useGridLogger';
 
+/**
+ * @deprecated Use `apiRef.current.register` instead.
+ */
 export function useGridApiMethod<T extends Partial<GridApi>>(
   apiRef: GridApiRef,
   apiMethods: T,

@@ -1,15 +1,53 @@
 import React from 'react';
 import { GridComponentProps } from '../../GridComponentProps';
-import { GridApiRef } from '../../models/api/gridApiRef';
-import { GridControlStateApi } from '../../models/api/gridControlStateApi';
+import { GridPrivateApiRef } from '../../models/api/gridApiRef';
+import { GridStateApi, GridStatePrivateApi } from '../../models/api/gridStateApi';
 import { GridControlStateItem } from '../../models/controlStateItem';
 import { GridSignature } from '../utils/useGridApiEventHandler';
-import { useGridApiMethod } from '../utils/useGridApiMethod';
+import { GridState } from '../../models';
+import { GridEvents } from '../../constants';
 
-export function useGridControlState(apiRef: GridApiRef, props: GridComponentProps) {
+export const useGridStateInitialization = (
+  apiRef: GridPrivateApiRef,
+  props: GridComponentProps,
+) => {
   const controlStateMapRef = React.useRef<Record<string, GridControlStateItem<any>>>({});
+  const [, rawForceUpdate] = React.useState<GridState>();
 
-  const updateControlState = React.useCallback<GridControlStateApi['unstable_updateControlState']>(
+  const setState = React.useCallback<GridStateApi['setState']>(
+    (stateUpdaterFn) => {
+      let newState: GridState;
+      if (typeof stateUpdaterFn === 'function') {
+        newState = stateUpdaterFn(apiRef.current.state);
+      } else {
+        newState = stateUpdaterFn;
+      }
+
+      if (apiRef.current.state === newState) {
+        return false;
+      }
+
+      const { ignoreSetState, postUpdate } = apiRef.current.applyControlStateConstraint(newState);
+
+      if (!ignoreSetState) {
+        // We always assign it as we mutate rows for perf reason.
+        apiRef.current.state = newState;
+
+        if (apiRef.current.publishEvent) {
+          apiRef.current.publishEvent(GridEvents.stateChange, newState);
+        }
+      }
+
+      postUpdate();
+
+      return !ignoreSetState;
+    },
+    [apiRef],
+  );
+
+  const forceUpdate = React.useCallback(() => rawForceUpdate(() => apiRef.current.state), [apiRef]);
+
+  const updateControlState = React.useCallback<GridStatePrivateApi['updateControlState']>(
     (controlStateItem) => {
       const { stateId, ...others } = controlStateItem;
 
@@ -22,7 +60,7 @@ export function useGridControlState(apiRef: GridApiRef, props: GridComponentProp
   );
 
   const applyControlStateConstraint = React.useCallback<
-    GridControlStateApi['unstable_applyControlStateConstraint']
+    GridStatePrivateApi['applyControlStateConstraint']
   >(
     (newState) => {
       let ignoreSetState = false;
@@ -82,9 +120,16 @@ export function useGridControlState(apiRef: GridApiRef, props: GridComponentProp
     [apiRef, props.signature],
   );
 
-  const controlStateApi: GridControlStateApi = {
-    unstable_updateControlState: updateControlState,
-    unstable_applyControlStateConstraint: applyControlStateConstraint,
+  const statePublicApi: Omit<GridStateApi, 'state'> = {
+    setState,
+    forceUpdate,
   };
-  useGridApiMethod(apiRef, controlStateApi, 'controlStateApi');
-}
+
+  const statePrivateApi: GridStatePrivateApi = {
+    updateControlState,
+    applyControlStateConstraint,
+  };
+
+  apiRef.current.register('public', statePublicApi);
+  apiRef.current.register('private', statePrivateApi);
+};

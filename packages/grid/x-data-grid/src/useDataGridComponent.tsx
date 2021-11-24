@@ -47,4 +47,6 @@ export const useDataGridComponent = (apiRef: GridApiRef, props: GridComponentPro
   useGridClipboard(privateApiRef);
   useGridDimensions(privateApiRef, props);
   useGridEvents(privateApiRef, props);
+
+  return privateApiRef;
 };

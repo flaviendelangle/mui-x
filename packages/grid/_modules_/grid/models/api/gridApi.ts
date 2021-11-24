@@ -1,6 +1,5 @@
 import { GridColumnApi } from './gridColumnApi';
 import { GridColumnMenuApi } from './gridColumnMenuApi';
-import { GridControlStateApi } from './gridControlStateApi';
 import { GridCoreApi, GridCorePrivateApi } from './gridCoreApi';
 import { GridClipboardApi } from './gridClipboardApi';
 import { GridCsvExportApi } from './gridCsvExportApi';
@@ -18,7 +17,7 @@ import { GridDisableVirtualizationApi } from './gridDisableVirtualizationApi';
 import { GridRowApi } from './gridRowApi';
 import { GridSelectionApi } from './gridSelectionApi';
 import { GridSortApi } from './gridSortApi';
-import { GridStateApi } from './gridStateApi';
+import { GridStateApi, GridStatePrivateApi } from './gridStateApi';
 import { GridLoggerApi } from './gridLoggerApi';
 import { GridScrollApi } from './gridScrollApi';
 import type { GridPreProcessingPrivateApi } from '../../hooks/core/preProcessing';
@@ -51,8 +50,12 @@ export interface GridApi
     GridPrintExportApi,
     GridDisableVirtualizationApi,
     GridLocaleTextApi,
-    GridControlStateApi,
     GridClipboardApi,
-    GridScrollApi {}
+    GridScrollApi,
+    GridStateApi {}
 
-export interface GridPrivateApi extends GridApi, GridCorePrivateApi, GridPreProcessingPrivateApi {}
+export interface GridPrivateApi
+  extends GridApi,
+    GridCorePrivateApi,
+    GridPreProcessingPrivateApi,
+    GridStatePrivateApi {}

@@ -46,6 +46,10 @@ export const useGridPreProcessing = (apiRef: GridPrivateApiRef) => {
     [],
   );
 
-  apiRef.current.registerMethod('registerPreProcessor', false, registerPreProcessor);
-  apiRef.current.registerMethod('applyPreProcessors', false, applyPreProcessors);
+  const preProcessingPrivateApi: GridPreProcessingPrivateApi = {
+    registerPreProcessor,
+    applyPreProcessors,
+  };
+
+  apiRef.current.register('private', preProcessingPrivateApi);
 };

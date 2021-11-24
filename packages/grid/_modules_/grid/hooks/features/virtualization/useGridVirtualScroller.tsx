@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useForkRef } from '@mui/material/utils';
 import { GridRowId } from '../../../models/gridRows';
-import { useGridApiContext } from '../../utils/useGridApiContext';
+import { useGridPrivateApiContext } from '../../utils/useGridPrivateApiContext';
 import { useGridRootProps } from '../../utils/useGridRootProps';
 import { useGridSelector } from '../../utils/useGridSelector';
 import {
@@ -52,7 +52,7 @@ interface UseGridVirtualScrollerProps {
 
 export const useGridVirtualScroller = (props: UseGridVirtualScrollerProps) => {
   const { ref, selectionLookup, disableVirtualization } = props;
-  const apiRef = useGridApiContext();
+  const apiRef = useGridPrivateApiContext();
   const rootProps = useGridRootProps();
   const visibleColumns = useGridSelector(apiRef, visibleGridColumnsSelector);
   const columnsMeta = useGridSelector(apiRef, gridColumnsMetaSelector);

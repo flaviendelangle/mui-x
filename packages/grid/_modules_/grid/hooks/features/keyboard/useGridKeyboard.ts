@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { gridClasses } from '../../../gridClasses';
 import { GridEvents } from '../../../constants/eventsConstants';
-import { GridApiRef } from '../../../models/api/gridApiRef';
+import { GridPrivateApiRef } from '../../../models/api/gridApiRef';
 import { GridCellParams } from '../../../models/params/gridCellParams';
 import {
   findParentElementFromClassName,
@@ -20,7 +20,7 @@ import { gridVisibleSortedRowIdsSelector } from '../filter/gridFilterSelector';
  * @requires useGridParamsApi (method)
  * @requires useGridColumnMenu (method)
  */
-export const useGridKeyboard = (apiRef: GridApiRef): void => {
+export const useGridKeyboard = (apiRef: GridPrivateApiRef): void => {
   const expandSelection = React.useCallback(
     (params: GridCellParams, event: React.KeyboardEvent) => {
       apiRef.current.publishEvent(GridEvents.cellNavigationKeyDown, params, event);

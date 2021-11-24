@@ -22,10 +22,10 @@ const DataGridRaw = React.forwardRef<HTMLDivElement, DataGridProps>(function Dat
 ) {
   const props = useDataGridProps(inProps);
   const apiRef = useGridApiRef();
-  useDataGridComponent(apiRef, props);
+  const privateApiRef = useDataGridComponent(apiRef, props);
 
   return (
-    <GridContextProvider apiRef={apiRef} props={props}>
+    <GridContextProvider apiRef={apiRef} privateApiRef={privateApiRef} props={props}>
       <GridRoot ref={ref}>
         <GridErrorHandler>
           <GridHeaderPlaceholder />

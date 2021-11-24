@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { GridEvents } from '../../../constants/eventsConstants';
 import { GridComponentProps } from '../../../GridComponentProps';
-import { GridApiRef } from '../../../models/api/gridApiRef';
+import { GridPrivateApiRef } from '../../../models/api/gridApiRef';
 import { GridRowApi } from '../../../models/api/gridRowApi';
 import {
   checkGridRowIdIsValid,
@@ -95,7 +95,7 @@ const convertGridRowsPropToState = ({
 
 const getRowsStateFromCache = (
   rowsCache: GridRowsInternalCache,
-  apiRef: GridApiRef,
+  apiRef: GridPrivateApiRef,
 ): GridRowsState => {
   const {
     props: { rowCount: propRowCount = 0 },
@@ -119,7 +119,7 @@ const getRowsStateFromCache = (
  * @requires useGridRowGroupsPreProcessing (method)
  */
 export const useGridRows = (
-  apiRef: GridApiRef,
+  apiRef: GridPrivateApiRef,
   props: Pick<
     GridComponentProps,
     'rows' | 'getRowId' | 'rowCount' | 'throttleRowsMs' | 'signature'

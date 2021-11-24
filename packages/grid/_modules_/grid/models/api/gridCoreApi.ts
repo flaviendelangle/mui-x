@@ -80,12 +80,17 @@ export interface GridCoreApi {
 
 export interface GridCorePrivateApi {
   /**
-   * Registers a method on the public or the private API.
-   * @param {keyof GridPrivateApi} methodName Name of the method to register.
-   * @param {boolean} isPublic If `true`, the method will be accessible via `useGridApiRef` and `useGridApiContext`.
-   * @param {Function} method Method to register.
+   * Registers a method on the public or private API.
+   * @param {'public' | 'private'} visibility The visibility of the methods.
+   * @param {Partial<GridApiRef>} methods The methods to register.
    */
-  registerMethod: (methodName: keyof GridPrivateApi, isPublic: boolean, method: Function) => void;
+  register: <
+    V extends 'public' | 'private',
+    T extends V extends 'public' ? Partial<GridApi> : Partial<GridPrivateApi>,
+  >(
+    visibility: V,
+    methods: T,
+  ) => void;
 
   /**
    * Returns the public API.

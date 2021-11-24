@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { GridApiRef } from '../../../models/api/gridApiRef';
+import { GridPrivateApiRef } from '../../../models/api/gridApiRef';
 import { useGridSelector } from '../../utils/useGridSelector';
 import { GridEvents } from '../../../constants/eventsConstants';
 import {
@@ -20,7 +20,7 @@ import { useCurrentPageRows } from '../../utils/useCurrentPageRows';
  * @requires useGridScroll (method
  */
 export const useGridInfiniteLoader = (
-  apiRef: GridApiRef,
+  apiRef: GridPrivateApiRef,
   props: Pick<
     GridComponentProps,
     'onRowsScrollEnd' | 'scrollEndThreshold' | 'pagination' | 'paginationMode'

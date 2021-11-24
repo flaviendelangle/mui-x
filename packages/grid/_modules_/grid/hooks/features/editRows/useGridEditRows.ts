@@ -77,7 +77,7 @@ export function useGridEditRows(
   const nextFocusedCell = React.useRef<GridCellParams | null>(null);
   const columns = useGridSelector(apiRef, allGridColumnsSelector);
 
-  apiRef.current.unstable_updateControlState({
+  apiRef.current.updateControlState({
     stateId: 'editRows',
     propModel: props.editRowsModel,
     propOnChange: props.onEditRowsModelChange,
@@ -614,18 +614,27 @@ export function useGridEditRows(
   useGridApiOptionHandler(apiRef, GridEvents.rowEditStart, props.onRowEditStart);
   useGridApiOptionHandler(apiRef, GridEvents.rowEditStop, props.onRowEditStop);
 
-  const isAdvancedApiPublic = props.signature !== GridSignature.DataGrid;
+  const advancedEditingMethod = {
+    commitCellChange,
+    commitRowChange,
+    setEditRowsModel,
+    getEditRowsModel,
+    setEditCellValue,
+  };
+  const isAdvancedEditingApiPublic = props.signature !== GridSignature.DataGrid;
 
-  apiRef.current.registerMethod('setCellMode', true, setCellMode);
-  apiRef.current.registerMethod('getCellMode', true, getCellMode);
-  apiRef.current.registerMethod('setRowMode', true, setRowMode);
-  apiRef.current.registerMethod('getRowMode', true, getRowMode);
-  apiRef.current.registerMethod('isCellEditable', true, isCellEditable);
-  apiRef.current.registerMethod('commitCellChange', isAdvancedApiPublic, commitCellChange);
-  apiRef.current.registerMethod('commitRowChange', isAdvancedApiPublic, commitRowChange);
-  apiRef.current.registerMethod('setEditRowsModel', isAdvancedApiPublic, setEditRowsModel);
-  apiRef.current.registerMethod('getEditRowsModel', isAdvancedApiPublic, getEditRowsModel);
-  apiRef.current.registerMethod('setEditCellValue', isAdvancedApiPublic, setEditCellValue);
+  apiRef.current.register('public', {
+    setCellMode,
+    getCellMode,
+    setRowMode,
+    getRowMode,
+    isCellEditable,
+    ...(isAdvancedEditingApiPublic && advancedEditingMethod),
+  });
+
+  if (!isAdvancedEditingApiPublic) {
+    apiRef.current.register('private', advancedEditingMethod);
+  }
 
   React.useEffect(() => {
     if (props.editRowsModel !== undefined) {

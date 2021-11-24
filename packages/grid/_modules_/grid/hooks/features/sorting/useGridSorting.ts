@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { GridEvents } from '../../../constants/eventsConstants';
 import { GridComponentProps } from '../../../GridComponentProps';
-import { GridApiRef } from '../../../models/api/gridApiRef';
+import { GridPrivateApiRef } from '../../../models/api/gridApiRef';
 import { GridSortApi } from '../../../models/api/gridSortApi';
 import { GridCellValue } from '../../../models/gridCell';
 import { GridColDef } from '../../../models/colDef/gridColDef';
@@ -37,7 +37,7 @@ import { useFirstRender } from '../../utils/useFirstRender';
  * @requires useGridColumns (event)
  */
 export const useGridSorting = (
-  apiRef: GridApiRef,
+  apiRef: GridPrivateApiRef,
   props: Pick<
     GridComponentProps,
     | 'initialState'
@@ -61,7 +61,7 @@ export const useGridSorting = (
 
   const [, setGridState, forceUpdate] = useGridState(apiRef);
 
-  apiRef.current.unstable_updateControlState({
+  apiRef.current.updateControlState({
     stateId: 'sortModel',
     propModel: props.sortModel,
     propOnChange: props.onSortModelChange,

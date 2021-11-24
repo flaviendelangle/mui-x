@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { GridEvents } from '../../../constants/eventsConstants';
 import { GridComponentProps } from '../../../GridComponentProps';
-import { GridApiRef } from '../../../models/api/gridApiRef';
+import { GridPrivateApiRef } from '../../../models/api/gridApiRef';
 import { GridFilterApi } from '../../../models/api/gridFilterApi';
 import { GridFeatureModeConstant } from '../../../models/gridFeatureMode';
 import { GridFilterItem, GridLinkOperator } from '../../../models/gridFilterItem';
@@ -39,7 +39,7 @@ const checkFilterModelValidity = (model: GridFilterModel) => {
  * @requires useGridControlState (method)
  */
 export const useGridFilter = (
-  apiRef: GridApiRef,
+  apiRef: GridPrivateApiRef,
   props: Pick<
     GridComponentProps,
     | 'initialState'
@@ -72,7 +72,7 @@ export const useGridFilter = (
 
   const [, setGridState, forceUpdate] = useGridState(apiRef);
 
-  apiRef.current.unstable_updateControlState({
+  apiRef.current.updateControlState({
     stateId: 'filter',
     propModel: props.filterModel,
     propOnChange: props.onFilterModelChange,

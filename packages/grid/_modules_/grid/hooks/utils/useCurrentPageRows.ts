@@ -5,7 +5,8 @@ import {
   gridPaginatedVisibleSortedGridRowEntriesSelector,
 } from '../features/pagination/gridPaginationSelector';
 import { gridVisibleSortedRowEntriesSelector } from '../features/filter/gridFilterSelector';
-import type { GridApiRef, GridRowEntry, GridState } from '../../models';
+import type { GridRowEntry, GridState } from '../../models';
+import { GridPrivateApiRef } from '../../models/api/gridApiRef';
 import { useGridState } from './useGridState';
 
 export const getCurrentPageRows = (
@@ -37,7 +38,7 @@ export const getCurrentPageRows = (
  * - If the row tree is flat, it only contains up to `state.pageSize` rows
  */
 export const useCurrentPageRows = (
-  apiRef: GridApiRef,
+  apiRef: GridPrivateApiRef,
   props: Pick<GridComponentProps, 'pagination' | 'paginationMode'>,
 ) => {
   const [state] = useGridState(apiRef);

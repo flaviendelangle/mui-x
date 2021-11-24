@@ -10,7 +10,8 @@ import {
   getFieldFromHeaderElem,
   findHeaderElementFromField,
 } from '../../../utils/domUtils';
-import { GridApiRef, CursorCoordinates, GridColumnHeaderParams } from '../../../models';
+import { CursorCoordinates, GridColumnHeaderParams } from '../../../models';
+import { GridPrivateApiRef } from '../../../models/api/gridApiRef';
 import {
   useGridApiEventHandler,
   useGridApiOptionHandler,
@@ -69,7 +70,7 @@ function trackFinger(event, currentTouchId): CursorCoordinates | boolean {
  * TODO: improve experience for last column
  */
 export const useGridColumnResize = (
-  apiRef: GridApiRef,
+  apiRef: GridPrivateApiRef,
   props: Pick<GridComponentProps, 'onColumnResize' | 'onColumnWidthChange'>,
 ) => {
   const logger = useGridLogger(apiRef, 'useGridColumnResize');

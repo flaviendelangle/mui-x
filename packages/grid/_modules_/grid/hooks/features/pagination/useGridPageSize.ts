@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { GridApiRef } from '../../../models';
+import { GridPrivateApiRef } from '../../../models/api/gridApiRef';
 import { GridComponentProps } from '../../../GridComponentProps';
 import { GridPageSizeApi } from '../../../models/api/gridPageSizeApi';
 import { GridEvents } from '../../../constants/eventsConstants';
@@ -20,7 +20,7 @@ import { gridDensityRowHeightSelector } from '../density';
  * @requires useGridFilter (state)
  */
 export const useGridPageSize = (
-  apiRef: GridApiRef,
+  apiRef: GridPrivateApiRef,
   props: Pick<GridComponentProps, 'pageSize' | 'onPageSizeChange' | 'autoPageSize'>,
 ) => {
   const logger = useGridLogger(apiRef, 'useGridPageSize');
@@ -32,7 +32,7 @@ export const useGridPageSize = (
   }));
   const [, setGridState, forceUpdate] = useGridState(apiRef);
 
-  apiRef.current.unstable_updateControlState({
+  apiRef.current.updateControlState({
     stateId: 'pageSize',
     propModel: props.pageSize,
     propOnChange: props.onPageSizeChange,

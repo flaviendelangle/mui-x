@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { GridEvents } from '../../../constants/eventsConstants';
-import { GridApiRef } from '../../../models/api/gridApiRef';
+import { GridPrivateApiRef } from '../../../models/api/gridApiRef';
 import { GridCellParams } from '../../../models/params/gridCellParams';
 import { GridColumnHeaderParams } from '../../../models/params/gridColumnHeaderParams';
 import { visibleGridColumnsLengthSelector } from '../columns/gridColumnsSelector';
@@ -23,7 +23,7 @@ import { useCurrentPageRows } from '../../utils/useCurrentPageRows';
  * @requires useGridScroll (method) - can be after
  */
 export const useGridKeyboardNavigation = (
-  apiRef: GridApiRef,
+  apiRef: GridPrivateApiRef,
   props: Pick<GridComponentProps, 'pagination' | 'paginationMode'>,
 ): void => {
   const logger = useGridLogger(apiRef, 'useGridKeyboardNavigation');

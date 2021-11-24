@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { ownerDocument } from '@mui/material/utils';
-import { GridApiRef } from '../../../models/api/gridApiRef';
+import { GridPrivateApiRef } from '../../../models/api/gridApiRef';
 import { GridPrintExportApi } from '../../../models/api/gridPrintExportApi';
 import { useGridLogger } from '../../utils/useGridLogger';
 import { gridVisibleRowCountSelector } from '../filter/gridFilterSelector';
@@ -32,7 +32,7 @@ type PrintWindowOnLoad = (
  * @requires useGridParamsApi (method)
  */
 export const useGridPrintExport = (
-  apiRef: GridApiRef,
+  apiRef: GridPrivateApiRef,
   props: Pick<GridComponentProps, 'pagination'>,
 ): void => {
   const logger = useGridLogger(apiRef, 'useGridPrintExport');

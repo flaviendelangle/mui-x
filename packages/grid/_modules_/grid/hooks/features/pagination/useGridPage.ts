@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { GridApiRef } from '../../../models';
+import { GridPrivateApiRef } from '../../../models/api/gridApiRef';
 import {
   useGridLogger,
   useGridSelector,
@@ -40,7 +40,7 @@ const applyValidPage = (paginationState: GridPaginationState): GridPaginationSta
  * @requires useGridFilter (state)
  */
 export const useGridPage = (
-  apiRef: GridApiRef,
+  apiRef: GridPrivateApiRef,
   props: Pick<GridComponentProps, 'page' | 'onPageChange' | 'rowCount'>,
 ) => {
   const logger = useGridLogger(apiRef, 'useGridPage');
@@ -58,7 +58,7 @@ export const useGridPage = (
 
   const visibleTopLevelRowCount = useGridSelector(apiRef, gridVisibleTopLevelRowCountSelector);
 
-  apiRef.current.unstable_updateControlState({
+  apiRef.current.updateControlState({
     stateId: 'page',
     propModel: props.page,
     propOnChange: props.onPageChange,
