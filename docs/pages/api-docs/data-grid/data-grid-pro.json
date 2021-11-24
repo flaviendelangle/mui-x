@@ -67,6 +67,9 @@
     "getRowId": { "type": { "name": "func" } },
     "getTreeDataPath": { "type": { "name": "func" } },
     "groupingColDef": { "type": { "name": "union", "description": "func<br>&#124;&nbsp;object" } },
+    "groupingColumnMode": {
+      "type": { "name": "enum", "description": "'multiple'<br>&#124;&nbsp;'single'" }
+    },
     "headerHeight": { "type": { "name": "number" }, "default": "56" },
     "hideFooter": { "type": { "name": "bool" } },
     "hideFooterPagination": { "type": { "name": "bool" } },
@@ -141,6 +144,7 @@
     },
     "rowBuffer": { "type": { "name": "number" }, "default": "3" },
     "rowCount": { "type": { "name": "number" } },
+    "rowGroupByColumnPanel": { "type": { "name": "bool" } },
     "rowHeight": { "type": { "name": "number" }, "default": "52" },
     "rowsPerPageOptions": {
       "type": { "name": "arrayOf", "description": "Array&lt;number&gt;" },
