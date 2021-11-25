@@ -1,5 +1,10 @@
 import * as React from 'react';
-import { DataGridPro, GridColumns } from '@mui/x-data-grid-pro';
+import {
+  DataGridPro,
+  GridColumns,
+  GridKeyGetterParams,
+  GridRenderCellParams,
+} from '@mui/x-data-grid-pro';
 
 const rows = [
   {
@@ -8,6 +13,9 @@ const rows = [
     director: 'James Cameron',
     company: '20th Century Fox',
     year: 2009,
+    composer: {
+      name: 'James Horner',
+    },
   },
   {
     title: 'Avengers: Endgame',
@@ -15,6 +23,9 @@ const rows = [
     director: 'Anthony & Joe Russo',
     company: 'Disney Studios',
     year: 2019,
+    composer: {
+      name: 'Alan Silvestri',
+    },
   },
   {
     title: 'Titanic',
@@ -22,6 +33,9 @@ const rows = [
     director: 'James Cameron',
     company: '20th Century Fox',
     year: 1997,
+    composer: {
+      name: 'James Horner',
+    },
   },
   {
     title: 'Star Wars: The Force Awakens',
@@ -29,6 +43,9 @@ const rows = [
     director: 'J. J. Abrams',
     company: 'Disney Studios',
     year: 2015,
+    composer: {
+      name: 'John Williams',
+    },
   },
   {
     title: 'Avengers: Infinity War',
@@ -36,6 +53,9 @@ const rows = [
     director: 'Anthony & Joe Russo',
     company: 'Disney Studios',
     year: 2018,
+    composer: {
+      name: 'Alan Silvestri',
+    },
   },
   {
     title: 'Jurassic World',
@@ -43,6 +63,9 @@ const rows = [
     director: 'Colin Trevorrow',
     company: 'Universal Pictures',
     year: 2015,
+    composer: {
+      name: 'Michael Giacchino',
+    },
   },
   {
     title: 'The Lion King',
@@ -50,6 +73,9 @@ const rows = [
     director: 'Jon Favreau',
     company: 'Disney Studios',
     year: 2019,
+    composer: {
+      name: 'Hans Zimmer',
+    },
   },
   {
     title: 'The Avengers',
@@ -57,6 +83,9 @@ const rows = [
     director: 'Joss Whedon',
     company: 'Disney Studios',
     year: 2012,
+    composer: {
+      name: 'Alan Silvestri',
+    },
   },
   {
     title: 'Furious 7',
@@ -64,6 +93,9 @@ const rows = [
     director: 'James Wan',
     company: 'Universal Pictures',
     year: 2015,
+    composer: {
+      name: 'Brian Tyler',
+    },
   },
   {
     title: 'Frozen II',
@@ -71,6 +103,9 @@ const rows = [
     director: 'Chris Buck & Jennifer Lee',
     company: 'Disney Studios',
     year: 2019,
+    composer: {
+      name: 'Christophe Beck',
+    },
   },
   {
     title: 'Avengers: Age of Ultron',
@@ -78,6 +113,9 @@ const rows = [
     director: 'Joss Whedon',
     company: 'Disney Studios',
     year: 2015,
+    composer: {
+      name: 'Danny Elfman',
+    },
   },
   {
     title: 'Black Panther',
@@ -85,6 +123,9 @@ const rows = [
     director: 'Ryan Coogler',
     company: 'Disney Studios',
     year: 2018,
+    composer: {
+      name: 'Ludwig Göransson',
+    },
   },
 ];
 
@@ -106,6 +147,13 @@ const columns: GridColumns = [
     headerName: 'Director',
     groupRows: true,
     hide: true,
+  },
+  {
+    field: 'composer',
+    headerName: 'Composer',
+    renderCell: (params: GridRenderCellParams<{ name: string } | undefined>) =>
+      params.value?.name,
+    keyGetter: (params: GridKeyGetterParams<{ name: string }>) => params.value.name,
   },
   {
     field: 'year',
