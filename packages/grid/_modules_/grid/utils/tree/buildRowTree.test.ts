@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { buildRowTree } from './rowTreeUtils';
+import { buildRowTree } from './buildRowTree';
 
 describe('buildRowTree', () => {
   it('should not expand the rows when defaultGroupingExpansionDepth === 0', () => {

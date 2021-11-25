@@ -10,7 +10,7 @@ import { GridEvents, GridEventListener } from '../../../models/events';
 import { GridRowGroupingPreProcessing } from '../../core/rowGroupsPerProcessing';
 import { useFirstRender } from '../../utils/useFirstRender';
 import { isSpaceKey } from '../../../utils/keyboardUtils';
-import { buildRowTree } from '../../../utils/rowTreeUtils';
+import { buildRowTree } from '../../../utils/tree/buildRowTree';
 import { useGridApiEventHandler } from '../../utils/useGridApiEventHandler';
 import { gridRowGroupingColumnLookupSelector } from './rowGroupByColumnsSelector';
 import { GridComponentProps } from '../../../GridComponentProps';

@@ -1,8 +1,8 @@
-import type { GridRowTreeNodeConfig, GridRowId, GridRowTreeConfig } from '../models';
+import type { GridRowTreeNodeConfig, GridRowId, GridRowTreeConfig } from '../../models';
 import type {
   GridRowGroupingResult,
   GridRowGroupParams,
-} from '../hooks/core/rowGroupsPerProcessing';
+} from '../../hooks/core/rowGroupsPerProcessing';
 
 type GridNodeNameToIdTree = {
   [nodeName: string]: { id: GridRowId; children: GridNodeNameToIdTree };
