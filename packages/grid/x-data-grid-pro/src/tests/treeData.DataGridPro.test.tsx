@@ -80,19 +80,19 @@ describe('<DataGridPro /> - Tree Data', () => {
       setProps({ treeData: true });
       expect(getColumnHeadersTextContent()).to.deep.equal(['Group', 'name']);
       expect(getColumnValues(1)).to.deep.equal(['A', 'B', 'C']);
-      // setProps({ treeData: false });
-      // expect(getColumnHeadersTextContent()).to.deep.equal(['name']);
-      // expect(getColumnValues(0)).to.deep.equal([
-      //   'A',
-      //   'A.A',
-      //   'A.B',
-      //   'B',
-      //   'B.A',
-      //   'B.B',
-      //   'B.B.A',
-      //   'B.B.A.A',
-      //   'C',
-      // ]);
+      setProps({ treeData: false });
+      expect(getColumnHeadersTextContent()).to.deep.equal(['name']);
+      expect(getColumnValues(0)).to.deep.equal([
+        'A',
+        'A.A',
+        'A.B',
+        'B',
+        'B.A',
+        'B.B',
+        'B.B.A',
+        'B.B.A.A',
+        'C',
+      ]);
     });
 
     it('should support enabling treeData after apiRef.current.updateRows has modified the rows', async () => {
@@ -357,6 +357,23 @@ describe('<DataGridPro /> - Tree Data', () => {
       expect(getColumnValues(1)).to.deep.equal(['B', 'B.A', 'B.B']);
     });
 
+    it('should allow to toggle props.disableChildrenFiltering', () => {
+      const { setProps } = render(
+        <Test
+          rows={[{ name: 'B' }, { name: 'B.A' }, { name: 'B.B' }]}
+          filterModel={{ items: [{ columnField: 'name', value: 'B', operatorValue: 'endsWith' }] }}
+          defaultGroupingExpansionDepth={-1}
+        />,
+      );
+      expect(getColumnValues(1)).to.deep.equal(['B', 'B.B']);
+
+      setProps({ disableChildrenFiltering: true });
+      expect(getColumnValues(1)).to.deep.equal(['B', 'B.A', 'B.B']);
+
+      setProps({ disableChildrenFiltering: false });
+      expect(getColumnValues(1)).to.deep.equal(['B', 'B.B']);
+    });
+
     it('should throw an error when using filterMode="server" and treeData', () => {
       expect(() => {
         render(<Test filterMode="server" />);
@@ -382,24 +399,94 @@ describe('<DataGridPro /> - Tree Data', () => {
 
   describe('sorting', () => {
     it('should respect the prop order for a given depth when no sortModel provided', () => {
-      render(<Test rows={[{ name: 'D' }, { name: 'A.B' }, { name: 'A' }, { name: 'A.A' }]} />);
-      expect(getColumnValues(1)).to.deep.equal(['D', 'A']);
-      fireEvent.click(getCell(1, 0).querySelector('button'));
+      render(
+        <Test
+          rows={[{ name: 'D' }, { name: 'A.B' }, { name: 'A' }, { name: 'A.A' }]}
+          defaultGroupingExpansionDepth={-1}
+        />,
+      );
       expect(getColumnValues(1)).to.deep.equal(['D', 'A', 'A.B', 'A.A']);
     });
 
     it('should apply the sortModel on every depth of the tree if props.disableChildrenSorting = false', () => {
-      render(<Test sortModel={[{ field: 'name', sort: 'desc' }]} />);
-      expect(getColumnValues(1)).to.deep.equal(['C', 'B', 'A']);
-      fireEvent.click(getCell(2, 0).querySelector('button'));
-      expect(getColumnValues(1)).to.deep.equal(['C', 'B', 'A', 'A.B', 'A.A']);
+      render(
+        <Test sortModel={[{ field: 'name', sort: 'desc' }]} defaultGroupingExpansionDepth={-1} />,
+      );
+      expect(getColumnValues(1)).to.deep.equal([
+        'C',
+        'B',
+        'B.B',
+        'B.B.A',
+        'B.B.A.A',
+        'B.A',
+        'A',
+        'A.B',
+        'A.A',
+      ]);
     });
 
     it('should only apply the sortModel on top level rows if props.disableChildrenSorting = true', () => {
-      render(<Test sortModel={[{ field: 'name', sort: 'desc' }]} disableChildrenSorting />);
-      expect(getColumnValues(1)).to.deep.equal(['C', 'B', 'A']);
-      fireEvent.click(getCell(2, 0).querySelector('button'));
-      expect(getColumnValues(1)).to.deep.equal(['C', 'B', 'A', 'A.A', 'A.B']);
+      render(
+        <Test
+          sortModel={[{ field: 'name', sort: 'desc' }]}
+          disableChildrenSorting
+          defaultGroupingExpansionDepth={-1}
+        />,
+      );
+      expect(getColumnValues(1)).to.deep.equal([
+        'C',
+        'B',
+        'B.A',
+        'B.B',
+        'B.B.A',
+        'B.B.A.A',
+        'A',
+        'A.A',
+        'A.B',
+      ]);
+    });
+
+    it('should allow to toggle props.disableChildrenSorting', () => {
+      const { setProps } = render(
+        <Test sortModel={[{ field: 'name', sort: 'desc' }]} defaultGroupingExpansionDepth={-1} />,
+      );
+      expect(getColumnValues(1)).to.deep.equal([
+        'C',
+        'B',
+        'B.B',
+        'B.B.A',
+        'B.B.A.A',
+        'B.A',
+        'A',
+        'A.B',
+        'A.A',
+      ]);
+
+      setProps({ disableChildrenSorting: true });
+      expect(getColumnValues(1)).to.deep.equal([
+        'C',
+        'B',
+        'B.A',
+        'B.B',
+        'B.B.A',
+        'B.B.A.A',
+        'A',
+        'A.A',
+        'A.B',
+      ]);
+
+      setProps({ disableChildrenSorting: false });
+      expect(getColumnValues(1)).to.deep.equal([
+        'C',
+        'B',
+        'B.B',
+        'B.B.A',
+        'B.B.A.A',
+        'B.A',
+        'A',
+        'A.B',
+        'A.A',
+      ]);
     });
 
     it('should update the order server side', () => {
