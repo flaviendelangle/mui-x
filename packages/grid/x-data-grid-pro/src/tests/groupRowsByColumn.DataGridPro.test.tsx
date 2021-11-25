@@ -37,6 +37,41 @@ const baselineProps: DataGridProProps = {
   ],
 };
 
+const GROUPING_COLS_SINGLE_CAT_2_CAT_1 = [
+  'Cat 1 (2)',
+  'A (1)',
+  '',
+  'B (1)',
+  '',
+  'Cat 2 (3)',
+  'A (2)',
+  '',
+  '',
+  'B (1)',
+  '',
+];
+const GROUPING_COLS_SINGLE_CAT_1_CAT_2 = [
+  'A (3)',
+  'Cat 1 (1)',
+  '',
+  'Cat 2 (2)',
+  '',
+  '',
+  'B (2)',
+  'Cat 2 (1)',
+  '',
+  'Cat 1 (1)',
+  '',
+];
+const GROUPING_COLS_MULTIPLE_CAT_1_CAT_2 = [
+  ['A (3)', '', '', '', '', '', 'B (2)', '', '', '', ''],
+  ['', 'Cat 1 (1)', '', 'Cat 2 (2)', '', '', '', 'Cat 2 (1)', '', 'Cat 1 (1)', ''],
+];
+const GROUPING_COLS_MULTIPLE_CAT_2_CAT_1 = [
+  ['Cat 1 (2)', '', '', '', '', 'Cat 2 (3)', '', '', '', '', ''],
+  ['', 'A (1)', '', 'B (1)', '', '', 'A (2)', '', '', 'B (1)', ''],
+];
+
 describe('<DataGridPro /> - Group Rows By Column', () => {
   const { render } = createRenderer();
 
@@ -73,19 +108,7 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
       );
 
       expect(getColumnHeadersTextContent()).to.deep.equal(['Group']);
-      expect(getColumnValues(0)).to.deep.equal([
-        'A (3)',
-        'Cat 1 (1)',
-        '',
-        'Cat 2 (2)',
-        '',
-        '',
-        'B (2)',
-        'Cat 2 (1)',
-        '',
-        'Cat 1 (1)',
-        '',
-      ]);
+      expect(getColumnValues(0)).to.deep.equal(GROUPING_COLS_SINGLE_CAT_1_CAT_2);
     });
 
     it('should gather call the grouping fields in a single column when groupingColumnMode = "single"', () => {
@@ -109,19 +132,7 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
       );
 
       expect(getColumnHeadersTextContent()).to.deep.equal(['Group']);
-      expect(getColumnValues(0)).to.deep.equal([
-        'A (3)',
-        'Cat 1 (1)',
-        '',
-        'Cat 2 (2)',
-        '',
-        '',
-        'B (2)',
-        'Cat 2 (1)',
-        '',
-        'Cat 1 (1)',
-        '',
-      ]);
+      expect(getColumnValues(0)).to.deep.equal(GROUPING_COLS_SINGLE_CAT_1_CAT_2);
     });
 
     it('should gather call the grouping fields in a single column when groupingColumnMode = "multiple"', () => {
@@ -145,32 +156,8 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
       );
 
       expect(getColumnHeadersTextContent()).to.deep.equal(['category1', 'category2']);
-      expect(getColumnValues(0)).to.deep.equal([
-        'A (3)',
-        '',
-        '',
-        '',
-        '',
-        '',
-        'B (2)',
-        '',
-        '',
-        '',
-        '',
-      ]);
-      expect(getColumnValues(1)).to.deep.equal([
-        '',
-        'Cat 1 (1)',
-        '',
-        'Cat 2 (2)',
-        '',
-        '',
-        '',
-        'Cat 2 (1)',
-        '',
-        'Cat 1 (1)',
-        '',
-      ]);
+      expect(getColumnValues(0)).to.deep.equal(GROUPING_COLS_MULTIPLE_CAT_1_CAT_2[0]);
+      expect(getColumnValues(1)).to.deep.equal(GROUPING_COLS_MULTIPLE_CAT_1_CAT_2[1]);
     });
 
     it('should support groupingColumnMode switch', () => {
@@ -194,48 +181,17 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
       );
 
       expect(getColumnHeadersTextContent()).to.deep.equal(['category1', 'category2']);
-      expect(getColumnValues(0)).to.deep.equal([
-        'A (3)',
-        '',
-        '',
-        '',
-        '',
-        '',
-        'B (2)',
-        '',
-        '',
-        '',
-        '',
-      ]);
-      expect(getColumnValues(1)).to.deep.equal([
-        '',
-        'Cat 1 (1)',
-        '',
-        'Cat 2 (2)',
-        '',
-        '',
-        '',
-        'Cat 2 (1)',
-        '',
-        'Cat 1 (1)',
-        '',
-      ]);
+      expect(getColumnValues(0)).to.deep.equal(GROUPING_COLS_MULTIPLE_CAT_1_CAT_2[0]);
+      expect(getColumnValues(1)).to.deep.equal(GROUPING_COLS_MULTIPLE_CAT_1_CAT_2[1]);
 
       setProps({ groupingColumnMode: 'single' });
       expect(getColumnHeadersTextContent()).to.deep.equal(['Group']);
-      expect(getColumnValues(0)).to.deep.equal([
-        'A (3)',
-        'Cat 1 (1)',
-        '',
-        'Cat 2 (2)',
-        '',
-        '',
-        'B (2)',
-        'Cat 2 (1)',
-        '',
-        'Cat 1 (1)',
-        '',
-      ]);
+      expect(getColumnValues(0)).to.deep.equal(GROUPING_COLS_SINGLE_CAT_1_CAT_2);
+
+      setProps({ groupingColumnMode: 'multiple' });
+      expect(getColumnHeadersTextContent()).to.deep.equal(['category1', 'category2']);
+      expect(getColumnValues(0)).to.deep.equal(GROUPING_COLS_MULTIPLE_CAT_1_CAT_2[0]);
+      expect(getColumnValues(1)).to.deep.equal(GROUPING_COLS_MULTIPLE_CAT_1_CAT_2[1]);
     });
   });
 
@@ -366,7 +322,7 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
   });
 
   describe('colDef: groupRowIndex', () => {
-    it('should order the grouping fields according to the column order if no groupRowIndex provided', () => {
+    it('should order the grouping fields according to the column order if no groupRowIndex provided (groupingColumnMode = "multiple")', () => {
       render(
         <Test
           columns={[
@@ -386,9 +342,11 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
         />,
       );
       expect(getColumnHeadersTextContent()).to.deep.equal(['category2', 'category1']);
+      expect(getColumnValues(0)).to.deep.equal(GROUPING_COLS_MULTIPLE_CAT_2_CAT_1[0]);
+      expect(getColumnValues(1)).to.deep.equal(GROUPING_COLS_MULTIPLE_CAT_2_CAT_1[1]);
     });
 
-    it('should order the grouping fields according to the groupRowIndex property if provided', () => {
+    it('should order the grouping fields according to the groupRowIndex property if provided (groupingColumnMode = "multiple")', () => {
       render(
         <Test
           columns={[
@@ -410,9 +368,36 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
         />,
       );
       expect(getColumnHeadersTextContent()).to.deep.equal(['category2', 'category1']);
+      expect(getColumnValues(0)).to.deep.equal(GROUPING_COLS_MULTIPLE_CAT_2_CAT_1[0]);
+      expect(getColumnValues(1)).to.deep.equal(GROUPING_COLS_MULTIPLE_CAT_2_CAT_1[1]);
     });
 
-    it('should put columns without groupRowIndex before columns with it', () => {
+    it('should order the grouping fields according to the groupRowIndex property if provided (groupingColumnMode = "single")', () => {
+      render(
+        <Test
+          columns={[
+            {
+              field: 'category1',
+              groupRows: true,
+              groupRowIndex: 2,
+              hide: true,
+            },
+            {
+              field: 'category2',
+              groupRows: true,
+              groupRowIndex: 1,
+              hide: true,
+            },
+          ]}
+          defaultGroupingExpansionDepth={-1}
+          groupingColumnMode="single"
+        />,
+      );
+      expect(getColumnHeadersTextContent()).to.deep.equal(['Group']);
+      expect(getColumnValues(0)).to.deep.equal(GROUPING_COLS_SINGLE_CAT_2_CAT_1);
+    });
+
+    it('should put columns without groupRowIndex before columns with it (groupingColumnMode = "multiple")', () => {
       render(
         <Test
           columns={[
@@ -433,9 +418,11 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
         />,
       );
       expect(getColumnHeadersTextContent()).to.deep.equal(['category2', 'category1']);
+      expect(getColumnValues(0)).to.deep.equal(GROUPING_COLS_MULTIPLE_CAT_2_CAT_1[0]);
+      expect(getColumnValues(1)).to.deep.equal(GROUPING_COLS_MULTIPLE_CAT_2_CAT_1[1]);
     });
 
-    it('should react to change of groupRowIndex via `apiRef.current.updateColumns`', () => {
+    it('should react to change of groupRowIndex via `apiRef.current.updateColumns` (groupingColumnMode = "multiple")', () => {
       render(
         <Test
           columns={[
@@ -457,7 +444,13 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
         />,
       );
       expect(getColumnHeadersTextContent()).to.deep.equal(['category2', 'category1']);
+      expect(getColumnValues(0)).to.deep.equal(GROUPING_COLS_MULTIPLE_CAT_2_CAT_1[0]);
+      expect(getColumnValues(1)).to.deep.equal(GROUPING_COLS_MULTIPLE_CAT_2_CAT_1[1]);
+
       apiRef.current.updateColumns([{ field: 'category2', groupRowIndex: 3 }]);
+      expect(getColumnHeadersTextContent()).to.deep.equal(['category1', 'category2']);
+      expect(getColumnValues(0)).to.deep.equal(GROUPING_COLS_MULTIPLE_CAT_1_CAT_2[0]);
+      expect(getColumnValues(1)).to.deep.equal(GROUPING_COLS_MULTIPLE_CAT_1_CAT_2[1]);
     });
   });
 
