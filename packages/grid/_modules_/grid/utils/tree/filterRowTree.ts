@@ -4,7 +4,8 @@ import { GridFilterState } from '../../hooks';
 interface FilterRowTreeParams {
   rowTree: GridRowTreeConfig;
   disableChildrenFiltering: boolean;
-  filteringMethod: ((rowId: GridRowId) => boolean) | null;
+  isRowMatchingFilters: ((rowId: GridRowId) => boolean) | null;
+  shouldOnlyCountDescendantLeaf: boolean;
 }
 
 /**
@@ -15,7 +16,8 @@ interface FilterRowTreeParams {
 export const filterRowTree = (
   params: FilterRowTreeParams,
 ): Pick<GridFilterState, 'visibleRowsLookup' | 'filteredDescendantCountLookup'> => {
-  const { rowTree, disableChildrenFiltering, filteringMethod } = params;
+  const { rowTree, disableChildrenFiltering, isRowMatchingFilters, shouldOnlyCountDescendantLeaf } =
+    params;
   const visibleRowsLookup: Record<GridRowId, boolean> = {};
   const filteredDescendantCountLookup: Record<GridRowId, number> = {};
 
@@ -29,10 +31,10 @@ export const filterRowTree = (
     let isMatchingFilters: boolean | null;
     if (shouldSkipFilters) {
       isMatchingFilters = null;
-    } else if (!filteringMethod) {
+    } else if (!isRowMatchingFilters) {
       isMatchingFilters = true;
     } else {
-      isMatchingFilters = filteringMethod(node.id);
+      isMatchingFilters = isRowMatchingFilters(node.id);
     }
 
     let filteredDescendantCount = 0;
@@ -71,7 +73,10 @@ export const filterRowTree = (
 
     filteredDescendantCountLookup[node.id] = filteredDescendantCount;
 
-    // TODO: For column grouping, we do not want to count the intermediate depth nodes in the visible descendant count
+    if (shouldOnlyCountDescendantLeaf && filteredDescendantCount > 0) {
+      return filteredDescendantCount;
+    }
+
     return filteredDescendantCount + 1;
   };
 

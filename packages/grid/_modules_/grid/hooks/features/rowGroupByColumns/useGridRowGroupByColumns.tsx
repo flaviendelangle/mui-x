@@ -20,6 +20,15 @@ import { GRID_ROW_GROUP_BY_COLUMNS_GROUP_COL_DEF } from './gridRowGroupByColumns
 import { GridRowGroupByColumnsGroupingCell } from '../../../components/cell/GridRowGroupByColumnsGroupingCell';
 import { GridPreProcessingGroup, useGridRegisterPreProcessor } from '../../core/preProcessing';
 import { GridColumnsRawState } from '../columns/gridColumnsState';
+import { useGridRegisterFilteringMethod } from '../filter/useGridRegisterFilteringMethod';
+import { GridFilteringMethod } from '../filter/gridFilterState';
+import { gridRowIdsSelector, gridRowTreeSelector } from '../rows';
+import { filterRowTree } from '../../../utils/tree/filterRowTree';
+import { useGridRegisterSortingMethod } from '../sorting/useGridRegisterSortingMethod';
+import { GridSortingMethod } from '../sorting/gridSortingState';
+import { sortRowTree } from '../../../utils/tree/sortRowTree';
+
+const GROUP_ROWS_BY_COLUMN_NAME = 'group-rows-by-columns';
 
 /**
  * Only available in DataGridPro
@@ -29,82 +38,16 @@ export const useGridRowGroupByColumns = (
   apiRef: GridApiRef,
   props: Pick<
     GridComponentProps,
-    'defaultGroupingExpansionDepth' | 'groupingColDef' | 'groupingColumnMode'
+    | 'defaultGroupingExpansionDepth'
+    | 'groupingColDef'
+    | 'groupingColumnMode'
+    | 'disableChildrenFiltering'
+    | 'disableChildrenSorting'
   >,
 ) => {
-  const getGroupingColDefs = React.useCallback(
-    (columnsState: GridColumnsRawState) => {
-      const propGroupingColDef = props.groupingColDef;
-      const groupedByColDefs = getRowGroupingColumnLookup(columnsState.lookup);
-      const orderedGroupedByFields = orderGroupedByFields(groupedByColDefs);
-
-      if (orderedGroupedByFields.length === 0) {
-        return [];
-      }
-
-      const lookup: GridColDef[] = [];
-      if (props.groupingColumnMode === 'single') {
-        const fullBaseColDef: GridColDef = {
-          ...GRID_ROW_GROUP_BY_COLUMNS_GROUP_COL_DEF,
-          headerName: apiRef.current.getLocaleText('treeDataGroupingHeaderName'),
-          renderCell: (params) => <GridRowGroupByColumnsGroupingCell {...params} />,
-          field: '__row_group_by_columns_group__',
-        };
-
-        let colDefOverride: Partial<GridColDef>;
-
-        if (isFunction(propGroupingColDef)) {
-          const params: GridColDefOverrideParams = {
-            colDef: fullBaseColDef,
-            sources: Object.values(groupedByColDefs),
-          };
-
-          colDefOverride = propGroupingColDef(params);
-        } else {
-          colDefOverride = propGroupingColDef ?? {};
-        }
-
-        lookup.push({ ...fullBaseColDef, ...colDefOverride });
-      } else {
-        orderedGroupedByFields.forEach((groupedByField, depth) => {
-          const groupedByColDef = groupedByColDefs[groupedByField];
-
-          // TODO: Handle valueFormatter
-          const fullBaseColDef: GridColDef = {
-            ...GRID_ROW_GROUP_BY_COLUMNS_GROUP_COL_DEF,
-            headerName: groupedByColDef.headerName ?? groupedByColDef.field,
-            renderCell: (params) => {
-              if (params.rowNode.depth !== depth) {
-                return '';
-              }
-
-              return <GridRowGroupByColumnsGroupingCell {...params} />;
-            },
-            field: `__row_group_by_columns_group_${groupedByField}__`,
-          };
-
-          let colDefOverride: Partial<GridColDef>;
-
-          if (isFunction(propGroupingColDef)) {
-            const params: GridColDefOverrideParams = {
-              colDef: fullBaseColDef,
-              sources: [groupedByColDef],
-            };
-
-            colDefOverride = propGroupingColDef(params);
-          } else {
-            colDefOverride = propGroupingColDef ?? {};
-          }
-
-          lookup.push({ ...fullBaseColDef, ...colDefOverride });
-        });
-      }
-
-      return lookup;
-    },
-    [apiRef, props.groupingColDef, props.groupingColumnMode],
-  );
-
+  /**
+   * ROW GROUPING
+   */
   const groupingFieldsOnLastRowPreProcessing = React.useRef<string[]>([]);
 
   const updateRowGrouping = React.useCallback(() => {
@@ -187,11 +130,102 @@ export const useGridRowGroupByColumns = (
         ...params,
         rows,
         defaultGroupingExpansionDepth: props.defaultGroupingExpansionDepth,
+        treeGroupingName: GROUP_ROWS_BY_COLUMN_NAME,
       });
     };
 
     return apiRef.current.unstable_registerRowGroupsBuilder('rowGrouping', groupRows);
   }, [apiRef, props.defaultGroupingExpansionDepth]);
+
+  useFirstRender(() => {
+    updateRowGrouping();
+  });
+
+  const isFirstRender = React.useRef(true);
+  React.useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+
+    updateRowGrouping();
+  }, [updateRowGrouping]);
+
+  /**
+   * PRE-PROCESSING
+   */
+  const getGroupingColDefs = React.useCallback(
+    (columnsState: GridColumnsRawState) => {
+      const propGroupingColDef = props.groupingColDef;
+      const groupedByColDefs = getRowGroupingColumnLookup(columnsState.lookup);
+      const orderedGroupedByFields = orderGroupedByFields(groupedByColDefs);
+
+      if (orderedGroupedByFields.length === 0) {
+        return [];
+      }
+
+      const lookup: GridColDef[] = [];
+      if (props.groupingColumnMode === 'single') {
+        const fullBaseColDef: GridColDef = {
+          ...GRID_ROW_GROUP_BY_COLUMNS_GROUP_COL_DEF,
+          headerName: apiRef.current.getLocaleText('treeDataGroupingHeaderName'),
+          renderCell: (params) => <GridRowGroupByColumnsGroupingCell {...params} />,
+          field: '__row_group_by_columns_group__',
+        };
+
+        let colDefOverride: Partial<GridColDef>;
+
+        if (isFunction(propGroupingColDef)) {
+          const params: GridColDefOverrideParams = {
+            colDef: fullBaseColDef,
+            sources: Object.values(groupedByColDefs),
+          };
+
+          colDefOverride = propGroupingColDef(params);
+        } else {
+          colDefOverride = propGroupingColDef ?? {};
+        }
+
+        lookup.push({ ...fullBaseColDef, ...colDefOverride });
+      } else {
+        orderedGroupedByFields.forEach((groupedByField, depth) => {
+          const groupedByColDef = groupedByColDefs[groupedByField];
+
+          // TODO: Handle valueFormatter
+          const fullBaseColDef: GridColDef = {
+            ...GRID_ROW_GROUP_BY_COLUMNS_GROUP_COL_DEF,
+            headerName: groupedByColDef.headerName ?? groupedByColDef.field,
+            renderCell: (params) => {
+              if (params.rowNode.depth !== depth) {
+                return '';
+              }
+
+              return <GridRowGroupByColumnsGroupingCell {...params} />;
+            },
+            field: `__row_group_by_columns_group_${groupedByField}__`,
+          };
+
+          let colDefOverride: Partial<GridColDef>;
+
+          if (isFunction(propGroupingColDef)) {
+            const params: GridColDefOverrideParams = {
+              colDef: fullBaseColDef,
+              sources: [groupedByColDef],
+            };
+
+            colDefOverride = propGroupingColDef(params);
+          } else {
+            colDefOverride = propGroupingColDef ?? {};
+          }
+
+          lookup.push({ ...fullBaseColDef, ...colDefOverride });
+        });
+      }
+
+      return lookup;
+    },
+    [apiRef, props.groupingColDef, props.groupingColumnMode],
+  );
 
   const updateGroupingColumn = React.useCallback(
     (columnsState: GridColumnsRawState) => {
@@ -224,22 +258,43 @@ export const useGridRowGroupByColumns = (
     [getGroupingColDefs],
   );
 
-  useFirstRender(() => {
-    updateRowGrouping();
-  });
+  const filteringMethod = React.useCallback<GridFilteringMethod>(
+    (params) => {
+      const rowTree = gridRowTreeSelector(apiRef.current.state);
 
-  const isFirstRender = React.useRef(true);
-  React.useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
+      return filterRowTree({
+        rowTree,
+        isRowMatchingFilters: params.isRowMatchingFilters,
+        disableChildrenFiltering: props.disableChildrenFiltering,
+        shouldOnlyCountDescendantLeaf: true,
+      });
+    },
+    [apiRef, props.disableChildrenFiltering],
+  );
 
-    updateRowGrouping();
-  }, [updateRowGrouping]);
+  const sortingMethod = React.useCallback<GridSortingMethod>(
+    (params) => {
+      const rowTree = gridRowTreeSelector(apiRef.current.state);
+      const rowIds = gridRowIdsSelector(apiRef.current.state);
+
+      return sortRowTree({
+        rowTree,
+        rowIds,
+        sortRowList: params.sortRowList,
+        comparatorList: params.comparatorList,
+        disableChildrenSorting: props.disableChildrenSorting,
+      });
+    },
+    [apiRef, props.disableChildrenSorting],
+  );
 
   useGridRegisterPreProcessor(apiRef, GridPreProcessingGroup.hydrateColumns, updateGroupingColumn);
+  useGridRegisterFilteringMethod(apiRef, GROUP_ROWS_BY_COLUMN_NAME, filteringMethod);
+  useGridRegisterSortingMethod(apiRef, GROUP_ROWS_BY_COLUMN_NAME, sortingMethod);
 
+  /**
+   * EVENTS
+   */
   const handleCellKeyDown = React.useCallback<GridEventListener<GridEvents.cellKeyDown>>(
     (params, event) => {
       const cellParams = apiRef.current.getCellParams(params.id, params.field);

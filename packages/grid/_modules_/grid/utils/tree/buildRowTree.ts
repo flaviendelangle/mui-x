@@ -11,6 +11,7 @@ type GridNodeNameToIdTree = {
 interface GenerateRowTreeParams extends GridRowGroupParams {
   rows: { id: GridRowId; path: string[] }[];
   defaultGroupingExpansionDepth: number;
+  treeGroupingName: string;
 }
 
 interface TempRowTreeNode extends Omit<GridRowTreeNodeConfig, 'children'> {
@@ -140,5 +141,6 @@ export const buildRowTree = (params: GenerateRowTreeParams): GridRowGroupingResu
     treeDepth,
     ids,
     idRowsLookup,
+    treeGroupingName: params.treeGroupingName,
   };
 };
