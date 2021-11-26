@@ -21,11 +21,6 @@ export interface GridFilterApi {
    */
   upsertFilterItem: (item: GridFilterItem) => void;
   /**
-   * Applies all filters on all rows.
-   * @ignore - do not document.
-   */
-  unstable_applyFilters: () => void;
-  /**
    * Deletes a [[GridFilterItem]].
    * @param {GridFilterItem} item The filter to delete.
    */

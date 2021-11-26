@@ -21,8 +21,11 @@ import { GridStateApi, GridStatePrivateApi } from './gridStateApi';
 import { GridLoggerApi } from './gridLoggerApi';
 import { GridScrollApi } from './gridScrollApi';
 import type { GridPreProcessingPrivateApi } from '../../hooks/core/preProcessing';
-import type { GridRowGroupsPreProcessingApi } from '../../hooks/core/rowGroupsPerProcessing';
-import type { GridDimensionsApi } from '../../hooks/features/dimensions';
+import type { GridRowGroupsPreProcessingPrivateApi } from '../../hooks/core/rowGroupsPreProcessing';
+import type {
+  GridDimensionsApi,
+  GridDimensionsPrivateApi,
+} from '../../hooks/features/dimensions/gridDimensionsApi';
 
 /**
  * The full grid API.
@@ -31,7 +34,6 @@ export interface GridApi
   extends GridCoreApi,
     GridStateApi,
     GridLoggerApi,
-    GridRowGroupsPreProcessingApi,
     GridDensityApi,
     GridDimensionsApi,
     GridRowApi,
@@ -58,4 +60,6 @@ export interface GridPrivateApi
   extends GridApi,
     GridCorePrivateApi,
     GridPreProcessingPrivateApi,
-    GridStatePrivateApi {}
+    GridRowGroupsPreProcessingPrivateApi,
+    GridStatePrivateApi,
+    GridDimensionsPrivateApi {}

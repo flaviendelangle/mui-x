@@ -60,7 +60,7 @@ export const useGridKeyboardNavigation = (
         return;
       }
 
-      const viewportPageSize = apiRef.current.unstable_getViewportPageSize();
+      const viewportPageSize = apiRef.current.getViewportPageSize();
       const colIndexBefore = params.field ? apiRef.current.getColumnIndex(params.field) : 0;
       const rowIndexBefore = visibleSortedRows.findIndex((row) => row.id === params.id);
       const firstRowIndexInPage = currentPage.range.firstRowIndex;
@@ -162,7 +162,7 @@ export const useGridKeyboardNavigation = (
         return;
       }
 
-      const viewportPageSize = apiRef.current.unstable_getViewportPageSize();
+      const viewportPageSize = apiRef.current.getViewportPageSize();
       const colIndexBefore = params.field ? apiRef.current.getColumnIndex(params.field) : 0;
       const firstRowIndexInPage = currentPage.range?.firstRowIndex ?? null;
       const lastRowIndexInPage = currentPage.range?.lastRowIndex ?? null;

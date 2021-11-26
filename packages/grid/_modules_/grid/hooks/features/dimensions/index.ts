@@ -1,1 +1,1 @@
-export * from './gridDimensionsApi';
+export type { GridDimensionsApi, GridDimensions } from './gridDimensionsApi';

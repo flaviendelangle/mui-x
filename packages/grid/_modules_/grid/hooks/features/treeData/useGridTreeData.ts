@@ -17,7 +17,7 @@ import {
 import { isSpaceKey } from '../../../utils/keyboardUtils';
 import { useFirstRender } from '../../utils/useFirstRender';
 import { buildRowTree } from '../../../utils/rowTreeUtils';
-import { GridRowGroupingPreProcessing } from '../../core/rowGroupsPerProcessing';
+import { GridRowGroupingPreProcessing } from '../../core/rowGroupsPreProcessing';
 import { gridFilteredDescendantCountLookupSelector } from '../filter';
 import { GridPreProcessingGroup, useGridRegisterPreProcessor } from '../../core/preProcessing';
 
@@ -74,7 +74,7 @@ export const useGridTreeData = (
 
   const updateRowGrouping = React.useCallback(() => {
     if (!props.treeData) {
-      return apiRef.current.unstable_registerRowGroupsBuilder('treeData', null);
+      return apiRef.current.registerRowGroupsBuilder('treeData', null);
     }
 
     const groupRows: GridRowGroupingPreProcessing = (params) => {
@@ -96,7 +96,7 @@ export const useGridTreeData = (
       });
     };
 
-    return apiRef.current.unstable_registerRowGroupsBuilder('treeData', groupRows);
+    return apiRef.current.registerRowGroupsBuilder('treeData', groupRows);
   }, [apiRef, props.getTreeDataPath, props.treeData, props.defaultGroupingExpansionDepth]);
 
   useFirstRender(() => {

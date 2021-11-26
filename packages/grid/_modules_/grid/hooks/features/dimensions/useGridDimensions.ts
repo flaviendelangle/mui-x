@@ -5,12 +5,11 @@ import {
   unstable_useEnhancedEffect as useEnhancedEffect,
 } from '@mui/material/utils';
 import { GridEvents } from '../../../constants/eventsConstants';
-import { ElementSize, GridApiRef } from '../../../models';
+import { ElementSize } from '../../../models';
 import {
   useGridApiEventHandler,
   useGridApiOptionHandler,
 } from '../../utils/useGridApiEventHandler';
-import { useGridApiMethod } from '../../utils/useGridApiMethod';
 import { useGridLogger } from '../../utils/useGridLogger';
 import { GridComponentProps } from '../../../GridComponentProps';
 import { GridDimensions, GridDimensionsApi } from './gridDimensionsApi';
@@ -18,6 +17,7 @@ import { gridColumnsTotalWidthSelector } from '../columns';
 import { gridDensityHeaderHeightSelector, gridDensityRowHeightSelector } from '../density';
 import { useGridSelector } from '../../utils';
 import { getCurrentPageRows } from '../../utils/useCurrentPageRows';
+import { GridPrivateApiRef } from '../../../models/api/gridApiRef';
 
 const isTestEnvironment = process.env.NODE_ENV === 'test';
 
@@ -49,7 +49,7 @@ const hasScroll = ({
 };
 
 export function useGridDimensions(
-  apiRef: GridApiRef,
+  apiRef: GridPrivateApiRef,
   props: Pick<
     GridComponentProps,
     'rows' | 'onResize' | 'scrollbarSize' | 'pagination' | 'paginationMode' | 'autoHeight'
@@ -166,13 +166,14 @@ export function useGridDimensions(
     return Math.min(maximumPageSizeWithoutScrollBar, currentPage.rows.length);
   }, [apiRef, props.pagination, props.paginationMode]);
 
-  const dimensionsApi: GridDimensionsApi = {
+  apiRef.current.register('public', {
     resize,
     getRootDimensions,
-    unstable_getViewportPageSize: getViewportPageSize,
-  };
+  });
 
-  useGridApiMethod(apiRef, dimensionsApi, 'GridDimensionsApi');
+  apiRef.current.register('private', {
+    getViewportPageSize,
+  });
 
   const debounceResize = React.useMemo(() => debounce(resize, 60), [resize]);
 

@@ -2,7 +2,7 @@ import type { GridRowTreeNodeConfig, GridRowId, GridRowTreeConfig } from '../mod
 import type {
   GridRowGroupingResult,
   GridRowGroupParams,
-} from '../hooks/core/rowGroupsPerProcessing';
+} from '../hooks/core/rowGroupsPreProcessing';
 
 type GridNodeNameToIdTree = {
   [nodeName: string]: { id: GridRowId; children: GridNodeNameToIdTree };

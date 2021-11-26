@@ -23,7 +23,7 @@ import {
   gridRowIdsSelector,
 } from './gridRowsSelector';
 import { GridSignature, useGridApiEventHandler } from '../../utils/useGridApiEventHandler';
-import { GridRowGroupParams } from '../../core/rowGroupsPerProcessing';
+import { GridRowGroupParams } from '../../core/rowGroupsPreProcessing';
 
 interface GridRowsInternalCacheState {
   value: GridRowGroupParams;
@@ -102,7 +102,7 @@ const getRowsStateFromCache = (
     value,
   } = rowsCache.state;
 
-  const groupingResponse = apiRef.current.unstable_groupRows(value);
+  const groupingResponse = apiRef.current.groupRows(value);
 
   const dataTopLevelRowCount = Object.values(groupingResponse.tree).filter(
     (node) => node.parent == null,

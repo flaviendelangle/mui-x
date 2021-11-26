@@ -7,7 +7,6 @@ import { GridFeatureModeConstant } from '../../../models/gridFeatureMode';
 import { GridFilterItem, GridLinkOperator } from '../../../models/gridFilterItem';
 import { GridRowId, GridRowModel, GridRowTreeNodeConfig } from '../../../models/gridRows';
 import { useGridApiEventHandler } from '../../utils/useGridApiEventHandler';
-import { useGridApiMethod } from '../../utils/useGridApiMethod';
 import { useGridLogger } from '../../utils/useGridLogger';
 import { filterableGridColumnsIdsSelector } from '../columns/gridColumnsSelector';
 import { useGridState } from '../../utils/useGridState';
@@ -18,6 +17,7 @@ import { gridVisibleSortedRowEntriesSelector, gridFilterModelSelector } from './
 import { useGridStateInit } from '../../utils/useGridStateInit';
 import { useFirstRender } from '../../utils/useFirstRender';
 import { gridRowIdsSelector, gridRowTreeDepthSelector, gridRowTreeSelector } from '../rows';
+import { useEventCallback } from '@mui/material';
 
 type GridFilterItemApplier = (rowId: GridRowId) => boolean;
 
@@ -152,7 +152,7 @@ export const useGridFilter = (
    * Generate the `visibleRowsLookup` and `visibleDescendantsCountLookup` for the current `filterModel`
    * If the tree is not flat, we have to create the lookups even with "server" filtering or 0 filter item to remove to collapsed rows.
    */
-  const applyFilters = React.useCallback<GridFilterApi['unstable_applyFilters']>(() => {
+  const applyFilters = useEventCallback(() => {
     setGridState((state) => {
       const filterModel = gridFilterModelSelector(state);
       const rowIds = gridRowIdsSelector(state);
@@ -250,14 +250,7 @@ export const useGridFilter = (
     });
     apiRef.current.publishEvent(GridEvents.visibleRowsSet);
     forceUpdate();
-  }, [
-    apiRef,
-    setGridState,
-    forceUpdate,
-    props.filterMode,
-    buildAggregatedFilterApplier,
-    props.disableChildrenFiltering,
-  ]);
+  });
 
   const cleanFilterItem = React.useCallback(
     (item: GridFilterItem) => {
@@ -378,10 +371,10 @@ export const useGridFilter = (
             filterModel: model,
           },
         }));
-        apiRef.current.unstable_applyFilters();
+        applyFilters();
       }
     },
-    [apiRef, logger, setGridState, props.disableMultipleColumnsFiltering],
+    [apiRef, applyFilters, logger, setGridState, props.disableMultipleColumnsFiltering],
   );
 
   const getVisibleRowModels = React.useCallback<GridFilterApi['getVisibleRowModels']>(() => {
@@ -389,20 +382,15 @@ export const useGridFilter = (
     return new Map<GridRowId, GridRowModel>(visibleSortedRows.map((row) => [row.id, row.model]));
   }, [apiRef]);
 
-  useGridApiMethod<GridFilterApi>(
-    apiRef,
-    {
-      setFilterLinkOperator,
-      unstable_applyFilters: applyFilters,
-      deleteFilterItem,
-      upsertFilterItem,
-      setFilterModel,
-      showFilterPanel,
-      hideFilterPanel,
-      getVisibleRowModels,
-    },
-    'FilterApi',
-  );
+  apiRef.current.register('public', {
+    setFilterLinkOperator,
+    deleteFilterItem,
+    upsertFilterItem,
+    setFilterModel,
+    showFilterPanel,
+    hideFilterPanel,
+    getVisibleRowModels,
+  });
 
   const onColUpdated = React.useCallback(() => {
     logger.debug('onColUpdated - GridColumns changed, applying filters');
@@ -429,16 +417,12 @@ export const useGridFilter = (
       isFirstRender.current = false;
       return;
     }
-    apiRef.current.unstable_applyFilters();
-  }, [apiRef, props.disableChildrenFiltering]);
+    applyFilters();
+  }, [applyFilters, props.disableChildrenFiltering]);
 
-  useFirstRender(() => apiRef.current.unstable_applyFilters());
+  useFirstRender(() => applyFilters());
 
-  useGridApiEventHandler(apiRef, GridEvents.rowsSet, apiRef.current.unstable_applyFilters);
-  useGridApiEventHandler(
-    apiRef,
-    GridEvents.rowExpansionChange,
-    apiRef.current.unstable_applyFilters,
-  );
+  useGridApiEventHandler(apiRef, GridEvents.rowsSet, applyFilters);
+  useGridApiEventHandler(apiRef, GridEvents.rowExpansionChange, applyFilters);
   useGridApiEventHandler(apiRef, GridEvents.columnsChange, onColUpdated);
 };

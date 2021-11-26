@@ -41,7 +41,7 @@ export const useGridInfiniteLoader = (
       }
 
       const scrollPositionBottom = scrollPosition.top + dimensions.viewportOuterSize.height;
-      const viewportPageSize = apiRef.current.unstable_getViewportPageSize();
+      const viewportPageSize = apiRef.current.getViewportPageSize();
 
       if (scrollPositionBottom < contentHeight - props.scrollEndThreshold) {
         isInScrollBottomArea.current = false;

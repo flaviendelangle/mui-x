@@ -16,24 +16,21 @@ export type GridRowGroupingPreProcessing = (
   params: GridRowGroupParams,
 ) => GridRowGroupingResult | null;
 
-export interface GridRowGroupsPreProcessingApi {
+export interface GridRowGroupsPreProcessingPrivateApi {
   /**
    * Register a column pre-processing and emit an event to re-apply the row grouping pre-processing.
    * @param {string} processingName Name of the pre-processing. Used to clean the previous version of the pre-processing.
-   * @param {GridRowGroupingPreProcessing} columnsPreProcessing Pre-processing to register.
-   * @ignore - do not document.
+   * @param {GridRowGroupingPreProcessing} groupingFunction Grouping function to register.
    */
-  unstable_registerRowGroupsBuilder: (
+  registerRowGroupsBuilder: (
     processingName: string,
     groupingFunction: GridRowGroupingPreProcessing | null,
   ) => void;
 
   /**
    * Apply the first row grouping pre-processing that does not return null.
-   * @param {GridRowsLookup} rowsLookup. Lookup of the rows to group.
-   * @param {GridRowId[]} List of the rows IDs.
+   * @param {GridRowGroupParams} params The params needed to group the rows.
    * @returns {GridRowGroupingResult} The grouped rows.
-   * @ignore - do not document.
    */
-  unstable_groupRows: (params: GridRowGroupParams) => GridRowGroupingResult;
+  groupRows: (params: GridRowGroupParams) => GridRowGroupingResult;
 }

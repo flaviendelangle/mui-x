@@ -7,7 +7,7 @@ import { useGridErrorHandler } from './useGridErrorHandler';
 import { useGridStateInitialization } from './useGridStateInitialization';
 import { useGridLocaleText } from './useGridLocaleText';
 import { useGridPreProcessing } from './preProcessing';
-import { useGridRowGroupsPreProcessing } from './rowGroupsPerProcessing';
+import { useGridRowGroupsPreProcessing } from './rowGroupsPreProcessing';
 
 /**
  * Initialize the technical pieces of the DataGrid (logger, state, ...) that any DataGrid implementation needs

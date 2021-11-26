@@ -1,13 +1,12 @@
 import * as React from 'react';
-import { GridApiRef } from '../../../models/api/gridApiRef';
+import { GridPrivateApiRef } from '../../../models/api/gridApiRef';
 import { GridRowTreeConfig } from '../../../models/gridRows';
 import {
-  GridRowGroupsPreProcessingApi,
+  GridRowGroupsPreProcessingPrivateApi,
   GridRowGroupingPreProcessing,
   GridRowGroupingResult,
 } from './gridRowGroupsPreProcessingApi';
 import { GridEvents } from '../../../constants/eventsConstants';
-import { useGridApiMethod } from '../../utils/useGridApiMethod';
 
 const getFlatRowTree: GridRowGroupingPreProcessing = ({ ids, idRowsLookup }) => {
   const tree: GridRowTreeConfig = {};
@@ -24,13 +23,13 @@ const getFlatRowTree: GridRowGroupingPreProcessing = ({ ids, idRowsLookup }) => 
   };
 };
 
-export const useGridRowGroupsPreProcessing = (apiRef: GridApiRef) => {
+export const useGridRowGroupsPreProcessing = (apiRef: GridPrivateApiRef) => {
   const rowGroupsPreProcessingRef = React.useRef(
     new Map<string, GridRowGroupingPreProcessing | null>(),
   );
 
   const registerRowGroupsBuilder = React.useCallback<
-    GridRowGroupsPreProcessingApi['unstable_registerRowGroupsBuilder']
+    GridRowGroupsPreProcessingPrivateApi['registerRowGroupsBuilder']
   >(
     (processingName, rowGroupingPreProcessing) => {
       const rowGroupingPreProcessingBefore =
@@ -44,7 +43,7 @@ export const useGridRowGroupsPreProcessing = (apiRef: GridApiRef) => {
     [apiRef],
   );
 
-  const groupRows = React.useCallback<GridRowGroupsPreProcessingApi['unstable_groupRows']>(
+  const groupRows = React.useCallback<GridRowGroupsPreProcessingPrivateApi['groupRows']>(
     (...params) => {
       let response: GridRowGroupingResult | null = null;
       const preProcessingList = Array.from(rowGroupsPreProcessingRef.current.values());
@@ -66,10 +65,10 @@ export const useGridRowGroupsPreProcessing = (apiRef: GridApiRef) => {
     [],
   );
 
-  const rowGroupsPreProcessingApi: GridRowGroupsPreProcessingApi = {
-    unstable_registerRowGroupsBuilder: registerRowGroupsBuilder,
-    unstable_groupRows: groupRows,
+  const rowGroupsPreProcessingApi: GridRowGroupsPreProcessingPrivateApi = {
+    registerRowGroupsBuilder,
+    groupRows,
   };
 
-  useGridApiMethod(apiRef, rowGroupsPreProcessingApi, 'GridRowGroupsPreProcessing');
+  apiRef.current.register('private', rowGroupsPreProcessingApi);
 };
