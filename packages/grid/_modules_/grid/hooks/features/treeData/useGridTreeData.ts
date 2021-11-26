@@ -3,14 +3,14 @@ import { GridApiRef } from '../../../models/api/gridApiRef';
 import { GridComponentProps } from '../../../GridComponentProps';
 import {
   GRID_TREE_DATA_GROUP_COL_DEF,
-  GRID_TREE_DATA_GROUP_COL_DEF_FORCED_FIELDS,
+  GRID_TREE_DATA_GROUP_COL_DEF_FORCED_PROPERTIES,
 } from './gridTreeDataGroupColDef';
 import { useGridApiEventHandler } from '../../utils/useGridApiEventHandler';
 import { GridEventListener, GridEvents } from '../../../models/events';
 import { GridColDef, GridColDefOverrideParams } from '../../../models';
 import { isSpaceKey } from '../../../utils/keyboardUtils';
 import { useFirstRender } from '../../utils/useFirstRender';
-import { buildRowTree } from '../../../utils/tree/buildRowTree';
+import { buildRowTree, BuildRowTreeGroupingCriteria } from '../../../utils/tree/buildRowTree';
 import { GridRowGroupingPreProcessing } from '../../core/rowGroupsPerProcessing';
 import { gridFilteredDescendantCountLookupSelector } from '../filter';
 import { GridPreProcessingGroup, useGridRegisterPreProcessor } from '../../core/preProcessing';
@@ -58,7 +58,9 @@ export const useGridTreeData = (
       const rows = params.ids
         .map((rowId) => ({
           id: rowId,
-          path: props.getTreeDataPath!(params.idRowsLookup[rowId]),
+          path: props.getTreeDataPath!(params.idRowsLookup[rowId]).map(
+            (key): BuildRowTreeGroupingCriteria => ({ key, field: null }),
+          ),
         }))
         .sort((a, b) => a.path.length - b.path.length);
 
@@ -93,16 +95,14 @@ export const useGridTreeData = (
   const groupingColDef = React.useMemo<GridColDef>(() => {
     const propGroupingColDef = props.groupingColDef;
 
-    const baseColDef: GridColDef = {
+    const baseColDef: Omit<GridColDef, 'field' | 'editable'> = {
       ...GRID_TREE_DATA_GROUP_COL_DEF,
       headerName: apiRef.current.getLocaleText('treeDataGroupingHeaderName'),
-      ...GRID_TREE_DATA_GROUP_COL_DEF_FORCED_FIELDS,
     };
     let colDefOverride: Partial<GridColDef>;
 
     if (typeof propGroupingColDef === 'function') {
       const params: GridColDefOverrideParams = {
-        colDef: baseColDef,
         sources: [],
       };
 
@@ -114,6 +114,7 @@ export const useGridTreeData = (
     return {
       ...baseColDef,
       ...colDefOverride,
+      ...GRID_TREE_DATA_GROUP_COL_DEF_FORCED_PROPERTIES,
     };
   }, [apiRef, props.groupingColDef]);
 
@@ -180,7 +181,7 @@ export const useGridTreeData = (
   const handleCellKeyDown = React.useCallback<GridEventListener<GridEvents.cellKeyDown>>(
     (params, event) => {
       const cellParams = apiRef.current.getCellParams(params.id, params.field);
-      if (cellParams.colDef.type === 'treeDataGroup' && isSpaceKey(event.key)) {
+      if (cellParams.colDef.type === 'treeDataGroup' && isSpaceKey(event.key) && !event.shiftKey) {
         event.stopPropagation();
         event.preventDefault();
 

@@ -66,7 +66,11 @@ CustomGridTreeDataGroupingCell.propTypes = {
     depth: PropTypes.number.isRequired,
     expanded: PropTypes.bool.isRequired,
     filteredDescendantCount: PropTypes.number.isRequired,
-    label: PropTypes.string.isRequired,
+    groupingKey: PropTypes.oneOfType([
+      PropTypes.number,
+      PropTypes.string,
+      PropTypes.bool,
+    ]).isRequired,
   }).isRequired,
 };
 

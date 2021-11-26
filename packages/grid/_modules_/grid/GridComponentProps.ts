@@ -2,9 +2,9 @@ import * as React from 'react';
 import { GridInitialState } from './models/gridState';
 import { GridApiRef } from './models/api/gridApiRef';
 import {
-  GridColDefOverride,
-  GridColDefOverrideCallback,
+  GridColDefOverrideParams,
   GridColumns,
+  GridGroupingColDefOverride,
 } from './models/colDef/gridColDef';
 import {
   GridSimpleOptions,
@@ -406,6 +406,6 @@ interface GridComponentOtherProps {
    * The grouping column used by the tree data.
    */
   groupingColDef?:
-    | GridColDefOverride<'field' | 'editable'>
-    | GridColDefOverrideCallback<'field' | 'editable'>;
+    | GridGroupingColDefOverride
+    | ((params: GridColDefOverrideParams) => GridGroupingColDefOverride);
 }

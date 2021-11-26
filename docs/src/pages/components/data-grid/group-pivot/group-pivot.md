@@ -140,6 +140,16 @@ By default, the grid will create only one grouping column even if you have sever
 
 {{"demo": "pages/components/data-grid/group-pivot/row-group-by-columns/SingleGroupingColumn.js", "bg": "inline", "defaultCodeOpen": false}}
 
+#### Show values for the leaf
+
+By default, the leaf nodes don't render anything for their grouping cell.
+
+If you want to display some value, you can provide a `leafField` property to the `groupingColDef`.
+
+> ⚠️ If the column whose field is given in `groupingColDef` has a `renderCell` or a `valueGetter`, it will not be called for the grouping cell.
+
+{{"demo": "pages/components/data-grid/group-pivot/row-group-by-columns/LeafWithValue.js", "bg": "inline", "defaultCodeOpen": false}}
+
 ### Multiple grouping column
 
 To have a grouping column for each grouping fields, set the `groupingColumnMode` prop to `multiple`:
@@ -164,7 +174,7 @@ const columns: GridColDef[] = [
 
 If you want to group according to a column which values are objects, you can use the `keyGetter` property in `GridColDef` to transform this object into a serializable value.
 
-> For now, the row grouping is not using the `valueGetter` property in `GridColDef`. In the future, it should use it and the `keyGetter` property would only be necessary when the value returned by `valueGetter` is an object.
+> ⚠ For now, the row grouping is not using the `valueGetter` property in `GridColDef`. In the future, it should use it and the `keyGetter` property would only be necessary when the value returned by `valueGetter` is an object.
 
 {{"demo": "pages/components/data-grid/group-pivot/row-group-by-columns/KeyGetterExample.js", "bg": "inline", "defaultCodeOpen": false}}
 

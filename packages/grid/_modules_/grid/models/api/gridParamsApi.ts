@@ -1,6 +1,6 @@
 import { GridCellValue } from '../gridCell';
 import { GridRowId } from '../gridRows';
-import { GridCellParams } from '../params/gridCellParams';
+import { GridCellParams, GridValueGetterParams } from '../params/gridCellParams';
 import { GridColumnHeaderParams } from '../params/gridColumnHeaderParams';
 import { GridRowParams } from '../params/gridRowParams';
 
@@ -51,4 +51,11 @@ export interface GridParamsApi {
    * @returns {GridColumnHeaderParams} The cell params.
    */
   getColumnHeaderParams: (field: string) => GridColumnHeaderParams;
+
+  /**
+   * @param id
+   * @param field
+   * @ignore - do not document.
+   */
+  unstable_getBaseCellParams: (id: GridRowId, field: string) => GridValueGetterParams;
 }

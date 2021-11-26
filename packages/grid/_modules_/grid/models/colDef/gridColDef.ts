@@ -243,21 +243,23 @@ export interface GridColumnsMeta {
   positions: number[];
 }
 
-export type GridColDefOverride<ForcedFields extends keyof GridColDef> = Omit<
-  Partial<GridColDef>,
-  ForcedFields
->;
+export interface GridGroupingColDefOverride
+  extends Omit<GridColDef, 'editable' | 'valueGetter' | 'valueSetter' | 'field'> {
+  /**
+   * The field from which we want to apply the sorting and the filtering for the grouping column.
+   * It is only useful when `props.groupingColumnMode === "multiple"` to decide which grouping criteria should be used for sorting and filtering
+   * @default: The sorting and filtering is applied based on the leaf field in any, otherwise based on top level grouping criteria.
+   */
+  mainGroupingCriteria?: string;
 
-export type GridColDefOverrideCallback<ForcedFields extends keyof GridColDef> = (
-  params: GridColDefOverrideParams,
-) => GridColDefOverride<ForcedFields>;
+  /**
+   * If `true`, the leaf cells will be rendered based on the `sourceField`
+   * If `false`, the leaf cells will be empty
+   */
+  leafField?: string;
+}
 
 export interface GridColDefOverrideParams {
-  /**
-   * The column we are generating before the override.
-   */
-  colDef: GridColDef;
-
   /**
    * The base columns this column is grouping
    */

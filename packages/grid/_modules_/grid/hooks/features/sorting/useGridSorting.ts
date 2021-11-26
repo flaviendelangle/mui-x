@@ -120,6 +120,7 @@ export const useGridSorting = (
       const params: GridSortCellParams = {
         id,
         field,
+        rowNode: apiRef.current.getRowNode(id)!,
         value: apiRef.current.getCellValue(id, field),
         api: apiRef.current,
       };

@@ -197,6 +197,7 @@ export function useGridParamsApi(apiRef: GridApiRef) {
       getRowElement,
       getColumnHeaderParams,
       getColumnHeaderElement,
+      unstable_getBaseCellParams: getBaseCellParams,
     },
     'GridParamsApi',
   );
