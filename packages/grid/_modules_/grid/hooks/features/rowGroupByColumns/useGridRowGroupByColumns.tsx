@@ -2,7 +2,6 @@ import * as React from 'react';
 import type {
   GridApiRef,
   GridRowModel,
-  GridColDefOverrideParams,
   GridRowId,
   GridColDef,
   GridKeyValue,
@@ -22,7 +21,6 @@ import {
   createGroupingColDefSeveralCriteria,
 } from './rowGroupByColumnsUtils';
 import { isDeepEqual, isFunction } from '../../../utils/utils';
-import { GridRowGroupByColumnsGroupingCell } from '../../../components/cell/GridRowGroupByColumnsGroupingCell';
 import { GridPreProcessingGroup, useGridRegisterPreProcessor } from '../../core/preProcessing';
 import { GridColumnsRawState } from '../columns/gridColumnsState';
 import { useGridRegisterFilteringMethod } from '../filter/useGridRegisterFilteringMethod';
@@ -35,14 +33,6 @@ import { sortRowTree } from '../../../utils/tree/sortRowTree';
 import { gridFilteredDescendantCountLookupSelector } from '../filter';
 
 const GROUP_ROWS_BY_COLUMN_NAME = 'group-rows-by-columns';
-
-const GROUPING_COL_DEF_DEFAULT_VALUES: Partial<GridColDef> = {
-  type: 'rowGroupByColumnsGroup',
-  disableReorder: true,
-  hide: false,
-  align: 'left',
-  headerAlign: 'left',
-};
 
 /**
  * Only available in DataGridPro
