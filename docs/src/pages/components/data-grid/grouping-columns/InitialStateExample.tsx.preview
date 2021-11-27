@@ -1,0 +1,11 @@
+<DataGridPro
+  rows={movies}
+  columns={columns}
+  groupingColDef={{ width: 250 }}
+  getRowId={getRowId}
+  initialState={{
+    groupingColumns: {
+      model: ['company'],
+    },
+  }}
+/>

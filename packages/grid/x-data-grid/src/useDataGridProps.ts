@@ -28,7 +28,7 @@ const FORCED_PROPS: { [key in ForcedPropsKey]-?: GridInputComponentProps[key] } 
   scrollEndThreshold: undefined,
   defaultGroupingExpansionDepth: undefined,
   treeData: undefined,
-  rowGroupByColumnPanel: undefined,
+  groupingColumnsPanel: undefined,
   signature: 'DataGrid',
 };
 

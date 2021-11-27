@@ -169,7 +169,7 @@ export default function SingleGroupingColumn() {
         columns={columns}
         getRowId={getRowId}
         groupingColumnMode="multiple"
-        rowGroupByColumnPanel
+        groupingColumnsPanel
         initialState={{
           groupingColumns: {
             model: ['company', 'director'],

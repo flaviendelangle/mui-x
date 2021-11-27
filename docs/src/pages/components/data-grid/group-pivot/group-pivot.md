@@ -1,8 +1,8 @@
 ---
-title: Data Grid - Group & Pivot
+title: Data Grid - Tree Data & Pivot
 ---
 
-# Data Grid - Group & Pivot
+# Data Grid - Tree Data & Pivot
 
 <p class="description">Use grouping, pivoting and more to analyse the data in depth.</p>
 
@@ -119,60 +119,6 @@ You can limit the sorting to the top level rows with the `disableChildrenSorting
 > 👍 Upvote [issue #211](https://github.com/mui-org/material-ui-x/issues/211) if you want to see it land faster.
 
 The feature allows to display row details on an expandable pane.
-
-## 🚧 Row Grouping [<span class="premium"></span>](https://mui.com/store/items/material-ui-pro/)
-
-> ⚠️ This feature is temporarily available in beta on the pro plan.
-> It will be moved to the premium plan once available.
-
-To enable the grouping, you simply have to set the `groupRows` property in `GridColDef`
-
-```tsx
-const columns: GridColDef[] = [
-  { field: 'director', groupRows: true },
-  { field: 'company', groupRows: true },
-];
-```
-
-### Single grouping column
-
-By default, the grid will create only one grouping column even if you have several grouping fields:
-
-{{"demo": "pages/components/data-grid/group-pivot/row-group-by-columns/SingleGroupingColumn.js", "bg": "inline", "defaultCodeOpen": false}}
-
-#### Show values for the leaf
-
-By default, the leaf nodes don't render anything for their grouping cell.
-
-If you want to display some value, you can provide a `leafField` property to the `groupingColDef`.
-
-> ⚠️ If the column whose field is given in `groupingColDef` has a `renderCell` or a `valueGetter`, it will not be called for the grouping cell.
-
-{{"demo": "pages/components/data-grid/group-pivot/row-group-by-columns/LeafWithValue.js", "bg": "inline", "defaultCodeOpen": false}}
-
-### Multiple grouping column
-
-To have a grouping column for each grouping fields, set the `groupingColumnMode` prop to `multiple`:
-
-{{"demo": "pages/components/data-grid/group-pivot/row-group-by-columns/MultipleGroupingColumn.js", "bg": "inline", "defaultCodeOpen": false}}
-
-### Group with object values
-
-If you want to group according to a column which values are objects, you can use the `keyGetter` property in `GridColDef` to transform this object into a serializable value.
-
-> ⚠ For now, the row grouping is not using the `valueGetter` property in `GridColDef`. In the future, it should use it and the `keyGetter` property would only be necessary when the value returned by `valueGetter` is an object.
-
-{{"demo": "pages/components/data-grid/group-pivot/row-group-by-columns/KeyGetterExample.js", "bg": "inline", "defaultCodeOpen": false}}
-
-### Grouping panel
-
-To enable the grouping panel, you simply have to use the `rowGroupByColumnPanel` prop:
-
-{{"demo": "pages/components/data-grid/group-pivot/row-group-by-columns/RowGroupingPanel.js", "bg": "inline", "defaultCodeOpen": false}}
-
-### Full Example
-
-{{"demo": "pages/components/data-grid/group-pivot/row-group-by-columns/RowGroupingFullExample.js", "bg": "inline", "defaultCodeOpen": false}}
 
 ## 🚧 Aggregation [<span class="premium"></span>](https://mui.com/store/items/material-ui-pro/)
 

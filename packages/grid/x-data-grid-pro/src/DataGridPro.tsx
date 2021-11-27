@@ -641,7 +641,7 @@ DataGridProRaw.propTypes = {
    * If `true`, the grid will render a panel above header to enable row grouping by column by dropping a column header in it.
    * @default false
    */
-  rowGroupByColumnPanel: PropTypes.bool,
+  groupingColumnsPanel: PropTypes.bool,
   /**
    * Set the height in pixel of a row in the grid.
    * @default 52

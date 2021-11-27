@@ -1,8 +1,19 @@
-import { useDemoData } from '@mui/x-data-grid-generator';
+import {
+  DemoDataReturnType,
+  useDemoData,
+  UseDemoDataOptions,
+} from '@mui/x-data-grid-generator';
 import * as React from 'react';
-import { DataGridPro } from '@mui/x-data-grid-pro';
+import { DataGridPro, DataGridProProps } from '@mui/x-data-grid-pro';
 
-const useGroupedByColumnsDemoData = ({ groupedColumns, ...options }) => {
+interface UseDemoDataGroupedByColumnsOptions extends UseDemoDataOptions {
+  groupedColumns: string[];
+}
+
+const useGroupedByColumnsDemoData = ({
+  groupedColumns,
+  ...options
+}: UseDemoDataGroupedByColumnsOptions): DemoDataReturnType => {
   const response = useDemoData(options);
 
   const columns = React.useMemo(
@@ -21,7 +32,7 @@ const useGroupedByColumnsDemoData = ({ groupedColumns, ...options }) => {
 
         if (groupedCol.field === 'counterPartyCountry') {
           groupedCol.keyGetter = (params) => {
-            return params.value.label;
+            return (params.value as any).label;
           };
         }
 
@@ -47,7 +58,7 @@ export default function RowGroupingFullExample() {
     groupedColumns: ['status', 'counterPartyCurrency'],
   });
 
-  const groupingColDef = React.useMemo(
+  const groupingColDef = React.useMemo<DataGridProProps['groupingColDef']>(
     () => ({
       width: 300,
     }),
@@ -61,7 +72,7 @@ export default function RowGroupingFullExample() {
         disableSelectionOnClick
         {...data}
         groupingColDef={groupingColDef}
-        rowGroupByColumnPanel
+        groupingColumnsPanel
         groupingColumnMode="multiple"
       />
     </div>

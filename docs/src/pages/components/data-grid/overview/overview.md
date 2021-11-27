@@ -78,6 +78,7 @@ We provide three options:
 - [Selection](/components/data-grid/selection/)
 - [Column virtualization](/components/data-grid/virtualization/#column-virtualization) and [rows virtualization](/components/data-grid/virtualization/#row-virtualization) <span class="pro"></span>
 - [Tree data](/components/data-grid/group-pivot/#tree-data) <span class="pro"></span>
+- [Grouping columns](/components/data-grid/grouping-columns) <span class="premium"></span>
 - [Resizable columns](/components/data-grid/columns/#column-resizing) <span class="pro"></span>
 - [100% customizable](/components/data-grid/style/)
 - Server-side data
@@ -93,7 +94,7 @@ While development of the data grid component is moving fast, there are still man
 - [Column pinning](/components/data-grid/columns/#column-pinning) <span class="pro"></span>
 - [Excel export](/components/data-grid/export/) <span class="premium"></span>
 - [Range selection](/components/data-grid/selection/#range-selection) <span class="premium"></span>
-- [Group, Pivot, Aggregation](/components/data-grid/group-pivot/) <span class="premium"></span>
+- [Pivot, Aggregation](/components/data-grid/group-pivot/) <span class="premium"></span>
 
 You can find more details on, the [feature comparison](/components/data-grid/getting-started/#feature-comparison), our living quarterly [roadmap](https://github.com/mui-org/material-ui-x/projects/1) as well as on the open [GitHub issues](https://github.com/mui-org/material-ui-x/issues?q=is%3Aopen+label%3A%22component%3A+DataGrid%22+label%3Aenhancement).
 

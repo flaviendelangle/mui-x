@@ -6,6 +6,7 @@ import { useGridApiContext } from '../hooks/utils/useGridApiContext';
 import { useGridSelector } from '../hooks/utils/useGridSelector';
 import { GridEventListener, GridEvents } from '../models/events';
 import { gridGroupingRowsSanitizedModelSelector } from '../hooks/features/groupingColumns';
+import { gridColumnLookupSelector } from '../hooks/features/columns';
 import { GridDragIcon } from './icons';
 
 const GridGroupingColumnsPanelRoot = styled('div', {
@@ -34,6 +35,7 @@ export const GridGroupingColumnsPanel = () => {
   const [colHeaderDragField, setColHeaderDragField] = React.useState('');
   const [chipDragField, setChipDragField] = React.useState('');
   const groupingColumnsModel = useGridSelector(apiRef, gridGroupingRowsSanitizedModelSelector);
+  const columnsLookup = useGridSelector(apiRef, gridColumnLookupSelector);
   const handleColumnReorderStart = React.useCallback<
     GridEventListener<GridEvents.columnHeaderDragStart>
   >((params) => setColHeaderDragField(params.field), []);
@@ -123,7 +125,7 @@ export const GridGroupingColumnsPanel = () => {
   return (
     <GridGroupingColumnsPanelRoot>
       {groupingColumnsModel.map((field) => {
-        const label = groupingColumnsModel[field].headerName ?? field;
+        const label = columnsLookup[field].headerName ?? field;
 
         return (
           <GridGroupingChipContainer key={field} onDragEnter={() => handleDragEnter(field)}>

@@ -25,7 +25,7 @@ export type DataGridProps = Omit<
   | 'getTreeDataPath'
   | 'groupingColDef'
   | 'defaultGroupingExpansionDepth'
-  | 'rowGroupByColumnPanel'
+  | 'groupingColumnsPanel'
   | 'signature'
 > & {
   pagination?: true;

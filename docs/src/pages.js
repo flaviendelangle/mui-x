@@ -48,7 +48,8 @@ dataGridComponent.children = [
   { pathname: '/components/data-grid/scrolling' },
   { pathname: '/components/data-grid/virtualization' },
   { pathname: '/components/data-grid/accessibility' },
-  { pathname: '/components/data-grid/group-pivot', title: 'Group & Pivot' },
+  { pathname: '/components/data-grid/grouping-columns', title: 'Group rows by column' },
+  { pathname: '/components/data-grid/group-pivot', title: 'Tree Data & Pivot' },
 ];
 
 dataGridComponentAPI.children = [

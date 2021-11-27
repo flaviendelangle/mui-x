@@ -3,6 +3,6 @@
   disableSelectionOnClick
   {...data}
   groupingColDef={groupingColDef}
-  rowGroupByColumnPanel
+  groupingColumnsPanel
   groupingColumnMode="multiple"
 />

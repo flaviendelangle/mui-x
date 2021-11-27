@@ -231,7 +231,7 @@ export interface GridSimpleOptions {
    * If `true`, the grid will render a panel above header to enable row grouping by column by dropping a column header in it.
    * @default false
    */
-  rowGroupByColumnPanel: boolean;
+  groupingColumnsPanel: boolean;
   /**
    * If above 0, the row children will be expanded up to this depth.
    * If equal to -1, all the row children will be expanded.
@@ -315,7 +315,7 @@ export const GRID_DEFAULT_SIMPLE_OPTIONS: GridSimpleOptions = {
   rowsPerPageOptions: [25, 50, 100],
   treeData: false,
   groupingColumnMode: 'single',
-  rowGroupByColumnPanel: false,
+  groupingColumnsPanel: false,
   defaultGroupingExpansionDepth: 0,
   scrollEndThreshold: 80,
   showCellRightBorder: false,
