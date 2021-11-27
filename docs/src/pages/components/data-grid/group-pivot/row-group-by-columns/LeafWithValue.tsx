@@ -98,7 +98,6 @@ const columns: GridColumns = [
   {
     field: 'company',
     headerName: 'Company',
-    groupRows: true,
     hide: true,
   },
   {
@@ -121,6 +120,11 @@ export default function LeafWithValue() {
         columns={columns}
         groupingColDef={{ width: 250, leafField: 'title', headerName: 'Title' }}
         getRowId={getRowId}
+        initialState={{
+          groupingColumns: {
+            model: ['company'],
+          },
+        }}
       />
     </div>
   );

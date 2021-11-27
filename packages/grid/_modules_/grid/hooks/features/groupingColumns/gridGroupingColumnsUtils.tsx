@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { GridColumnLookup, GridColumnRawLookup } from '../columns/gridColumnsState';
+import { GridColumnRawLookup } from '../columns/gridColumnsState';
 import {
   GridApiRef,
   GridColDef,
@@ -8,53 +8,6 @@ import {
   GridStateColDef,
 } from '../../../models';
 import { GridRowGroupByColumnsGroupingCell } from '../../../components/cell/GridRowGroupByColumnsGroupingCell';
-
-export const getRowGroupingColumnLookup = <V extends GridColumnLookup | GridColumnRawLookup>(
-  lookup: V,
-) => {
-  const groupingColumns = {} as V;
-  Object.keys(lookup).forEach((key) => {
-    if (lookup[key].groupRows) {
-      groupingColumns[key] = lookup[key];
-    }
-  });
-
-  return groupingColumns;
-};
-
-export const orderGroupedByFields = (groupingColumns: GridColumnRawLookup) => {
-  const unOrderedGroupingFields = Object.keys(groupingColumns);
-  const shouldApplyExplicitGroupOrder = unOrderedGroupingFields.some(
-    (field) => groupingColumns[field].groupRowIndex != null,
-  );
-
-  if (!shouldApplyExplicitGroupOrder) {
-    return unOrderedGroupingFields;
-  }
-
-  const fieldInitialIndex = Object.fromEntries(
-    unOrderedGroupingFields.map((field, fieldIndex) => [field, fieldIndex]),
-  );
-
-  return unOrderedGroupingFields.sort((a, b) => {
-    const colA = groupingColumns[a];
-    const colB = groupingColumns[b];
-
-    if (colA.groupRowIndex == null && colB.groupRowIndex != null) {
-      return -1;
-    }
-
-    if (colA.groupRowIndex != null && colB.groupRowIndex == null) {
-      return 1;
-    }
-
-    if (colA.groupRowIndex != null && colB.groupRowIndex != null) {
-      return colA.groupRowIndex - colB.groupRowIndex;
-    }
-
-    return fieldInitialIndex[a] - fieldInitialIndex[b];
-  });
-};
 
 const GROUPING_COL_DEF_DEFAULT_VALUES: Partial<GridColDef> = {
   type: 'rowGroupByColumnsGroup',
@@ -159,16 +112,20 @@ export const createGroupingColDefMonoCriteria = ({
   colDefOverride,
 }: CreateGroupingColDefMonoCriteriaParams): GridColDef => {
   const { leafField, mainGroupingCriteria, ...colDefOverrideProperties } = colDefOverride;
-  const mainGroupingColDef = mainGroupingCriteria ? columnsLookup[mainGroupingCriteria] : null;
   const leafColDef = leafField ? columnsLookup[leafField] : null;
 
-  // If we have a `leafColDef`, we apply the sorting and the filtering on the leaves based on this `leafColDef` properties
-  // If not, we apply the sorting and the filtering on the groups of the current grouping criteria based on the `groupedColDef` properties.
-  // TODO: Fix comment
+  // If we have a `mainGroupingCriteria` defined and matching the `groupedByField`
+  // Then we apply the sorting / filtering on the groups of this column's grouping criteria based on the properties of `groupedByColDef`.
+  // It can be useful to define a `leafField` for leaves rendering but still use the grouping criteria for the sorting / filtering
+  //
+  // If we have a `leafField` defined and matching an existing column
+  // Then we apply the sorting / filtering on the leaves based on the properties of `leavesColDef`
+  //
+  // By default, we apply the sorting / filtering on the groups of this column's grouping criteria based on the properties of `groupedColDef`.
   let sourceProperties: Partial<GridColDef>;
-  if (mainGroupingColDef) {
-    if (mainGroupingColDef.field === groupedByField) {
-      sourceProperties = getGroupingCriteriaProperties(mainGroupingColDef);
+  if (mainGroupingCriteria) {
+    if (mainGroupingCriteria === groupedByField) {
+      sourceProperties = getGroupingCriteriaProperties(groupedByColDef);
     } else {
       sourceProperties = { filterable: false, sortable: false };
     }
@@ -226,7 +183,7 @@ interface CreateGroupingColDefSeveralCriteriaParams {
   /**
    * The fields from which we are grouping the rows
    */
-  orderedGroupedByFields: string[];
+  groupingColumnsModel: string[];
 
   /**
    * The col def properties the user wants to override.
@@ -241,27 +198,31 @@ interface CreateGroupingColDefSeveralCriteriaParams {
 export const createGroupingColDefSeveralCriteria = ({
   apiRef,
   columnsLookup,
-  orderedGroupedByFields,
+  groupingColumnsModel,
   colDefOverride,
 }: CreateGroupingColDefSeveralCriteriaParams): GridColDef => {
   const { leafField, mainGroupingCriteria, ...colDefOverrideProperties } = colDefOverride;
-  const mainGroupingColDef = mainGroupingCriteria ? columnsLookup[mainGroupingCriteria] : null;
   const leafColDef = leafField ? columnsLookup[leafField] : null;
 
-  // If we have a `leafColDef`, we apply the sorting and the filtering on the leaves based on this `leafColDef` properties
-  // If not, we apply the sorting and the filtering on the groups of the top level grouping criteria based on the `groupedColDef` properties.
-  // TODO: Fix comment
+  // If we have a `mainGroupingCriteria` defined and matching one of the `orderedGroupedByFields`
+  // Then we apply the sorting / filtering on the groups of this column's grouping criteria based on the properties of `columnsLookup[mainGroupingCriteria]`.
+  // It can be useful to use another grouping criteria than the top level one for the sorting / filtering
+  //
+  // If we have a `leafField` defined and matching an existing column
+  // Then we apply the sorting / filtering on the leaves based on the properties of `leavesColDef`
+  //
+  // By default, we apply the sorting / filtering on the groups of the top level grouping criteria based on the properties of `columnsLookup[orderedGroupedByFields[0]]`.
   let sourceProperties: Partial<GridColDef>;
-  if (mainGroupingColDef) {
-    if (orderedGroupedByFields.includes(mainGroupingColDef.field)) {
-      sourceProperties = getGroupingCriteriaProperties(mainGroupingColDef);
+  if (mainGroupingCriteria) {
+    if (groupingColumnsModel.includes(mainGroupingCriteria)) {
+      sourceProperties = getGroupingCriteriaProperties(columnsLookup[mainGroupingCriteria]);
     } else {
       sourceProperties = { filterable: false, sortable: false };
     }
   } else if (leafColDef) {
     sourceProperties = getLeafProperties(leafColDef);
   } else {
-    sourceProperties = getGroupingCriteriaProperties(columnsLookup[orderedGroupedByFields[0]]);
+    sourceProperties = getGroupingCriteriaProperties(columnsLookup[groupingColumnsModel[0]]);
   }
 
   // The properties that do not depend on the presence of a `leafColDef` and that can be override by `colDefOverride`

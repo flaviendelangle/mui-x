@@ -98,13 +98,11 @@ const columns: GridColumns = [
   {
     field: 'company',
     headerName: 'Company',
-    groupRows: true,
     hide: true,
   },
   {
     field: 'director',
     headerName: 'Director',
-    groupRows: true,
     hide: true,
   },
   {
@@ -123,6 +121,11 @@ export default function SingleGroupingColumn() {
         columns={columns}
         groupingColDef={{ width: 250 }}
         getRowId={getRowId}
+        initialState={{
+          groupingColumns: {
+            model: ['company', 'director'],
+          },
+        }}
       />
     </div>
   );

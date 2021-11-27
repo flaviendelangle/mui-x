@@ -23,6 +23,7 @@ import { GridSlotsComponentsProps } from './models/gridSlotsComponentsProps';
 import { GridClasses } from './gridClasses';
 import { GridCallbackDetails } from './models/api/gridCallbackDetails';
 import { GridEventListener, GridEvents } from './models/events';
+import type { GridGroupingColumnsModel } from './hooks/features/groupingColumns';
 
 /**
  * The grid component react props before applying the default values.
@@ -352,6 +353,19 @@ interface GridComponentOtherProps {
    * @param {GridCallbackDetails} details Additional details for this callback.
    */
   onSortModelChange?: (model: GridSortModel, details: GridCallbackDetails) => void;
+  /**
+   * Set the grouping columns of the grid.
+   */
+  groupingColumnsModel?: GridGroupingColumnsModel;
+  /**
+   * Callback fired when the grouping columns model changes.
+   * @param {GridGroupingColumnsModel} model Columns used as grouping criteria
+   * @param {GridCallbackDetails} details Additional details for this callback.
+   */
+  onGroupingColumnsModelChange?: (
+    model: GridGroupingColumnsModel,
+    details: GridCallbackDetails,
+  ) => void;
   /**
    * The label of the grid.
    */

@@ -136,7 +136,6 @@ const columns = [
     headerName: 'Composer',
     renderCell: (params) => params.value?.name,
     keyGetter: (params) => params.value.name,
-    groupRows: true,
     hide: true,
   },
   {
@@ -155,6 +154,11 @@ export default function SingleGroupingColumn() {
         columns={columns}
         groupingColDef={{ width: 250 }}
         getRowId={getRowId}
+        initialState={{
+          groupingColumns: {
+            model: ['composer'],
+          },
+        }}
       />
     </div>
   );

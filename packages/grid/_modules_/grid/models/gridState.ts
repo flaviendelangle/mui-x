@@ -20,7 +20,14 @@ import type {
   GridFilterState,
   GridFilterInitialState,
 } from '../hooks/features/filter/gridFilterState';
+import type {
+  GridGroupingColumnsState,
+  GridGroupingColumnsInitialState,
+} from '../hooks/features/groupingColumns';
 
+/**
+ * TODO: Distinguish pro and community states
+ */
 export interface GridState {
   rows: GridRowsState;
   editRows: GridEditRowsModel;
@@ -36,6 +43,7 @@ export interface GridState {
   filter: GridFilterState;
   preferencePanel: GridPreferencePanelState;
   density: GridDensityState;
+  groupingColumns: GridGroupingColumnsState;
   error?: any;
 }
 
@@ -43,4 +51,5 @@ export interface GridInitialState {
   sorting?: GridSortingInitialState;
   filter?: GridFilterInitialState;
   preferencePanel?: GridPreferencePanelInitialState;
+  groupingColumns?: GridGroupingColumnsInitialState;
 }

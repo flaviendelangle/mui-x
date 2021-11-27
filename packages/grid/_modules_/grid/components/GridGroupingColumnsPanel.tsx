@@ -5,14 +5,12 @@ import { useGridApiEventHandler } from '../hooks/utils/useGridApiEventHandler';
 import { useGridApiContext } from '../hooks/utils/useGridApiContext';
 import { useGridSelector } from '../hooks/utils/useGridSelector';
 import { GridEventListener, GridEvents } from '../models/events';
-import { GridColDef } from '../models';
-import { gridRowGroupingColumnLookupSelector } from '../hooks/features/rowGroupByColumns';
-import { orderGroupedByFields } from '../hooks/features/rowGroupByColumns/rowGroupByColumnsUtils';
+import { gridGroupingRowsSanitizedModelSelector } from '../hooks/features/groupingColumns';
 import { GridDragIcon } from './icons';
 
-const GridGroupRowByColumnPanelRoot = styled('div', {
+const GridGroupingColumnsPanelRoot = styled('div', {
   name: 'MuiDataGrid',
-  slot: 'GroupRowByColumnPanel',
+  slot: 'GroupingColumnsPanel',
 })({
   display: 'flex',
   alignItems: 'stretch',
@@ -31,16 +29,11 @@ const GridGroupingEmptySpace = styled('div')({
 /**
  * Only available in DataGridPro
  */
-export const GridGroupRowByColumnPanel = () => {
+export const GridGroupingColumnsPanel = () => {
   const apiRef = useGridApiContext();
   const [colHeaderDragField, setColHeaderDragField] = React.useState('');
   const [chipDragField, setChipDragField] = React.useState('');
-  const groupingColumns = useGridSelector(apiRef, gridRowGroupingColumnLookupSelector);
-  const groupingFields = React.useMemo(
-    () => orderGroupedByFields(groupingColumns),
-    [groupingColumns],
-  );
-
+  const groupingColumnsModel = useGridSelector(apiRef, gridGroupingRowsSanitizedModelSelector);
   const handleColumnReorderStart = React.useCallback<
     GridEventListener<GridEvents.columnHeaderDragStart>
   >((params) => setColHeaderDragField(params.field), []);
@@ -60,66 +53,77 @@ export const GridGroupRowByColumnPanel = () => {
       return;
     }
 
-    let newGroupingFields: string[];
+    let newGroupingColumnsModel: string[];
     if (!targetField) {
-      newGroupingFields = [...groupingFields.filter((field) => field !== dragField), dragField];
+      newGroupingColumnsModel = [
+        ...groupingColumnsModel.filter((field) => field !== dragField),
+        dragField,
+      ];
     } else {
-      const currentDragFieldPosition = groupingFields.findIndex((field) => field === dragField);
-      const currentTargetFieldPosition = groupingFields.findIndex((field) => field === targetField);
+      const currentDragFieldPosition = groupingColumnsModel.findIndex(
+        (field) => field === dragField,
+      );
+      const currentTargetFieldPosition = groupingColumnsModel.findIndex(
+        (field) => field === targetField,
+      );
 
       if (currentDragFieldPosition < currentTargetFieldPosition) {
-        newGroupingFields = [
+        newGroupingColumnsModel = [
           ...(currentDragFieldPosition > 0
-            ? groupingFields.slice(0, currentDragFieldPosition)
+            ? groupingColumnsModel.slice(0, currentDragFieldPosition)
             : []),
-          ...groupingFields.slice(currentDragFieldPosition + 1, currentTargetFieldPosition),
+          ...groupingColumnsModel.slice(currentDragFieldPosition + 1, currentTargetFieldPosition),
           targetField,
           dragField,
-          ...groupingFields.slice(currentTargetFieldPosition + 1),
+          ...groupingColumnsModel.slice(currentTargetFieldPosition + 1),
         ];
       } else {
-        newGroupingFields = [
-          ...groupingFields.slice(0, currentTargetFieldPosition),
-          ...groupingFields.slice(currentTargetFieldPosition + 1, currentDragFieldPosition),
+        newGroupingColumnsModel = [
+          ...groupingColumnsModel.slice(0, currentTargetFieldPosition),
+          ...groupingColumnsModel.slice(currentTargetFieldPosition + 1, currentDragFieldPosition),
           dragField,
           targetField,
-          ...groupingFields.slice(currentDragFieldPosition + 1),
+          ...groupingColumnsModel.slice(currentDragFieldPosition + 1),
         ];
       }
     }
 
-    const colUpdates: GridColDef[] = newGroupingFields.map((field, fieldIndex) => {
-      const col: GridColDef = {
-        field,
-        groupRows: true,
-        groupRowIndex: fieldIndex,
-      };
+    // TODO: Hide columns when adding them to the groupingColumnsModel
+    // const colUpdates: GridColDef[] = newGroupingFields.map((field, fieldIndex) => {
+    //   const col: GridColDef = {
+    //     field,
+    //     groupRows: true,
+    //     groupRowIndex: fieldIndex,
+    //   };
+    //
+    //   if (field === colHeaderDragField) {
+    //     col.hide = true;
+    //   }
+    //
+    //   return col;
+    // });
 
-      if (field === colHeaderDragField) {
-        col.hide = true;
-      }
-
-      return col;
-    });
-
-    apiRef.current.updateColumns(colUpdates);
+    apiRef.current.setGroupingColumnsModel(newGroupingColumnsModel);
   };
 
-  const handleRemoveGroupingCol = (field: string) =>
-    apiRef.current.updateColumn({
-      ...apiRef.current.getColumn(field),
-      hide: false,
-      groupRows: false,
-      groupRowIndex: undefined,
-    });
+  const handleRemoveGroupingCol = (field: string) => {
+    apiRef.current.setGroupingColumnsModel(groupingColumnsModel.filter((el) => el !== field));
+    // TODO: Show column when removing it from groupingColumnsModel
+    // apiRef.current.updateColumn({
+    //   ...apiRef.current.getColumn(field),
+    //   hide: false,
+    //   groupRows: false,
+    //   groupRowIndex: undefined,
+    // });
+  };
 
   useGridApiEventHandler(apiRef, GridEvents.columnHeaderDragStart, handleColumnReorderStart);
   useGridApiEventHandler(apiRef, GridEvents.columnHeaderDragEnd, handleColumnReorderStop);
 
   return (
-    <GridGroupRowByColumnPanelRoot>
-      {groupingFields.map((field) => {
-        const label = groupingColumns[field].headerName ?? field;
+    <GridGroupingColumnsPanelRoot>
+      {groupingColumnsModel.map((field) => {
+        const label = groupingColumnsModel[field].headerName ?? field;
 
         return (
           <GridGroupingChipContainer key={field} onDragEnter={() => handleDragEnter(field)}>
@@ -135,6 +139,6 @@ export const GridGroupRowByColumnPanel = () => {
         );
       })}
       <GridGroupingEmptySpace onDragEnter={() => handleDragEnter(null)} />
-    </GridGroupRowByColumnPanelRoot>
+    </GridGroupingColumnsPanelRoot>
   );
 };

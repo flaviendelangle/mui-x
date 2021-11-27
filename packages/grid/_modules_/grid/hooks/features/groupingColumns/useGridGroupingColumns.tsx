@@ -12,14 +12,15 @@ import { useFirstRender } from '../../utils/useFirstRender';
 import { isSpaceKey } from '../../../utils/keyboardUtils';
 import { buildRowTree, BuildRowTreeGroupingCriteria } from '../../../utils/tree/buildRowTree';
 import { useGridApiEventHandler } from '../../utils/useGridApiEventHandler';
-import { gridRowGroupingColumnLookupSelector } from './rowGroupByColumnsSelector';
+import {
+  gridGroupingRowsModelSelector,
+  gridGroupingRowsSanitizedModelSelector,
+} from './gridGroupingColumnsSelector';
 import { GridComponentProps } from '../../../GridComponentProps';
 import {
-  orderGroupedByFields,
-  getRowGroupingColumnLookup,
   createGroupingColDefMonoCriteria,
   createGroupingColDefSeveralCriteria,
-} from './rowGroupByColumnsUtils';
+} from './gridGroupingColumnsUtils';
 import { isDeepEqual, isFunction } from '../../../utils/utils';
 import { GridPreProcessingGroup, useGridRegisterPreProcessor } from '../../core/preProcessing';
 import { GridColumnsRawState } from '../columns/gridColumnsState';
@@ -31,6 +32,10 @@ import { useGridRegisterSortingMethod } from '../sorting/useGridRegisterSortingM
 import { GridSortingMethod } from '../sorting/gridSortingState';
 import { sortRowTree } from '../../../utils/tree/sortRowTree';
 import { gridFilteredDescendantCountLookupSelector } from '../filter';
+import { useGridStateInit } from '../../utils/useGridStateInit';
+import { GridGroupingColumnsApi, GridGroupingColumnsModel } from './gridGroupingColumnsInterfaces';
+import { useGridApiMethod, useGridState } from '../../utils';
+import { gridColumnLookupSelector } from '../columns';
 
 const GROUP_ROWS_BY_COLUMN_NAME = 'group-rows-by-columns';
 
@@ -38,10 +43,13 @@ const GROUP_ROWS_BY_COLUMN_NAME = 'group-rows-by-columns';
  * Only available in DataGridPro
  * TODO: Add requirements
  */
-export const useGridRowGroupByColumns = (
+export const useGridGroupingColumns = (
   apiRef: GridApiRef,
   props: Pick<
     GridComponentProps,
+    | 'initialState'
+    | 'groupingColumnsModel'
+    | 'onGroupingColumnsModelChange'
     | 'defaultGroupingExpansionDepth'
     | 'groupingColDef'
     | 'groupingColumnMode'
@@ -49,24 +57,42 @@ export const useGridRowGroupByColumns = (
     | 'disableChildrenSorting'
   >,
 ) => {
+  useGridStateInit(apiRef, (state) => ({
+    ...state,
+    groupingColumns: {
+      model: props.groupingColumnsModel ?? props.initialState?.groupingColumns?.model ?? [],
+    },
+  }));
+
+  const [, setGridState, forceUpdate] = useGridState(apiRef);
+
+  apiRef.current.unstable_updateControlState({
+    stateId: 'groupingColumns',
+    propModel: props.groupingColumnsModel,
+    propOnChange: props.onGroupingColumnsModelChange,
+    stateSelector: gridGroupingRowsModelSelector,
+    changeEvent: GridEvents.groupingColumnsModelChange,
+  });
+
   /**
    * ROW GROUPING
    */
-  const groupingFieldsOnLastRowPreProcessing = React.useRef<string[]>([]);
+  const sanitizedGroupingColumnsModelOnLastRowPreProcessing =
+    React.useRef<GridGroupingColumnsModel>();
 
   const updateRowGrouping = React.useCallback(() => {
     const groupRows: GridRowGroupingPreProcessing = (params) => {
-      const groupingColumns = gridRowGroupingColumnLookupSelector(apiRef.current.state);
-      const groupedByFields = orderGroupedByFields(groupingColumns);
-      groupingFieldsOnLastRowPreProcessing.current = groupedByFields;
+      const groupingColumnsModel = gridGroupingRowsSanitizedModelSelector(apiRef.current.state);
+      const columnsLookup = gridColumnLookupSelector(apiRef.current.state);
+      sanitizedGroupingColumnsModelOnLastRowPreProcessing.current = groupingColumnsModel;
 
-      if (groupedByFields.length === 0) {
+      if (groupingColumnsModel.length === 0) {
         return null;
       }
 
       const distinctValues: { [field: string]: { map: { [val: string]: boolean }; list: any[] } } =
         Object.fromEntries(
-          groupedByFields.map((groupingField) => [groupingField, { map: {}, list: [] }]),
+          groupingColumnsModel.map((groupingField) => [groupingField, { map: {}, list: [] }]),
         );
 
       const getCellGroupingCriteria = ({
@@ -101,11 +127,11 @@ export const useGridRowGroupByColumns = (
       params.ids.forEach((rowId) => {
         const row = params.idRowsLookup[rowId];
 
-        groupedByFields.forEach((groupedByField) => {
+        groupingColumnsModel.forEach((groupedByField) => {
           const { key } = getCellGroupingCriteria({
             row,
             id: rowId,
-            colDef: groupingColumns[groupedByField],
+            colDef: columnsLookup[groupedByField],
             field: groupedByField,
           });
           const groupingFieldsDistinctKeys = distinctValues[groupedByField];
@@ -119,12 +145,12 @@ export const useGridRowGroupByColumns = (
 
       const rows = params.ids.map((rowId) => {
         const row = params.idRowsLookup[rowId];
-        const parentPath = groupedByFields
+        const parentPath = groupingColumnsModel
           .map((groupingField) =>
             getCellGroupingCriteria({
               row,
               id: rowId,
-              colDef: groupingColumns[groupingField],
+              colDef: columnsLookup[groupingField],
               field: groupingField,
             }),
           )
@@ -167,10 +193,13 @@ export const useGridRowGroupByColumns = (
   const getGroupingColDefs = React.useCallback(
     (columnsState: GridColumnsRawState) => {
       const propGroupingColDef = props.groupingColDef;
-      const groupedByColDefs = getRowGroupingColumnLookup(columnsState.lookup);
-      const orderedGroupedByFields = orderGroupedByFields(groupedByColDefs);
 
-      if (orderedGroupedByFields.length === 0) {
+      // We can't use `gridGroupingRowsSanitizedModelSelector` here because the new columns are not in the state yet
+      const groupingColumnsModel = gridGroupingRowsModelSelector(apiRef.current.state).filter(
+        (field) => !!columnsState.lookup[field],
+      );
+
+      if (groupingColumnsModel.length === 0) {
         return [];
       }
 
@@ -178,14 +207,14 @@ export const useGridRowGroupByColumns = (
         case 'single': {
           const colDefOverride = isFunction(propGroupingColDef)
             ? propGroupingColDef({
-                sources: Object.values(groupedByColDefs),
+                sources: groupingColumnsModel.map((field) => columnsState.lookup[field]),
               })
             : propGroupingColDef ?? {};
 
           return [
             createGroupingColDefSeveralCriteria({
               apiRef,
-              orderedGroupedByFields,
+              groupingColumnsModel,
               colDefOverride,
               columnsLookup: columnsState.lookup,
             }),
@@ -193,8 +222,8 @@ export const useGridRowGroupByColumns = (
         }
 
         case 'multiple': {
-          return orderedGroupedByFields.map((groupedByField) => {
-            const groupedByColDef = groupedByColDefs[groupedByField];
+          return groupingColumnsModel.map((groupedByField) => {
+            const groupedByColDef = columnsState.lookup[groupedByField];
 
             const colDefOverride = isFunction(propGroupingColDef)
               ? propGroupingColDef({
@@ -285,6 +314,34 @@ export const useGridRowGroupByColumns = (
   useGridRegisterSortingMethod(apiRef, GROUP_ROWS_BY_COLUMN_NAME, sortingMethod);
 
   /**
+   * API METHODS
+   */
+  const setGroupingColumnsModel = React.useCallback<
+    GridGroupingColumnsApi['setGroupingColumnsModel']
+  >(
+    (model) => {
+      const currentModel = gridGroupingRowsModelSelector(apiRef.current.state);
+      if (currentModel !== model) {
+        setGridState((state) => ({
+          ...state,
+          groupingColumns: { ...state.groupingColumns, model },
+        }));
+        updateRowGrouping();
+        forceUpdate();
+      }
+    },
+    [apiRef, setGridState, forceUpdate, updateRowGrouping],
+  );
+
+  useGridApiMethod<GridGroupingColumnsApi>(
+    apiRef,
+    {
+      setGroupingColumnsModel,
+    },
+    'GridGroupingColumnsApi',
+  );
+
+  /**
    * EVENTS
    */
   const handleCellKeyDown = React.useCallback<GridEventListener<GridEvents.cellKeyDown>>(
@@ -313,15 +370,23 @@ export const useGridRowGroupByColumns = (
   );
 
   const handleColumnChange = React.useCallback<GridEventListener<GridEvents.columnsChange>>(() => {
-    const groupingColumns = gridRowGroupingColumnLookupSelector(apiRef.current.state);
-    const newGroupingFields = orderGroupedByFields(groupingColumns);
-    const currentGroupingFields = groupingFieldsOnLastRowPreProcessing.current;
+    const groupingColumnsModel = gridGroupingRowsModelSelector(apiRef.current.state);
+    const currentGroupingFields = sanitizedGroupingColumnsModelOnLastRowPreProcessing.current;
 
-    if (!isDeepEqual(currentGroupingFields, newGroupingFields)) {
+    if (!isDeepEqual(currentGroupingFields, groupingColumnsModel)) {
       updateRowGrouping();
     }
   }, [apiRef, updateRowGrouping]);
 
   useGridApiEventHandler(apiRef, GridEvents.cellKeyDown, handleCellKeyDown);
   useGridApiEventHandler(apiRef, GridEvents.columnsChange, handleColumnChange);
+
+  /**
+   * UPDATES
+   */
+  React.useEffect(() => {
+    if (props.groupingColumnsModel !== undefined) {
+      apiRef.current.setGroupingColumnsModel(props.groupingColumnsModel);
+    }
+  }, [apiRef, props.groupingColumnsModel]);
 };

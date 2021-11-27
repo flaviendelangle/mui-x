@@ -24,6 +24,7 @@ import { GridScrollApi } from './gridScrollApi';
 import type { GridPreProcessingApi } from '../../hooks/core/preProcessing';
 import type { GridRowGroupsPreProcessingApi } from '../../hooks/core/rowGroupsPerProcessing';
 import type { GridDimensionsApi } from '../../hooks/features/dimensions';
+import type { GridGroupingColumnsApi } from '../../hooks/features/groupingColumns';
 
 /**
  * The full grid API.
@@ -54,4 +55,5 @@ export interface GridApi
     GridLocaleTextApi,
     GridControlStateApi,
     GridClipboardApi,
-    GridScrollApi {}
+    GridScrollApi,
+    GridGroupingColumnsApi {}

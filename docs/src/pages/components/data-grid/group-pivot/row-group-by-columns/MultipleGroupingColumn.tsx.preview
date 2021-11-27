@@ -3,4 +3,9 @@
   columns={columns}
   getRowId={getRowId}
   groupingColumnMode="multiple"
+  initialState={{
+    groupingColumns: {
+      model: ['company', 'director'],
+    },
+  }}
 />

@@ -134,13 +134,11 @@ const columns: GridColumns = [
   {
     field: 'company',
     headerName: 'Company',
-    groupRows: true,
     hide: true,
   },
   {
     field: 'director',
     headerName: 'Director',
-    groupRows: true,
     hide: true,
   },
   {
@@ -159,6 +157,11 @@ export default function MultipleGroupingColumn() {
         columns={columns}
         getRowId={getRowId}
         groupingColumnMode="multiple"
+        initialState={{
+          groupingColumns: {
+            model: ['company', 'director'],
+          },
+        }}
       />
     </div>
   );

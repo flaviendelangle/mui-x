@@ -142,7 +142,6 @@ const columns: GridColumns = [
     renderCell: (params: GridRenderCellParams<{ name: string } | undefined>) =>
       params.value?.name,
     keyGetter: (params: GridKeyGetterParams<{ name: string }>) => params.value.name,
-    groupRows: true,
     hide: true,
   },
   {
@@ -161,6 +160,11 @@ export default function SingleGroupingColumn() {
         columns={columns}
         groupingColDef={{ width: 250 }}
         getRowId={getRowId}
+        initialState={{
+          groupingColumns: {
+            model: ['composer'],
+          },
+        }}
       />
     </div>
   );

@@ -201,16 +201,6 @@ export interface GridColDef {
    * @default false
    */
   disableExport?: boolean;
-  /**
-   * If `true`, the rows will be grouped according to the value of this column.
-   * @default false
-   */
-  groupRows?: boolean;
-  /**
-   * Allows to define the grouping order when several columns are used to group rows.
-   * But default the grouping order will be the definition order in the columns.
-   */
-  groupRowIndex?: number;
 }
 
 export interface GridActionsColDef extends GridColDef {

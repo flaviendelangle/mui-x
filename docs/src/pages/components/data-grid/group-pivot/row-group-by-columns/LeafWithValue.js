@@ -89,7 +89,7 @@ const rows = [
 ];
 
 const columns = [
-  { field: 'title', headerName: 'Title' },
+  { field: 'title', hide: true, headerName: 'Title' },
   {
     field: 'gross',
     headerName: 'Gross',
@@ -98,14 +98,11 @@ const columns = [
   {
     field: 'company',
     headerName: 'Company',
-    groupRows: true,
     hide: true,
   },
   {
     field: 'director',
     headerName: 'Director',
-    groupRows: true,
-    hide: true,
   },
   {
     field: 'year',
@@ -121,8 +118,13 @@ export default function LeafWithValue() {
       <DataGridPro
         rows={rows}
         columns={columns}
-        groupingColDef={{ width: 250, field: 'title' }}
+        groupingColDef={{ width: 250, leafField: 'title', headerName: 'Title' }}
         getRowId={getRowId}
+        initialState={{
+          groupingColumns: {
+            model: ['company'],
+          },
+        }}
       />
     </div>
   );

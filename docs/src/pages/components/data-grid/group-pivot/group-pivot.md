@@ -156,20 +156,6 @@ To have a grouping column for each grouping fields, set the `groupingColumnMode`
 
 {{"demo": "pages/components/data-grid/group-pivot/row-group-by-columns/MultipleGroupingColumn.js", "bg": "inline", "defaultCodeOpen": false}}
 
-### Group order
-
-By default, the rows are grouped based on the order of the columns.
-To manually set a grouping order, you can use the `groupRowIndex` property in `GridColDef`
-
-```tsx
-const columns: GridColDef[] = [
-  { field: 'director', groupRows: true, groupRowIndex: 1 },
-  { field: 'company', groupRows: true, groupRowIndex: 0 },
-];
-```
-
-{{"demo": "pages/components/data-grid/group-pivot/row-group-by-columns/CustomGroupOrder.js", "bg": "inline", "defaultCodeOpen": false}}
-
 ### Group with object values
 
 If you want to group according to a column which values are objects, you can use the `keyGetter` property in `GridColDef` to transform this object into a serializable value.

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useGridRootProps } from '../hooks/utils/useGridRootProps';
 
-import { GridGroupRowByColumnPanel } from './GridGroupRowByColumnPanel';
+import { GridGroupingColumnsPanel } from './GridGroupingColumnsPanel';
 
 export const GridHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   function GridHeader(props, ref) {
@@ -14,7 +14,7 @@ export const GridHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<
           <rootProps.components.Toolbar {...rootProps.componentsProps?.toolbar} />
         )}
 
-        {rootProps.rowGroupByColumnPanel && <GridGroupRowByColumnPanel />}
+        {rootProps.rowGroupByColumnPanel && <GridGroupingColumnsPanel />}
       </div>
     );
   },
