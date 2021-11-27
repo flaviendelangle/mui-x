@@ -47,6 +47,7 @@
     "groupingColumnMode": {
       "type": { "name": "enum", "description": "'multiple'<br>&#124;&nbsp;'single'" }
     },
+    "groupingColumnsModel": { "type": { "name": "arrayOf", "description": "Array&lt;string&gt;" } },
     "headerHeight": { "type": { "name": "number" }, "default": "56" },
     "hideFooter": { "type": { "name": "bool" } },
     "hideFooterPagination": { "type": { "name": "bool" } },
@@ -96,6 +97,7 @@
     "onEditRowsModelChange": { "type": { "name": "func" } },
     "onError": { "type": { "name": "func" } },
     "onFilterModelChange": { "type": { "name": "func" } },
+    "onGroupingColumnsModelChange": { "type": { "name": "func" } },
     "onPageChange": { "type": { "name": "func" } },
     "onPageSizeChange": { "type": { "name": "func" } },
     "onResize": { "type": { "name": "func" } },
