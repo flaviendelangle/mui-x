@@ -2,7 +2,7 @@
 title: Data Grid - Grouping columns
 ---
 
-# Data Grid - Grouping columns [<span class="premium"></span>](https://mui.com/store/items/material-ui-pro/)
+# Data Grid - Grouping columns [<span class="plan-premium"></span>](https://mui.com/store/items/material-ui-pro/)
 
 <p class="description">Use grouping columns to group the rows according to one or several columns value</p>
 

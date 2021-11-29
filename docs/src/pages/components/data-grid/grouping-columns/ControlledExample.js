@@ -53,6 +53,7 @@ export default function ControlledExample() {
         getRowId={getRowId}
         groupingColumnsModel={groupingColumnsModel}
         onGroupingColumnsModelChange={handleGroupingColumnsModelChange}
+        groupingColumnsPanel
       />
     </div>
   );

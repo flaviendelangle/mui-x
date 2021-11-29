@@ -5,4 +5,5 @@
   getRowId={getRowId}
   groupingColumnsModel={groupingColumnsModel}
   onGroupingColumnsModelChange={handleGroupingColumnsModelChange}
+  groupingColumnsPanel
 />

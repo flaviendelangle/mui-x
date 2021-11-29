@@ -45,9 +45,7 @@ interface TempRowTreeNode extends Omit<GridRowTreeNodeConfig, 'children'> {
    ],
    defaultGroupingExpansionDepth: 0,
  }
-
  Returns:
-
  {
    ids: [0, 1, 2, 'auto-generated-row-B'],
    idRowsLookup: { 0: {...}, 1: {...}, 2: {...}, 'auto-generated-row-B': {} },
@@ -78,7 +76,7 @@ export const buildRowTree = (params: BuildRowTreeParams): GridRowGroupingResult 
 
     for (let depth = 0; depth < row.path.length; depth += 1) {
       const { key, field: rawField } = row.path[depth];
-      const field = rawField ?? '__leaf__';
+      const field = rawField ?? '__no_field__';
 
       let nodeId: GridRowId;
 

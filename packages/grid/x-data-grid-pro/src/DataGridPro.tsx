@@ -298,6 +298,11 @@ DataGridProRaw.propTypes = {
    */
   groupingColumnsModel: PropTypes.arrayOf(PropTypes.string),
   /**
+   * If `true`, the grid will render a panel above header to enable row grouping by column by dropping a column header in it.
+   * @default false
+   */
+  groupingColumnsPanel: PropTypes.bool,
+  /**
    * Set the height in pixel of the column headers in the grid.
    * @default 56
    */
@@ -637,11 +642,6 @@ DataGridProRaw.propTypes = {
    * If some of the rows have children (for instance in the tree data), this number represents the amount of top level rows.
    */
   rowCount: PropTypes.number,
-  /**
-   * If `true`, the grid will render a panel above header to enable row grouping by column by dropping a column header in it.
-   * @default false
-   */
-  groupingColumnsPanel: PropTypes.bool,
   /**
    * Set the height in pixel of a row in the grid.
    * @default 52

@@ -96,7 +96,7 @@
     "paginationMode": "Pagination can be processed on the server or client-side. Set it to &#39;client&#39; if you would like to handle the pagination on the client-side. Set it to &#39;server&#39; if you would like to handle the pagination on the server-side.",
     "rowBuffer": "Number of extra rows to be rendered before/after the visible slice.",
     "rowCount": "Set the total number of rows, if it is different than the length of the value <code>rows</code> prop. If some of the rows have children (for instance in the tree data), this number represents the amount of top level rows.",
-    "rowGroupByColumnPanel": "If <code>true</code>, the grid will render a panel above header to enable row grouping by column by dropping a column header in it.",
+    "groupingColumnsPanel": "If <code>true</code>, the grid will render a panel above header to enable row grouping by column by dropping a column header in it.",
     "rowHeight": "Set the height in pixel of a row in the grid.",
     "rows": "Set of rows of type GridRowsProp.",
     "rowsPerPageOptions": "Select the pageSize dynamically using the component UI.",
