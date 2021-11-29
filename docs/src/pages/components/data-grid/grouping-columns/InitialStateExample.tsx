@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { DataGridPro, GridColumns } from '@mui/x-data-grid-pro';
-import { useMovieData } from './useMovieData';
+import { useMovieRows } from '@mui/x-data-grid-generator';
 
 const columns: GridColumns = [
   { field: 'title', headerName: 'Title' },
@@ -23,7 +23,7 @@ const columns: GridColumns = [
 const getRowId = (row) => row.title;
 
 export default function InitialStateExample() {
-  const movies = useMovieData();
+  const movies = useMovieRows();
 
   return (
     <div style={{ height: 400, width: '100%' }}>

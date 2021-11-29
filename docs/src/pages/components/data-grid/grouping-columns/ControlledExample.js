@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { DataGridPro } from '@mui/x-data-grid-pro';
-import { useMovieData } from './useMovieData';
+import { useMovieRows } from '@mui/x-data-grid-generator';
 
 const BASE_COLUMNS = [
   { field: 'title', headerName: 'Title' },
@@ -30,7 +30,7 @@ const hideGroupedColumns = (model) =>
 const getRowId = (row) => row.title;
 
 export default function ControlledExample() {
-  const movies = useMovieData();
+  const movies = useMovieRows();
 
   const [groupingColumnsModel, setGroupingColumnsModel] = React.useState(
     INITIAL_GROUPING_COLUMNS_MODEL,

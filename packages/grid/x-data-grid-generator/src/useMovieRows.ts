@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-export const useMovieData = () =>
+export const useMovieRows = () =>
   React.useMemo(
     () => [
       {

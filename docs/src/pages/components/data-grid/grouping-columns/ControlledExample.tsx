@@ -4,7 +4,7 @@ import {
   GridColumns,
   GridGroupingColumnsModel,
 } from '@mui/x-data-grid-pro';
-import { useMovieData } from './useMovieData';
+import { useMovieRows } from '@mui/x-data-grid-generator';
 
 const BASE_COLUMNS: GridColumns = [
   { field: 'title', headerName: 'Title' },
@@ -34,7 +34,7 @@ const hideGroupedColumns = (model: GridGroupingColumnsModel): GridColumns =>
 const getRowId = (row) => row.title;
 
 export default function ControlledExample() {
-  const movies = useMovieData();
+  const movies = useMovieRows();
 
   const [groupingColumnsModel, setGroupingColumnsModel] =
     React.useState<GridGroupingColumnsModel>(INITIAL_GROUPING_COLUMNS_MODEL);
