@@ -1,18 +1,23 @@
 import * as React from 'react';
-import { DataGridPro } from '@mui/x-data-grid-pro';
-import { useMovieRows } from '@mui/x-data-grid-generator';
-
-const getRowId = (row) => row.title;
+import { DataGridPro, GridColumns } from '@mui/x-data-grid-pro';
+import { useMovieData } from '@mui/x-data-grid-generator';
 
 export default function MultipleGroupingColumn() {
-  const rows = useMovieRows();
+  const data = useMovieData();
+
+  const columns = React.useMemo<GridColumns>(
+    () =>
+      data.columns.map((colDef) =>
+        colDef.field === 'company' ? { ...colDef, hide: true } : colDef,
+      ),
+    [data.columns],
+  );
 
   return (
     <div style={{ height: 400, width: '100%' }}>
       <DataGridPro
-        rows={rows}
+        {...data}
         columns={columns}
-        getRowId={getRowId}
         groupingColumnMode="multiple"
         initialState={{
           groupingColumns: {

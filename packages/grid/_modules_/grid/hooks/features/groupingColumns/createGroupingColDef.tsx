@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { GridColumnRawLookup } from '../columns/gridColumnsState';
 import {
   GRID_STRING_COL_DEF,
   GridApiRef,
@@ -8,7 +7,9 @@ import {
   GridRenderCellParams,
   GridStateColDef,
 } from '../../../models';
+import { GridColumnRawLookup } from '../columns/gridColumnsState';
 import { GridRowGroupByColumnsGroupingCell } from '../../../components/cell/GridRowGroupByColumnsGroupingCell';
+import { getGroupingColDefField } from './gridGroupingColumnsUtils';
 
 const GROUPING_COL_DEF_DEFAULT_VALUES: Partial<GridColDef> = {
   ...GRID_STRING_COL_DEF,
@@ -107,7 +108,7 @@ interface CreateGroupingColDefMonoCriteriaParams {
  * Creates the `GridColDef` for a grouping column that only takes car of a single grouping criteria
  * TODO: Handle valueFormatter
  */
-export const createGroupingColDefMonoCriteria = ({
+export const createGroupingColDefForOneGroupingCriteria = ({
   columnsLookup,
   groupedByColDef,
   groupedByField,
@@ -135,6 +136,10 @@ export const createGroupingColDefMonoCriteria = ({
 
   // The properties that do not depend on the presence of a `leafColDef` and that can be override by `colDefOverride`
   const commonProperties: Partial<GridColDef> = {
+    width: Math.max(
+      (groupedByColDef.width ?? GRID_STRING_COL_DEF.width!) + 40,
+      leafColDef?.width ?? 0,
+    ),
     renderCell: (params: GridRenderCellParams) => {
       if (params.rowNode.groupingField !== groupedByField) {
         return null;
@@ -157,7 +162,7 @@ export const createGroupingColDefMonoCriteria = ({
 
   // The properties that can't be override with `colDefOverride`
   const forcedProperties: Pick<GridColDef, 'field' | 'editable'> = {
-    field: `__row_group_by_columns_group_${groupedByField}__`,
+    field: getGroupingColDefField(groupedByField),
     editable: false,
   };
 
@@ -189,7 +194,7 @@ interface CreateGroupingColDefSeveralCriteriaParams {
  * Creates the `GridColDef` for a grouping column that only takes car of a single grouping criteria
  * TODO: Handle valueFormatter
  */
-export const createGroupingColDefSeveralCriteria = ({
+export const createGroupingColDefForAllGroupingCriteria = ({
   apiRef,
   columnsLookup,
   groupingColumnsModel,
@@ -218,6 +223,12 @@ export const createGroupingColDefSeveralCriteria = ({
   // The properties that do not depend on the presence of a `leafColDef` and that can be override by `colDefOverride`
   const baseColDef: Partial<GridColDef> = {
     headerName: apiRef.current.getLocaleText('treeDataGroupingHeaderName'),
+    width: Math.max(
+      ...groupingColumnsModel.map(
+        (field) => (columnsLookup[field].width ?? GRID_STRING_COL_DEF.width!) + 40,
+      ),
+      leafColDef?.width ?? 0,
+    ),
     renderCell: (params) => {
       if (params.rowNode.groupingField == null) {
         return params.value;
@@ -240,7 +251,7 @@ export const createGroupingColDefSeveralCriteria = ({
 
   // The properties that can't be override with `colDefOverride`
   const forcedProperties: Pick<GridColDef, 'field' | 'editable'> = {
-    field: '__row_group_by_columns_group__',
+    field: getGroupingColDefField(null),
     editable: false,
   };
 

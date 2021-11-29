@@ -1,8 +1,6 @@
 <DataGridPro
-  rows={rows}
+  {...data}
   columns={columns}
-  groupingColDef={{ width: 250 }}
-  getRowId={getRowId}
   initialState={{
     groupingColumns: {
       model: ['composer'],

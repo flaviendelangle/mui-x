@@ -1,5 +1,5 @@
 import { createRenderer, fireEvent, screen } from '@material-ui/monorepo/test/utils';
-import { getCell, getColumnHeadersTextContent, getColumnValues } from 'test/utils/helperFn';
+import { getCell, getColumnHeadersTextContent, getColumnValues, raf } from 'test/utils/helperFn';
 import * as React from 'react';
 import { expect } from 'chai';
 import {
@@ -209,11 +209,14 @@ describe('<DataGridPro /> - Tree Data', () => {
       ]);
     });
 
-    it('should not re-apply default expansion on rerender after expansion manually toggled', () => {
-      const { setProps } = render(<Test defaultGroupingExpansionDepth={1} />);
-      expect(getColumnValues(1)).to.deep.equal(['A', 'A.A', 'A.B', 'B', 'B.A', 'B.B', 'C']);
+    it('should not re-apply default expansion on rerender after expansion manually toggled', async () => {
+      const { setProps } = render(<Test />);
+      expect(getColumnValues(1)).to.deep.equal(['A', 'B', 'C']);
+      apiRef.current.setRowChildrenExpansion('B', true);
+      await raf();
+      expect(getColumnValues(1)).to.deep.equal(['A', 'B', 'B.A', 'B.B', 'C']);
       setProps({ sortModel: [{ field: 'name', sort: 'desc' }] });
-      expect(getColumnValues(1)).to.deep.equal(['C', 'B', 'B.B', 'B.A', 'A', 'A.B', 'A.A']);
+      expect(getColumnValues(1)).to.deep.equal(['C', 'B', 'B.B', 'B.A', 'A']);
     });
   });
 

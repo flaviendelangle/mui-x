@@ -1,11 +1,10 @@
 <DataGridPro
-  rows={movies}
+  {...data}
   columns={columns}
-  groupingColDef={{ width: 250 }}
-  getRowId={getRowId}
+  disableSelectionOnClick
   initialState={{
     groupingColumns: {
-      model: ['company'],
+      model: ['company', 'director'],
     },
   }}
 />

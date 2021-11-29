@@ -42,6 +42,16 @@ To enable the grouping panel, you simply have to use the `groupingColumnsPanel` 
 
 If you want to group according to a column which values are objects, you can use the `keyGetter` property in `GridColDef` to transform this object into a serializable value.
 
+```ts
+const columns: GridColumns = [
+  {
+    field: 'composer',
+    keyGetter: (params) => params.value.name,
+  },
+  // ...
+];
+```
+
 > ⚠ For now, the row grouping is not using the `valueGetter` property in `GridColDef`. In the future, it should use it and the `keyGetter` property would only be necessary when the value returned by `valueGetter` is an object.
 
 {{"demo": "pages/components/data-grid/grouping-columns/KeyGetterExample.js", "bg": "inline", "defaultCodeOpen": false}}

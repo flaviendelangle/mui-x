@@ -1,42 +1,24 @@
 import * as React from 'react';
 import { DataGridPro } from '@mui/x-data-grid-pro';
-import { useMovieRows } from '@mui/x-data-grid-generator';
-
-const columns = [
-  { field: 'title', headerName: 'Title' },
-  {
-    field: 'gross',
-    headerName: 'Gross',
-    type: 'number',
-  },
-  {
-    field: 'company',
-    headerName: 'Company',
-    hide: true,
-  },
-  {
-    field: 'director',
-    headerName: 'Director',
-    hide: true,
-  },
-  {
-    field: 'year',
-    headerName: 'Year',
-  },
-];
-
-const getRowId = (row) => row.title;
+import { useMovieData } from '@mui/x-data-grid-generator';
 
 export default function SingleGroupingColumn() {
-  const rows = useMovieRows();
+  const data = useMovieData();
+
+  const columns = React.useMemo(
+    () =>
+      data.columns.map((colDef) =>
+        colDef.field === 'company' ? { ...colDef, hide: true } : colDef,
+      ),
+    [data.columns],
+  );
 
   return (
     <div style={{ height: 400, width: '100%' }}>
       <DataGridPro
-        rows={rows}
+        {...data}
         columns={columns}
-        groupingColDef={{ width: 250 }}
-        getRowId={getRowId}
+        groupingColumnMode="single"
         initialState={{
           groupingColumns: {
             model: ['company', 'director'],

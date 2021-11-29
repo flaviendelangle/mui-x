@@ -17,10 +17,11 @@ import {
   gridGroupingRowsSanitizedModelSelector,
 } from './gridGroupingColumnsSelector';
 import { GridComponentProps } from '../../../GridComponentProps';
+import { getGroupingColDefField } from './gridGroupingColumnsUtils';
 import {
-  createGroupingColDefMonoCriteria,
-  createGroupingColDefSeveralCriteria,
-} from './gridGroupingColumnsUtils';
+  createGroupingColDefForOneGroupingCriteria,
+  createGroupingColDefForAllGroupingCriteria,
+} from './createGroupingColDef';
 import { isDeepEqual, isFunction } from '../../../utils/utils';
 import { GridPreProcessingGroup, useGridRegisterPreProcessor } from '../../core/preProcessing';
 import { GridColumnsRawState } from '../columns/gridColumnsState';
@@ -212,7 +213,7 @@ export const useGridGroupingColumns = (
             : propGroupingColDef ?? {};
 
           return [
-            createGroupingColDefSeveralCriteria({
+            createGroupingColDefForAllGroupingCriteria({
               apiRef,
               groupingColumnsModel,
               colDefOverride,
@@ -231,7 +232,7 @@ export const useGridGroupingColumns = (
                 })
               : propGroupingColDef ?? {};
 
-            return createGroupingColDefMonoCriteria({
+            return createGroupingColDefForOneGroupingCriteria({
               groupedByField,
               groupedByColDef,
               colDefOverride,
@@ -355,15 +356,17 @@ export const useGridGroupingColumns = (
         event.stopPropagation();
         event.preventDefault();
 
-        const node = apiRef.current.getRowNode(params.id);
         const filteredDescendantCount =
           gridFilteredDescendantCountLookupSelector(apiRef.current.state)[params.id] ?? 0;
 
-        if (!node || filteredDescendantCount === 0) {
+        const isOnGroupingCell =
+          props.groupingColumnMode === 'single' ||
+          getGroupingColDefField(params.rowNode.groupingField) === params.field;
+        if (!isOnGroupingCell || filteredDescendantCount === 0) {
           return;
         }
 
-        apiRef.current.setRowChildrenExpansion(params.id, !node.childrenExpanded);
+        apiRef.current.setRowChildrenExpansion(params.id, !params.rowNode.childrenExpanded);
       }
     },
     [apiRef],

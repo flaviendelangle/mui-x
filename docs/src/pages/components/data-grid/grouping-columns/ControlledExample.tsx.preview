@@ -1,8 +1,6 @@
 <DataGridPro
-  rows={movies}
+  {...data}
   columns={columns}
-  groupingColDef={{ width: 250 }}
-  getRowId={getRowId}
   groupingColumnsModel={groupingColumnsModel}
   onGroupingColumnsModelChange={handleGroupingColumnsModelChange}
   groupingColumnsPanel

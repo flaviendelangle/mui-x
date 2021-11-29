@@ -1,69 +1,41 @@
-import {
-  DemoDataReturnType,
-  useDemoData,
-  UseDemoDataOptions,
-} from '@mui/x-data-grid-generator';
+import { useDemoData } from '@mui/x-data-grid-generator';
 import * as React from 'react';
-import { DataGridPro, DataGridProProps } from '@mui/x-data-grid-pro';
+import {
+  DataGridPro,
+  DataGridProProps,
+  GridColumns,
+  GridGroupingColumnsModel,
+} from '@mui/x-data-grid-pro';
 
-interface UseDemoDataGroupedByColumnsOptions extends UseDemoDataOptions {
-  groupedColumns: string[];
-}
-
-const useGroupedByColumnsDemoData = ({
-  groupedColumns,
-  ...options
-}: UseDemoDataGroupedByColumnsOptions): DemoDataReturnType => {
-  const response = useDemoData(options);
-
-  const columns = React.useMemo(
-    () =>
-      response.data.columns.map((col) => {
-        if (!groupedColumns.includes(col.field)) {
-          return col;
-        }
-
-        const groupedCol = {
-          ...col,
-          groupRows: true,
-          hide: true,
-          groupRowIndex: groupedColumns.indexOf(col.field),
-        };
-
-        if (groupedCol.field === 'counterPartyCountry') {
-          groupedCol.keyGetter = (params) => {
-            return (params.value as any).label;
-          };
-        }
-
-        return groupedCol;
-      }),
-    [response.data.columns, groupedColumns],
-  );
-
-  return {
-    ...response,
-    data: {
-      ...response.data,
-      columns,
-    },
-  };
-};
+const hideGroupedColumns = (
+  columns: GridColumns,
+  model: GridGroupingColumnsModel,
+): GridColumns =>
+  columns.map((col) => ({
+    ...col,
+    hide: col.hide ?? model.includes(col.field),
+  }));
 
 export default function RowGroupingFullExample() {
-  const { data, loading } = useGroupedByColumnsDemoData({
+  const { data, loading } = useDemoData({
     dataSet: 'Commodity',
     rowLength: 100,
     maxColumns: 25,
-    groupedColumns: ['status', 'counterPartyCurrency'],
   });
 
-  const groupingColDef = React.useMemo<DataGridProProps['groupingColDef']>(
-    () => ({
-      width: 300,
-    }),
-    [],
-  );
+  const [state, setState] = React.useState<
+    Pick<DataGridProProps, 'columns' | 'groupingColumnsModel'>
+  >(() => ({
+    groupingColumnsModel: ['status', 'counterPartyCurrency'],
+    columns: hideGroupedColumns(data.columns, ['status', 'counterPartyCurrency']),
+  }));
+
+  React.useEffect(() => {
+    setState((prev) => ({
+      ...prev,
+      columns: hideGroupedColumns(data.columns, prev.groupingColumnsModel!),
+    }));
+  }, [data.columns]);
 
   return (
     <div style={{ height: 400, width: '100%' }}>
@@ -71,9 +43,15 @@ export default function RowGroupingFullExample() {
         loading={loading}
         disableSelectionOnClick
         {...data}
-        groupingColDef={groupingColDef}
+        {...state}
         groupingColumnsPanel
         groupingColumnMode="multiple"
+        onGroupingColumnsModelChange={(model) =>
+          setState({
+            groupingColumnsModel: model,
+            columns: hideGroupedColumns(data.columns, model),
+          })
+        }
       />
     </div>
   );

@@ -1,5 +1,5 @@
 import { createRenderer } from '@material-ui/monorepo/test/utils';
-import { getColumnHeadersTextContent, getColumnValues } from 'test/utils/helperFn';
+import { getColumnHeadersTextContent, getColumnValues, raf } from 'test/utils/helperFn';
 import * as React from 'react';
 import { expect } from 'chai';
 import {
@@ -294,7 +294,7 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
               keyGetter: (params: GridKeyGetterParams<string>) => `key-${params.value}`,
             },
           ]}
-          groupingColumnsModel={['category1']}
+          initialState={{ groupingColumns: { model: ['category1'] } }}
           defaultGroupingExpansionDepth={-1}
         />,
       );
@@ -324,12 +324,104 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
     //   expect(getColumnValues(1)).to.deep.equal(['', '0', '1', '2', '', '3', '4']);
   });
 
+  describe('prop: defaultGroupingExpansionDepth', () => {
+    it('should not expand any row if defaultGroupingExpansionDepth = 0', () => {
+      render(
+        <Test
+          defaultGroupingExpansionDepth={0}
+          groupingColDef={{ leafField: 'id' }}
+          initialState={{ groupingColumns: { model: ['category1', 'category2'] } }}
+        />,
+      );
+      expect(getColumnValues(0)).to.deep.equal(['A (3)', 'B (2)']);
+    });
+
+    it('should expand all top level rows if defaultGroupingExpansionDepth = 1', () => {
+      render(
+        <Test
+          defaultGroupingExpansionDepth={1}
+          groupingColDef={{ leafField: 'id' }}
+          initialState={{ groupingColumns: { model: ['category1', 'category2'] } }}
+        />,
+      );
+      expect(getColumnValues(0)).to.deep.equal([
+        'A (3)',
+        'Cat 1 (1)',
+        'Cat 2 (2)',
+        'B (2)',
+        'Cat 2 (1)',
+        'Cat 1 (1)',
+      ]);
+    });
+
+    it('should expand all rows up to depth of 2 if defaultGroupingExpansionDepth = 2', () => {
+      render(
+        <Test
+          defaultGroupingExpansionDepth={2}
+          groupingColDef={{ leafField: 'id' }}
+          initialState={{ groupingColumns: { model: ['category1', 'category2'] } }}
+        />,
+      );
+      expect(getColumnValues(0)).to.deep.equal([
+        'A (3)',
+        'Cat 1 (1)',
+        '0',
+        'Cat 2 (2)',
+        '1',
+        '2',
+        'B (2)',
+        'Cat 2 (1)',
+        '3',
+        'Cat 1 (1)',
+        '4',
+      ]);
+    });
+
+    it('should expand all rows if defaultGroupingExpansionDepth = -1', () => {
+      render(
+        <Test
+          defaultGroupingExpansionDepth={-1}
+          groupingColDef={{ leafField: 'id' }}
+          initialState={{ groupingColumns: { model: ['category1', 'category2'] } }}
+        />,
+      );
+      expect(getColumnValues(0)).to.deep.equal([
+        'A (3)',
+        'Cat 1 (1)',
+        '0',
+        'Cat 2 (2)',
+        '1',
+        '2',
+        'B (2)',
+        'Cat 2 (1)',
+        '3',
+        'Cat 1 (1)',
+        '4',
+      ]);
+    });
+
+    it('should not re-apply default expansion on rerender after expansion manually toggled', async () => {
+      const { setProps } = render(
+        <Test
+          groupingColDef={{ leafField: 'id', mainGroupingCriteria: 'category1' }}
+          initialState={{ groupingColumns: { model: ['category1', 'category2'] } }}
+        />,
+      );
+      expect(getColumnValues(0)).to.deep.equal(['A (3)', 'B (2)']);
+      apiRef.current.setRowChildrenExpansion('auto-generated-row-category1/B', true);
+      await raf();
+      expect(getColumnValues(0)).to.deep.equal(['A (3)', 'B (2)', 'Cat 2 (1)', 'Cat 1 (1)']);
+      setProps({ sortModel: [{ field: '__row_group_by_columns_group__', sort: 'desc' }] });
+      expect(getColumnValues(0)).to.deep.equal(['B (2)', 'Cat 2 (1)', 'Cat 1 (1)', 'A (3)']);
+    });
+  });
+
   describe('props: groupingColDef', () => {
     describe('props: groupingColumnMode = "single"', () => {
       it('should not allow to override the field', () => {
         render(
           <Test
-            groupingColumnsModel={['category1']}
+            initialState={{ groupingColumns: { model: ['category1'] } }}
             groupingColumnMode="multiple"
             groupingColDef={{
               // @ts-expect-error
@@ -346,7 +438,7 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
       it('should allow to override the headerName in object mode', () => {
         render(
           <Test
-            groupingColumnsModel={['category1', 'category2']}
+            initialState={{ groupingColumns: { model: ['category1', 'category2'] } }}
             groupingColumnMode="single"
             groupingColDef={{
               headerName: 'Main category',
@@ -365,7 +457,7 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
       it('should allow to override the headerName in callback mode', () => {
         render(
           <Test
-            groupingColumnsModel={['category1', 'category2']}
+            initialState={{ groupingColumns: { model: ['category1', 'category2'] } }}
             groupingColumnMode="single"
             groupingColDef={(params) =>
               params.sources.some((colDef) => colDef.field === 'category1')
@@ -390,7 +482,7 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
       it('should not allow to override the field', () => {
         render(
           <Test
-            groupingColumnsModel={['category1']}
+            initialState={{ groupingColumns: { model: ['category1'] } }}
             groupingColumnMode="single"
             groupingColDef={{
               // @ts-expect-error
@@ -405,7 +497,7 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
       it('should allow to override the headerName in object mode', () => {
         render(
           <Test
-            groupingColumnsModel={['category1', 'category2']}
+            initialState={{ groupingColumns: { model: ['category1', 'category2'] } }}
             groupingColumnMode="multiple"
             groupingColDef={{
               headerName: 'Main category',
@@ -425,7 +517,7 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
       it('should allow to override the headerName in callback mode', () => {
         render(
           <Test
-            groupingColumnsModel={['category1', 'category2']}
+            initialState={{ groupingColumns: { model: ['category1', 'category2'] } }}
             groupingColumnMode="multiple"
             groupingColDef={(params) =>
               params.sources.some((colDef) => colDef.field === 'category1')
@@ -453,7 +545,7 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
       it('should use the top level grouping criteria for sorting if mainGroupingCriteria and leafField are not defined', () => {
         render(
           <Test
-            groupingColumnsModel={['category1', 'category2']}
+            initialState={{ groupingColumns: { model: ['category1', 'category2'] } }}
             groupingColumnMode="single"
             sortModel={[{ field: '__row_group_by_columns_group__', sort: 'desc' }]}
             defaultGroupingExpansionDepth={-1}
@@ -478,7 +570,7 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
       it('should use the column grouping criteria for sorting if mainGroupingCriteria is one of the grouping criteria and leaf field is defined', () => {
         render(
           <Test
-            groupingColumnsModel={['category1', 'category2']}
+            initialState={{ groupingColumns: { model: ['category1', 'category2'] } }}
             groupingColumnMode="single"
             groupingColDef={{
               leafField: 'id',
@@ -506,7 +598,7 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
       it('should use the leaf field for sorting if mainGroupingCriteria is not defined and leaf field is defined', () => {
         render(
           <Test
-            groupingColumnsModel={['category1', 'category2']}
+            initialState={{ groupingColumns: { model: ['category1', 'category2'] } }}
             groupingColumnMode="single"
             groupingColDef={{
               leafField: 'id',
@@ -534,7 +626,7 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
       it('should use the leaf field for sorting if mainGroupingCriteria is not one of the grouping criteria and leaf field is defined', () => {
         render(
           <Test
-            groupingColumnsModel={['category1', 'category2']}
+            initialState={{ groupingColumns: { model: ['category1', 'category2'] } }}
             groupingColumnMode="single"
             groupingColDef={{
               leafField: 'id',
@@ -565,7 +657,7 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
       it('should use the column grouping criteria for sorting if mainGroupingCriteria and leafField are not defined', () => {
         render(
           <Test
-            groupingColumnsModel={['category1']}
+            initialState={{ groupingColumns: { model: ['category1'] } }}
             groupingColumnMode="multiple"
             sortModel={[{ field: '__row_group_by_columns_group_category1__', sort: 'desc' }]}
             defaultGroupingExpansionDepth={-1}
@@ -578,7 +670,7 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
       it('should use the column grouping criteria for sorting if mainGroupingCriteria matches the column grouping criteria and leaf field is defined', () => {
         render(
           <Test
-            groupingColumnsModel={['category1']}
+            initialState={{ groupingColumns: { model: ['category1'] } }}
             groupingColumnMode="multiple"
             groupingColDef={{
               leafField: 'id',
@@ -595,7 +687,7 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
       it('should use the leaf field for sorting if mainGroupingCriteria is not defined and leaf field is defined', () => {
         render(
           <Test
-            groupingColumnsModel={['category1']}
+            initialState={{ groupingColumns: { model: ['category1'] } }}
             groupingColumnMode="multiple"
             groupingColDef={{
               leafField: 'id',
@@ -611,7 +703,7 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
       it("should use the leaf field for sorting if mainGroupingCriteria doesn't match the column grouping criteria and leaf field is defined", () => {
         render(
           <Test
-            groupingColumnsModel={['category1']}
+            initialState={{ groupingColumns: { model: ['category1'] } }}
             groupingColumnMode="multiple"
             groupingColDef={{
               leafField: 'id',

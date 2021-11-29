@@ -1,8 +1,7 @@
 <DataGridPro
-  rows={rows}
+  {...data}
   columns={columns}
-  groupingColDef={{ width: 250 }}
-  getRowId={getRowId}
+  groupingColumnMode="single"
   initialState={{
     groupingColumns: {
       model: ['company', 'director'],

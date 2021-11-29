@@ -2,7 +2,13 @@
   loading={loading}
   disableSelectionOnClick
   {...data}
-  groupingColDef={groupingColDef}
+  {...state}
   groupingColumnsPanel
   groupingColumnMode="multiple"
+  onGroupingColumnsModelChange={(model) =>
+    setState({
+      groupingColumnsModel: model,
+      columns: hideGroupedColumns(data.columns, model),
+    })
+  }
 />

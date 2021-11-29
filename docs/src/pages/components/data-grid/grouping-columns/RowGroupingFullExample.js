@@ -2,57 +2,30 @@ import { useDemoData } from '@mui/x-data-grid-generator';
 import * as React from 'react';
 import { DataGridPro } from '@mui/x-data-grid-pro';
 
-const useGroupedByColumnsDemoData = ({ groupedColumns, ...options }) => {
-  const response = useDemoData(options);
-
-  const columns = React.useMemo(
-    () =>
-      response.data.columns.map((col) => {
-        if (!groupedColumns.includes(col.field)) {
-          return col;
-        }
-
-        const groupedCol = {
-          ...col,
-          groupRows: true,
-          hide: true,
-          groupRowIndex: groupedColumns.indexOf(col.field),
-        };
-
-        if (groupedCol.field === 'counterPartyCountry') {
-          groupedCol.keyGetter = (params) => {
-            return params.value.label;
-          };
-        }
-
-        return groupedCol;
-      }),
-    [response.data.columns, groupedColumns],
-  );
-
-  return {
-    ...response,
-    data: {
-      ...response.data,
-      columns,
-    },
-  };
-};
+const hideGroupedColumns = (columns, model) =>
+  columns.map((col) => ({
+    ...col,
+    hide: col.hide ?? model.includes(col.field),
+  }));
 
 export default function RowGroupingFullExample() {
-  const { data, loading } = useGroupedByColumnsDemoData({
+  const { data, loading } = useDemoData({
     dataSet: 'Commodity',
     rowLength: 100,
     maxColumns: 25,
-    groupedColumns: ['status', 'counterPartyCurrency'],
   });
 
-  const groupingColDef = React.useMemo(
-    () => ({
-      width: 300,
-    }),
-    [],
-  );
+  const [state, setState] = React.useState(() => ({
+    groupingColumnsModel: ['status', 'counterPartyCurrency'],
+    columns: hideGroupedColumns(data.columns, ['status', 'counterPartyCurrency']),
+  }));
+
+  React.useEffect(() => {
+    setState((prev) => ({
+      ...prev,
+      columns: hideGroupedColumns(data.columns, prev.groupingColumnsModel),
+    }));
+  }, [data.columns]);
 
   return (
     <div style={{ height: 400, width: '100%' }}>
@@ -60,9 +33,15 @@ export default function RowGroupingFullExample() {
         loading={loading}
         disableSelectionOnClick
         {...data}
-        groupingColDef={groupingColDef}
+        {...state}
         groupingColumnsPanel
         groupingColumnMode="multiple"
+        onGroupingColumnsModelChange={(model) =>
+          setState({
+            groupingColumnsModel: model,
+            columns: hideGroupedColumns(data.columns, model),
+          })
+        }
       />
     </div>
   );

@@ -185,15 +185,14 @@ export const useGridTreeData = (
         event.stopPropagation();
         event.preventDefault();
 
-        const node = apiRef.current.getRowNode(params.id);
         const filteredDescendantCount =
           gridFilteredDescendantCountLookupSelector(apiRef.current.state)[params.id] ?? 0;
 
-        if (!node || filteredDescendantCount === 0) {
+        if (filteredDescendantCount === 0) {
           return;
         }
 
-        apiRef.current.setRowChildrenExpansion(params.id, !node.childrenExpanded);
+        apiRef.current.setRowChildrenExpansion(params.id, !params.rowNode.childrenExpanded);
       }
     },
     [apiRef],

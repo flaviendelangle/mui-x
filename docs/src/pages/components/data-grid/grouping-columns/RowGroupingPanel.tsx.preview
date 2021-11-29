@@ -1,8 +1,5 @@
 <DataGridPro
-  rows={rows}
-  columns={columns}
-  getRowId={getRowId}
-  groupingColumnMode="multiple"
+  {...data}
   groupingColumnsPanel
   initialState={{
     groupingColumns: {

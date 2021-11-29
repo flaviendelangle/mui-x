@@ -1,7 +1,6 @@
 <DataGridPro
-  rows={rows}
+  {...data}
   columns={columns}
-  getRowId={getRowId}
   groupingColumnMode="multiple"
   initialState={{
     groupingColumns: {

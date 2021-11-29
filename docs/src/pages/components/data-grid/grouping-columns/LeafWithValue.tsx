@@ -1,41 +1,26 @@
 import * as React from 'react';
-import { DataGridPro, GridColumns } from '@mui/x-data-grid-pro';
-import { useMovieRows } from '@mui/x-data-grid-generator';
-
-const columns: GridColumns = [
-  { field: 'title', hide: true, headerName: 'Title' },
-  {
-    field: 'gross',
-    headerName: 'Gross',
-    type: 'number',
-  },
-  {
-    field: 'company',
-    headerName: 'Company',
-    hide: true,
-  },
-  {
-    field: 'director',
-    headerName: 'Director',
-  },
-  {
-    field: 'year',
-    headerName: 'Year',
-  },
-];
-
-const getRowId = (row) => row.title;
+import { DataGridPro } from '@mui/x-data-grid-pro';
+import { useMovieData } from '@mui/x-data-grid-generator';
 
 export default function LeafWithValue() {
-  const rows = useMovieRows();
+  const data = useMovieData();
+
+  const columns = React.useMemo(
+    () =>
+      data.columns.map((colDef) =>
+        ['title', 'company'].includes(colDef.field)
+          ? { ...colDef, hide: true }
+          : colDef,
+      ),
+    [data.columns],
+  );
 
   return (
     <div style={{ height: 400, width: '100%' }}>
       <DataGridPro
-        rows={rows}
+        {...data}
         columns={columns}
-        groupingColDef={{ width: 250, leafField: 'title', headerName: 'Title' }}
-        getRowId={getRowId}
+        groupingColDef={{ leafField: 'title' }}
         initialState={{
           groupingColumns: {
             model: ['company'],
