@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { GridColumnRawLookup } from '../columns/gridColumnsState';
 import {
+  GRID_STRING_COL_DEF,
   GridApiRef,
   GridColDef,
   GridGroupingColDefOverride,
@@ -10,6 +11,7 @@ import {
 import { GridRowGroupByColumnsGroupingCell } from '../../../components/cell/GridRowGroupByColumnsGroupingCell';
 
 const GROUPING_COL_DEF_DEFAULT_VALUES: Partial<GridColDef> = {
+  ...GRID_STRING_COL_DEF,
   type: 'rowGroupByColumnsGroup',
   disableReorder: true,
   hide: false,
@@ -123,12 +125,8 @@ export const createGroupingColDefMonoCriteria = ({
   //
   // By default, we apply the sorting / filtering on the groups of this column's grouping criteria based on the properties of `groupedColDef`.
   let sourceProperties: Partial<GridColDef>;
-  if (mainGroupingCriteria) {
-    if (mainGroupingCriteria === groupedByField) {
-      sourceProperties = getGroupingCriteriaProperties(groupedByColDef);
-    } else {
-      sourceProperties = { filterable: false, sortable: false };
-    }
+  if (mainGroupingCriteria && mainGroupingCriteria === groupedByField) {
+    sourceProperties = getGroupingCriteriaProperties(groupedByColDef);
   } else if (leafColDef) {
     sourceProperties = getLeafProperties(leafColDef);
   } else {
@@ -145,10 +143,6 @@ export const createGroupingColDefMonoCriteria = ({
       return <GridRowGroupByColumnsGroupingCell {...params} />;
     },
     valueGetter: (params) => {
-      if (params.rowNode.groupingField == null) {
-        return params.value;
-      }
-
       if (params.rowNode.groupingField === groupedByField) {
         return params.rowNode.groupingKey;
       }
@@ -213,12 +207,8 @@ export const createGroupingColDefSeveralCriteria = ({
   //
   // By default, we apply the sorting / filtering on the groups of the top level grouping criteria based on the properties of `columnsLookup[orderedGroupedByFields[0]]`.
   let sourceProperties: Partial<GridColDef>;
-  if (mainGroupingCriteria) {
-    if (groupingColumnsModel.includes(mainGroupingCriteria)) {
-      sourceProperties = getGroupingCriteriaProperties(columnsLookup[mainGroupingCriteria]);
-    } else {
-      sourceProperties = { filterable: false, sortable: false };
-    }
+  if (mainGroupingCriteria && groupingColumnsModel.includes(mainGroupingCriteria)) {
+    sourceProperties = getGroupingCriteriaProperties(columnsLookup[mainGroupingCriteria]);
   } else if (leafColDef) {
     sourceProperties = getLeafProperties(leafColDef);
   } else {

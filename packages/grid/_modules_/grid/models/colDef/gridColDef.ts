@@ -234,7 +234,7 @@ export interface GridColumnsMeta {
 }
 
 export interface GridGroupingColDefOverride
-  extends Omit<GridColDef, 'editable' | 'valueGetter' | 'valueSetter' | 'field'> {
+  extends Omit<GridColDef, 'editable' | 'valueSetter' | 'field'> {
   /**
    * The field from which we want to apply the sorting and the filtering for the grouping column.
    * It is only useful when `props.groupingColumnMode === "multiple"` to decide which grouping criteria should be used for sorting and filtering

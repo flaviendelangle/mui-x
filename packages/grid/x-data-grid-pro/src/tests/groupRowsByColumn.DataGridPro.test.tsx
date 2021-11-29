@@ -24,6 +24,7 @@ const rows: GridRowsProp = [
 
 const baselineProps: DataGridProProps = {
   autoHeight: isJSDOM,
+  disableVirtualization: true,
   rows,
   columns: [
     {
@@ -85,7 +86,7 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
     apiRef = useGridApiRef();
 
     return (
-      <div style={{ width: 300, height: 800 }}>
+      <div style={{ width: 300, height: 300 }}>
         <DataGridPro {...baselineProps} apiRef={apiRef} {...props} />
       </div>
     );
@@ -323,10 +324,245 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
     //   expect(getColumnValues(1)).to.deep.equal(['', '0', '1', '2', '', '3', '4']);
   });
 
-  // TODO: Add more tests
-  describe('sorting', () => {
+  describe('props: groupingColDef', () => {
+    describe('props: groupingColumnMode = "single"', () => {
+      it('should not allow to override the field', () => {
+        render(
+          <Test
+            groupingColumnsModel={['category1']}
+            groupingColumnMode="multiple"
+            groupingColDef={{
+              // @ts-expect-error
+              field: 'custom-field',
+            }}
+          />,
+        );
+
+        expect(apiRef.current.getAllColumns()[0].field).to.equal(
+          '__row_group_by_columns_group_category1__',
+        );
+      });
+
+      it('should allow to override the headerName in object mode', () => {
+        render(
+          <Test
+            groupingColumnsModel={['category1', 'category2']}
+            groupingColumnMode="single"
+            groupingColDef={{
+              headerName: 'Main category',
+            }}
+          />,
+        );
+
+        expect(getColumnHeadersTextContent()).to.deep.equal([
+          'Main category',
+          'id',
+          'category1',
+          'category2',
+        ]);
+      });
+
+      it('should allow to override the headerName in callback mode', () => {
+        render(
+          <Test
+            groupingColumnsModel={['category1', 'category2']}
+            groupingColumnMode="single"
+            groupingColDef={(params) =>
+              params.sources.some((colDef) => colDef.field === 'category1')
+                ? {
+                    headerName: 'Main category',
+                  }
+                : {}
+            }
+          />,
+        );
+
+        expect(getColumnHeadersTextContent()).to.deep.equal([
+          'Main category',
+          'id',
+          'category1',
+          'category2',
+        ]);
+      });
+    });
+
     describe('props: groupingColumnMode = "multiple"', () => {
-      it('should apply the sorting on the column grouping criteria if mainGroupingCriteria and leafField are not defined', () => {
+      it('should not allow to override the field', () => {
+        render(
+          <Test
+            groupingColumnsModel={['category1']}
+            groupingColumnMode="single"
+            groupingColDef={{
+              // @ts-expect-error
+              field: 'custom-field',
+            }}
+          />,
+        );
+
+        expect(apiRef.current.getAllColumns()[0].field).to.equal('__row_group_by_columns_group__');
+      });
+
+      it('should allow to override the headerName in object mode', () => {
+        render(
+          <Test
+            groupingColumnsModel={['category1', 'category2']}
+            groupingColumnMode="multiple"
+            groupingColDef={{
+              headerName: 'Main category',
+            }}
+          />,
+        );
+
+        expect(getColumnHeadersTextContent()).to.deep.equal([
+          'Main category',
+          'Main category',
+          'id',
+          'category1',
+          'category2',
+        ]);
+      });
+
+      it('should allow to override the headerName in callback mode', () => {
+        render(
+          <Test
+            groupingColumnsModel={['category1', 'category2']}
+            groupingColumnMode="multiple"
+            groupingColDef={(params) =>
+              params.sources.some((colDef) => colDef.field === 'category1')
+                ? {
+                    headerName: 'Main category',
+                  }
+                : {}
+            }
+          />,
+        );
+
+        expect(getColumnHeadersTextContent()).to.deep.equal([
+          'Main category',
+          'category2',
+          'id',
+          'category1',
+          'category2',
+        ]);
+      });
+    });
+  });
+
+  describe('sorting', () => {
+    describe('props: groupingColumnMode = "single"', () => {
+      it('should use the top level grouping criteria for sorting if mainGroupingCriteria and leafField are not defined', () => {
+        render(
+          <Test
+            groupingColumnsModel={['category1', 'category2']}
+            groupingColumnMode="single"
+            sortModel={[{ field: '__row_group_by_columns_group__', sort: 'desc' }]}
+            defaultGroupingExpansionDepth={-1}
+          />,
+        );
+
+        expect(getColumnValues(0)).to.deep.equal([
+          'B (2)',
+          'Cat 2 (1)',
+          '',
+          'Cat 1 (1)',
+          '',
+          'A (3)',
+          'Cat 1 (1)',
+          '',
+          'Cat 2 (2)',
+          '',
+          '',
+        ]);
+      });
+
+      it('should use the column grouping criteria for sorting if mainGroupingCriteria is one of the grouping criteria and leaf field is defined', () => {
+        render(
+          <Test
+            groupingColumnsModel={['category1', 'category2']}
+            groupingColumnMode="single"
+            groupingColDef={{
+              leafField: 'id',
+              mainGroupingCriteria: 'category2',
+            }}
+            sortModel={[{ field: '__row_group_by_columns_group__', sort: 'desc' }]}
+            defaultGroupingExpansionDepth={-1}
+          />,
+        );
+        expect(getColumnValues(0)).to.deep.equal([
+          'A (3)',
+          'Cat 2 (2)',
+          '1',
+          '2',
+          'Cat 1 (1)',
+          '0',
+          'B (2)',
+          'Cat 2 (1)',
+          '3',
+          'Cat 1 (1)',
+          '4',
+        ]);
+      });
+
+      it('should use the leaf field for sorting if mainGroupingCriteria is not defined and leaf field is defined', () => {
+        render(
+          <Test
+            groupingColumnsModel={['category1', 'category2']}
+            groupingColumnMode="single"
+            groupingColDef={{
+              leafField: 'id',
+            }}
+            sortModel={[{ field: '__row_group_by_columns_group__', sort: 'desc' }]}
+            defaultGroupingExpansionDepth={-1}
+          />,
+        );
+
+        expect(getColumnValues(0)).to.deep.equal([
+          'A (3)',
+          'Cat 1 (1)',
+          '0',
+          'Cat 2 (2)',
+          '2',
+          '1',
+          'B (2)',
+          'Cat 2 (1)',
+          '3',
+          'Cat 1 (1)',
+          '4',
+        ]);
+      });
+
+      it('should use the leaf field for sorting if mainGroupingCriteria is not one of the grouping criteria and leaf field is defined', () => {
+        render(
+          <Test
+            groupingColumnsModel={['category1', 'category2']}
+            groupingColumnMode="single"
+            groupingColDef={{
+              leafField: 'id',
+              mainGroupingCriteria: 'category3',
+            }}
+            sortModel={[{ field: '__row_group_by_columns_group__', sort: 'desc' }]}
+            defaultGroupingExpansionDepth={-1}
+          />,
+        );
+
+        expect(getColumnValues(0)).to.deep.equal([
+          'A (3)',
+          'Cat 1 (1)',
+          '0',
+          'Cat 2 (2)',
+          '2',
+          '1',
+          'B (2)',
+          'Cat 2 (1)',
+          '3',
+          'Cat 1 (1)',
+          '4',
+        ]);
+      });
+    });
+
+    describe('props: groupingColumnMode = "multiple"', () => {
+      it('should use the column grouping criteria for sorting if mainGroupingCriteria and leafField are not defined', () => {
         render(
           <Test
             groupingColumnsModel={['category1']}
@@ -337,6 +573,56 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
         );
 
         expect(getColumnValues(0)).to.deep.equal(['B (2)', '', '', 'A (3)', '', '', '']);
+      });
+
+      it('should use the column grouping criteria for sorting if mainGroupingCriteria matches the column grouping criteria and leaf field is defined', () => {
+        render(
+          <Test
+            groupingColumnsModel={['category1']}
+            groupingColumnMode="multiple"
+            groupingColDef={{
+              leafField: 'id',
+              mainGroupingCriteria: 'category1',
+            }}
+            sortModel={[{ field: '__row_group_by_columns_group_category1__', sort: 'desc' }]}
+            defaultGroupingExpansionDepth={-1}
+          />,
+        );
+
+        expect(getColumnValues(0)).to.deep.equal(['B (2)', '3', '4', 'A (3)', '0', '1', '2']);
+      });
+
+      it('should use the leaf field for sorting if mainGroupingCriteria is not defined and leaf field is defined', () => {
+        render(
+          <Test
+            groupingColumnsModel={['category1']}
+            groupingColumnMode="multiple"
+            groupingColDef={{
+              leafField: 'id',
+            }}
+            sortModel={[{ field: '__row_group_by_columns_group_category1__', sort: 'desc' }]}
+            defaultGroupingExpansionDepth={-1}
+          />,
+        );
+
+        expect(getColumnValues(0)).to.deep.equal(['A (3)', '2', '1', '0', 'B (2)', '4', '3']);
+      });
+
+      it("should use the leaf field for sorting if mainGroupingCriteria doesn't match the column grouping criteria and leaf field is defined", () => {
+        render(
+          <Test
+            groupingColumnsModel={['category1']}
+            groupingColumnMode="multiple"
+            groupingColDef={{
+              leafField: 'id',
+              mainGroupingCriteria: 'category2',
+            }}
+            sortModel={[{ field: '__row_group_by_columns_group_category1__', sort: 'desc' }]}
+            defaultGroupingExpansionDepth={-1}
+          />,
+        );
+
+        expect(getColumnValues(0)).to.deep.equal(['A (3)', '2', '1', '0', 'B (2)', '4', '3']);
       });
     });
   });
