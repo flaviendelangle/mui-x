@@ -64,8 +64,6 @@ export const useGridVirtualScroller = (props: UseGridVirtualScrollerProps) => {
   const [containerWidth, setContainerWidth] = React.useState<number | null>(null);
   const prevTotalWidth = React.useRef(columnsMeta.totalWidth);
 
-  console.log(currentPage);
-
   const computeRenderContext = React.useCallback(() => {
     if (disableVirtualization) {
       return {

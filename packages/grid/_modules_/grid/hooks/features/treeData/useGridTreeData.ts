@@ -92,7 +92,7 @@ export const useGridTreeData = (
   /**
    * PRE-PROCESSING
    */
-  const groupingColDef = React.useMemo<GridColDef>(() => {
+  const getGroupingColDef = React.useCallback((): GridColDef => {
     const propGroupingColDef = props.groupingColDef;
 
     const baseColDef: Omit<GridColDef, 'field' | 'editable'> = {
@@ -120,25 +120,29 @@ export const useGridTreeData = (
 
   const updateGroupingColumn = React.useCallback(
     (columnsState: GridColumnsRawState) => {
-      const shouldHaveGroupingColumn = props.treeData;
-      const haveGroupingColumn = columnsState.lookup[groupingColDef.field] != null;
-      const index = columnsState.all[0] === '__check__' ? 1 : 0;
+      const groupingColDefField = GRID_TREE_DATA_GROUP_COL_DEF_FORCED_PROPERTIES.field;
 
-      if (shouldHaveGroupingColumn && !haveGroupingColumn) {
-        columnsState.lookup[groupingColDef.field] = groupingColDef;
-        columnsState.all = [
-          ...columnsState.all.slice(0, index),
-          groupingColDef.field,
-          ...columnsState.all.slice(index),
-        ];
+      const shouldHaveGroupingColumn = props.treeData;
+      const haveGroupingColumn = columnsState.lookup[groupingColDefField] != null;
+
+      if (shouldHaveGroupingColumn) {
+        columnsState.lookup[groupingColDefField] = getGroupingColDef();
+        if (!haveGroupingColumn) {
+          const index = columnsState.all[0] === '__check__' ? 1 : 0;
+          columnsState.all = [
+            ...columnsState.all.slice(0, index),
+            groupingColDefField,
+            ...columnsState.all.slice(index),
+          ];
+        }
       } else if (!shouldHaveGroupingColumn && haveGroupingColumn) {
-        delete columnsState.lookup[groupingColDef.field];
-        columnsState.all = columnsState.all.filter((field) => field !== groupingColDef.field);
+        delete columnsState.lookup[groupingColDefField];
+        columnsState.all = columnsState.all.filter((field) => field !== groupingColDefField);
       }
 
       return columnsState;
     },
-    [props.treeData, groupingColDef],
+    [props.treeData, getGroupingColDef],
   );
 
   const filteringMethod = React.useCallback<GridFilteringMethod>(

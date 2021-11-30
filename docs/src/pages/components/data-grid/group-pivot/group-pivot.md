@@ -42,7 +42,7 @@ To enable the grouping panel, you simply have to use the `groupingColumnsPanel` 
 
 {{"demo": "pages/components/data-grid/group-pivot/GroupingColumnsPanel.js", "bg": "inline", "defaultCodeOpen": false}}
 
-### Parameterize grouping columns
+### Grouping column mode
 
 #### Single grouping column
 
@@ -56,9 +56,21 @@ To have a grouping column for each grouping fields, set the `groupingColumnMode`
 
 {{"demo": "pages/components/data-grid/group-pivot/GroupingColumnsMultipleGroupingCol.js", "bg": "inline", "defaultCodeOpen": false}}
 
-#### Show values for the leaf
+### Custom grouping columns
 
-By default, the leaf nodes don't render anything for their grouping cell.
+Use the `groupingColDef` prop to customize the rendering of the grouping column. You can override any property of the `GridColDef` interface except the `field` and the properties related to the edition.
+
+If you want to apply your overrides to every grouping column, use the object format of `groupingColDef`:
+
+{{"demo": "pages/components/data-grid/group-pivot/GroupingColumnsCustomGroupingColDefObject.js", "bg": "inline", "defaultCodeOpen": false}}
+
+If you want to only override properties of certain grouping columns or to apply different overrides based on the current grouping criteria, use the callback format of `groupingColDef`. It will be called for each grouping column with the list of the columns used to build it:
+
+{{"demo": "pages/components/data-grid/group-pivot/GroupingColumnsCustomGroupingColDefCallback.js", "bg": "inline", "defaultCodeOpen": false}}
+
+#### Show values for the leaves
+
+By default, the leaves nodes don't render anything for their grouping cell.
 
 If you want to display some value, you can provide a `leafField` property to the `groupingColDef`.
 
@@ -66,12 +78,11 @@ If you want to display some value, you can provide a `leafField` property to the
 
 {{"demo": "pages/components/data-grid/group-pivot/GroupingColumnsLeafWithValue.js", "bg": "inline", "defaultCodeOpen": false}}
 
-#### Custom grouping column
+#### Hide the descendant count
 
-Use the `groupingColDef` prop to customize the rendering of the grouping column.
-If you pass an object to `groupingColDef`, it will be applied to every grouping column.
+You can use the `hideDescendantCount` property of the `groupingColDef` to hide the amount of descendant of a grouping row.
 
-{{"demo": "pages/components/data-grid/group-pivot/GroupingColumnsCustomGroupingColDefObject.js", "bg": "inline", "defaultCodeOpen": false}}
+{{"demo": "pages/components/data-grid/group-pivot/GroupingColumnsHideDescendantCount.js", "bg": "inline", "defaultCodeOpen": false}}
 
 ### Complex grouping value
 
@@ -87,7 +98,7 @@ const columns: GridColumns = [
 ];
 ```
 
-> ⚠ For now, the row grouping is not using the `valueGetter` property in `GridColDef`. In the future, it should use it and the `keyGetter` property would only be necessary when the value returned by `valueGetter` is an object.
+> ⚠️ For now, the row grouping is not using the `valueGetter` property in `GridColDef`. In the future, it should use it and the `keyGetter` property would only be necessary when the value returned by `valueGetter` is an object.
 
 {{"demo": "pages/components/data-grid/group-pivot/GroupingColumnsKeyGetter.js", "bg": "inline", "defaultCodeOpen": false}}
 
@@ -101,6 +112,35 @@ If you want to expand the whole tree, set `defaultGroupingExpansionDepth = -1`
 Use the `setRowChildrenExpansion` method on `apiRef` to programmatically set the expansion of a row.
 
 {{"demo": "pages/components/data-grid/group-pivot/GroupingColumnsSetChildrenExpansion.js", "bg": "inline", "defaultCodeOpen": false}}
+
+### Sorting / Filtering
+
+#### Single grouping column
+
+When using `groupingColumnMode = "single"`, the default behavior is to apply the `sortComparator` and `filterOperators` of the top level grouping criteria.
+
+If you are rendering leaves with the `leafField` property of `groupColDef`, the sorting and filtering will be applied on the leaves based on the `sortComparator` and `filterOperators` of their original column.
+
+In both cases, you can force the sorting and filtering to be applied on another grouping criteria with the `mainGroupingCriteria` property of `groupColDef`
+
+{{"demo": "pages/components/data-grid/group-pivot/GroupingColumnsSortingSingleGroupingColDef.js", "bg": "inline", "defaultCodeOpen": false}}
+
+#### Multiple grouping column
+
+When using `groupingColumnMode = "multiple"`, the default behavior is to apply the `sortComparator` and `filterOperators` of the grouping criteria of each grouping column.
+
+If you are rendering leaves on one of those columns with the `leafField` property of `groupColDef`, the sorting and filtering will be applied on the leaves for this grouping column based on the `sortComparator` and `filterOperators` of the leave's original column.
+
+If you want to render leaves but apply the sorting and filtering on the grouping criteria of the column, you can force it by setting the `mainGroupingCriteria` property `groupColDef` to be equal to the grouping field.
+
+In the example below:
+
+- the sorting and filtering of the `company` grouping column is applied on the `company` field
+- the sorting and filtering of the `director` grouping column is applied on the `director` field even though it has leaves
+
+{{"demo": "pages/components/data-grid/group-pivot/GroupingColumnsSortingMultipleGroupingColDef.js", "bg": "inline", "defaultCodeOpen": false}}
+
+> ⚠️ If you are dynamically switching the `leafField` or `mainGroupingCriteria`, the sorting and filtering models will not automatically be cleaned-up and the sorting / filtering will not be re-applied.
 
 ### Full example
 

@@ -20,16 +20,10 @@ export default function GroupingColumnsControlled() {
 
   const [groupingColumnsModel, setGroupingColumnsModel] =
     React.useState<GridGroupingColumnsModel>(['company']);
-  const [columns, setColumns] = React.useState<GridColumns>(() =>
-    hideGroupedColumns(data.columns, groupingColumnsModel),
-  );
 
-  const handleGroupingColumnsModelChange = React.useCallback(
-    (model: GridGroupingColumnsModel) => {
-      setGroupingColumnsModel(model);
-      setColumns(hideGroupedColumns(data.columns, model));
-    },
-    [data.columns],
+  const columns = React.useMemo(
+    () => hideGroupedColumns(data.columns, groupingColumnsModel),
+    [data.columns, groupingColumnsModel],
   );
 
   return (
@@ -38,7 +32,7 @@ export default function GroupingColumnsControlled() {
         {...data}
         columns={columns}
         groupingColumnsModel={groupingColumnsModel}
-        onGroupingColumnsModelChange={handleGroupingColumnsModelChange}
+        onGroupingColumnsModelChange={(model) => setGroupingColumnsModel(model)}
         groupingColumnsPanel
       />
     </div>

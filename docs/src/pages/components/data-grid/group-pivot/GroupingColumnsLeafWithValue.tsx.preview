@@ -1,0 +1,10 @@
+<DataGridPro
+  {...data}
+  columns={columns}
+  groupingColDef={{ leafField: 'title' }}
+  initialState={{
+    groupingColumns: {
+      model: ['company'],
+    },
+  }}
+/>

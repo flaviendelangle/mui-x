@@ -24,8 +24,12 @@ const useStyles = makeStyles({
   },
 });
 
-const GridRowGroupByColumnsGroupingCell = (props: GridRenderCellParams) => {
-  const { id, field, rowNode } = props;
+interface GridRowGroupByColumnsGroupingCellProps extends GridRenderCellParams {
+  hideDescendantCount?: boolean;
+}
+
+const GridRowGroupByColumnsGroupingCell = (props: GridRowGroupByColumnsGroupingCellProps) => {
+  const { id, field, rowNode, hideDescendantCount } = props;
 
   const rootProps = useGridRootProps();
   const apiRef = useGridApiContext();
@@ -78,7 +82,7 @@ const GridRowGroupByColumnsGroupingCell = (props: GridRenderCellParams) => {
       </div>
       <span>
         {rowNode.groupingKey}
-        {filteredDescendantCount > 0 ? ` (${filteredDescendantCount})` : ''}
+        {!hideDescendantCount && filteredDescendantCount > 0 ? ` (${filteredDescendantCount})` : ''}
       </span>
     </Box>
   );

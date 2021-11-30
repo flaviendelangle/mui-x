@@ -35,18 +35,19 @@ export default function GroupingColumnsSetChildrenExpansion() {
   return (
     <Stack style={{ width: '100%' }} alignItems="flex-start" spacing={2}>
       <Button onClick={toggleSecondRow}>Toggle 2nd row expansion</Button>
-      <DataGridPro
-        {...data}
-        columns={columns}
-        apiRef={apiRef}
-        defaultGroupingExpansionDepth={-1}
-        disableSelectionOnClick
-        initialState={{
-          groupingColumns: {
-            model: ['company'],
-          },
-        }}
-      />
+      <div style={{ height: 400, width: '100%' }}>
+        <DataGridPro
+          {...data}
+          columns={columns}
+          apiRef={apiRef}
+          disableSelectionOnClick
+          initialState={{
+            groupingColumns: {
+              model: ['company'],
+            },
+          }}
+        />
+      </div>
     </Stack>
   );
 }

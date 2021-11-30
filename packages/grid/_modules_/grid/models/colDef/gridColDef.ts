@@ -234,19 +234,29 @@ export interface GridColumnsMeta {
 }
 
 export interface GridGroupingColDefOverride
-  extends Omit<GridColDef, 'editable' | 'valueSetter' | 'field'> {
+  extends Omit<
+    GridColDef,
+    'editable' | 'valueSetter' | 'field' | 'preProcessEditCellProps' | 'renderEditCell'
+  > {
   /**
    * The field from which we want to apply the sorting and the filtering for the grouping column.
-   * It is only useful when `props.groupingColumnMode === "multiple"` to decide which grouping criteria should be used for sorting and filtering
+   * It is only useful when `props.groupingColumnMode === "multiple"` to decide which grouping criteria should be used for sorting and filtering.
+   * Do not have any effect when building the tree with the `props.treeData` feature.
    * @default: The sorting and filtering is applied based on the leaf field in any, otherwise based on top level grouping criteria.
    */
   mainGroupingCriteria?: string;
 
   /**
-   * If `true`, the leaf cells will be rendered based on the `sourceField`
-   * If `false`, the leaf cells will be empty
+   * The field from which we want to render the leaves of the tree.
+   * Do not have any effect when building the tree with the `props.treeData` feature.
    */
   leafField?: string;
+
+  /**
+   * If `true`, the grouping cells will not render the amount of descendants.
+   * @default: false
+   */
+  hideDescendantCount?: boolean;
 }
 
 export interface GridColDefOverrideParams {
