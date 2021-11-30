@@ -86,7 +86,10 @@ You can use the `hideDescendantCount` property of the `groupingColDef` to hide t
 
 ### Complex grouping value
 
-If you want to group according to a column which values are objects, you can use the `keyGetter` property in `GridColDef` to transform this object into a serializable value.
+In most scenarios, when you need to handle complex values, you provide a `valueGetter` property to your column definition.
+But sometimes, you need to give the object format to the `renderCell` property and thus can not convert it to a serializable value in `valueGetter`.
+
+You can then provide a `keyGetter` property in your column definition to convert this object into a serializable value.
 
 ```ts
 const columns: GridColumns = [
@@ -98,9 +101,11 @@ const columns: GridColumns = [
 ];
 ```
 
-> ⚠️ For now, the row grouping is not using the `valueGetter` property in `GridColDef`. In the future, it should use it and the `keyGetter` property would only be necessary when the value returned by `valueGetter` is an object.
-
 {{"demo": "pages/components/data-grid/group-pivot/GroupingColumnsKeyGetter.js", "bg": "inline", "defaultCodeOpen": false}}
+
+If your column also have a `valueGetter` property, the value passed to the `keyGetter` property will be the one returned by `valueGetter`.
+
+{{"demo": "pages/components/data-grid/group-pivot/GroupingColumnsKeyGetterValueGetter.js", "bg": "inline", "defaultCodeOpen": false}}
 
 ### Group expansion
 

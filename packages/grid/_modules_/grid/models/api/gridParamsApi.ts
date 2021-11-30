@@ -51,12 +51,4 @@ export interface GridParamsApi {
    * @returns {GridColumnHeaderParams} The cell params.
    */
   getColumnHeaderParams: (field: string) => GridColumnHeaderParams;
-
-  /**
-   * @param {GridRowId} id The id of the row.
-   * @param {string} field The column field.
-   * @returns {GridValueGetterParams} The base cell params.
-   * @ignore - do not document.
-   */
-  unstable_getBaseCellParams: (id: GridRowId, field: string) => GridValueGetterParams;
 }

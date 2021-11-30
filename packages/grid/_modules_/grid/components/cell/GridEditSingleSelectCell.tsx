@@ -22,7 +22,7 @@ const renderSingleSelectOptions = (option) =>
     </MenuItem>
   );
 
-function GridEditSingleSelectCell(props: GridRenderEditCellParams & SelectProps) {
+function GridEditSingleSelectCell(props: GridRenderEditCellParams & Omit<SelectProps, 'id'>) {
   const {
     id,
     value,
@@ -127,7 +127,7 @@ GridEditSingleSelectCell.propTypes = {
   /**
    * GridApi that let you manipulate the grid.
    */
-  api: PropTypes.any.isRequired,
+  api: PropTypes.object.isRequired,
 } as any;
 
 export { GridEditSingleSelectCell };
