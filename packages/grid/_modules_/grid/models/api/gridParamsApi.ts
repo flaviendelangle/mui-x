@@ -1,6 +1,6 @@
 import { GridCellValue } from '../gridCell';
 import { GridRowId } from '../gridRows';
-import { GridCellParams, GridValueGetterParams } from '../params/gridCellParams';
+import { GridCellParams } from '../params/gridCellParams';
 import { GridColumnHeaderParams } from '../params/gridColumnHeaderParams';
 import { GridRowParams } from '../params/gridRowParams';
 
