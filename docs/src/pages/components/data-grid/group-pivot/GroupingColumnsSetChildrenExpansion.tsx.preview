@@ -1,0 +1,13 @@
+<Button onClick={toggleSecondRow}>Toggle 2nd row expansion</Button>
+<DataGridPro
+  {...data}
+  columns={columns}
+  apiRef={apiRef}
+  defaultGroupingExpansionDepth={-1}
+  disableSelectionOnClick
+  initialState={{
+    groupingColumns: {
+      model: ['company'],
+    },
+  }}
+/>

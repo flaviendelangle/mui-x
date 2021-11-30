@@ -1,9 +1,0 @@
-<DataGridPro
-  {...data}
-  groupingColumnsPanel
-  initialState={{
-    groupingColumns: {
-      model: ['company', 'director'],
-    },
-  }}
-/>

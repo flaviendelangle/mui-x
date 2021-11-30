@@ -1,0 +1,11 @@
+<DataGridPro
+  {...data}
+  columns={columns}
+  defaultGroupingExpansionDepth={-1}
+  disableSelectionOnClick
+  initialState={{
+    groupingColumns: {
+      model: ['company', 'director'],
+    },
+  }}
+/>
