@@ -24,11 +24,11 @@ const useStyles = makeStyles({
   },
 });
 
-interface GridRowGroupByColumnsGroupingCellProps extends GridRenderCellParams {
+interface GridGroupingColumnGroupCellProps extends GridRenderCellParams {
   hideDescendantCount?: boolean;
 }
 
-const GridRowGroupByColumnsGroupingCell = (props: GridRowGroupByColumnsGroupingCellProps) => {
+const GridGroupingColumnGroupCell = (props: GridGroupingColumnGroupCellProps) => {
   const { id, field, rowNode, hideDescendantCount } = props;
 
   const rootProps = useGridRootProps();
@@ -88,7 +88,7 @@ const GridRowGroupByColumnsGroupingCell = (props: GridRowGroupByColumnsGroupingC
   );
 };
 
-GridRowGroupByColumnsGroupingCell.propTypes = {
+GridGroupingColumnGroupCell.propTypes = {
   // ----------------------------- Warning --------------------------------
   // | These PropTypes are generated from the TypeScript type definitions |
   // | To update them edit the TypeScript types and run "yarn proptypes"  |
@@ -158,4 +158,4 @@ GridRowGroupByColumnsGroupingCell.propTypes = {
   ]),
 } as any;
 
-export { GridRowGroupByColumnsGroupingCell };
+export { GridGroupingColumnGroupCell };

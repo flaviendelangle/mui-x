@@ -1,0 +1,10 @@
+<DataGridPro
+  {...data}
+  columns={columns}
+  disableSelectionOnClick
+  initialState={{
+    groupingColumns: {
+      model: ['marvelCinematicUniversePhase'],
+    },
+  }}
+/>

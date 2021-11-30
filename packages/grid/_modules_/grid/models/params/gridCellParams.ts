@@ -35,7 +35,7 @@ export interface GridCellParams<V = any, R = any, F = V> {
   /**
    * The column of the row that the current cell belongs to.
    */
-  colDef: GridStateColDef;
+  colDef: GridColDef | GridStateColDef;
   /**
    * If true, the cell is editable.
    */

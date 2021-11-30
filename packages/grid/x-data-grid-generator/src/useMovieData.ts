@@ -7,6 +7,7 @@ type Movie = {
   company: string;
   year: number;
   composer: { name: string };
+  marvelCinematicUniversePhase?: number;
 };
 
 const COLUMNS: GridColumns = [
@@ -52,6 +53,7 @@ const ROWS: GridRowModel<Movie>[] = [
     director: 'Anthony & Joe Russo',
     company: 'Disney Studios',
     year: 2019,
+    marvelCinematicUniversePhase: 3,
     composer: {
       name: 'Alan Silvestri',
     },
@@ -82,6 +84,7 @@ const ROWS: GridRowModel<Movie>[] = [
     director: 'Anthony & Joe Russo',
     company: 'Disney Studios',
     year: 2018,
+    marvelCinematicUniversePhase: 3,
     composer: {
       name: 'Alan Silvestri',
     },
@@ -112,6 +115,7 @@ const ROWS: GridRowModel<Movie>[] = [
     director: 'Joss Whedon',
     company: 'Disney Studios',
     year: 2012,
+    marvelCinematicUniversePhase: 1,
     composer: {
       name: 'Alan Silvestri',
     },
@@ -142,6 +146,7 @@ const ROWS: GridRowModel<Movie>[] = [
     director: 'Joss Whedon',
     company: 'Disney Studios',
     year: 2015,
+    marvelCinematicUniversePhase: 2,
     composer: {
       name: 'Danny Elfman',
     },
@@ -152,6 +157,7 @@ const ROWS: GridRowModel<Movie>[] = [
     director: 'Ryan Coogler',
     company: 'Disney Studios',
     year: 2018,
+    marvelCinematicUniversePhase: 3,
     composer: {
       name: 'Ludwig Göransson',
     },

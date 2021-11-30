@@ -107,6 +107,12 @@ If your column also have a `valueGetter` property, the value passed to the `keyG
 
 {{"demo": "pages/components/data-grid/group-pivot/GroupingColumnsKeyGetterValueGetter.js", "bg": "inline", "defaultCodeOpen": false}}
 
+### Rows with missing groups
+
+If the grouping key of some grouping criteria is `null` or `undefined` for a row. Then the grid will consider that this row do not have a value for those groups and will inline it for those groups.
+
+{{"demo": "pages/components/data-grid/group-pivot/GroupingColumnsRowsWithMissingGroups.js", "bg": "inline", "defaultCodeOpen": false}}
+
 ### Group expansion
 
 Use the `defaultGroupingExpansionDepth` prop to expand all the groups up to a given depth when loading the data.
