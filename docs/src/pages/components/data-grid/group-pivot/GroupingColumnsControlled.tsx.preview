@@ -1,0 +1,7 @@
+<DataGridPro
+  {...data}
+  columns={columns}
+  groupingColumnsModel={groupingColumnsModel}
+  onGroupingColumnsModelChange={(model) => setGroupingColumnsModel(model)}
+  groupingColumnsPanel
+/>

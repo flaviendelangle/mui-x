@@ -1,13 +1,9 @@
 <DataGridPro
   {...data}
-  columns={columns}
-  disableSelectionOnClick
+  groupingColumnsPanel
   initialState={{
     groupingColumns: {
       model: ['company', 'director'],
     },
-  }}
-  groupingColDef={{
-    hideDescendantCount: true,
   }}
 />

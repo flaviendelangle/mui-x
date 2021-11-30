@@ -1,0 +1,9 @@
+<DataGridPro
+  {...data}
+  columns={columns}
+  initialState={{
+    groupingColumns: {
+      model: ['composer'],
+    },
+  }}
+/>

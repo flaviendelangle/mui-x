@@ -369,7 +369,7 @@ export const useGridGroupingColumns = (
         apiRef.current.setRowChildrenExpansion(params.id, !params.rowNode.childrenExpanded);
       }
     },
-    [apiRef],
+    [apiRef, props.groupingColumnMode],
   );
 
   const handleColumnChange = React.useCallback<GridEventListener<GridEvents.columnsChange>>(() => {
