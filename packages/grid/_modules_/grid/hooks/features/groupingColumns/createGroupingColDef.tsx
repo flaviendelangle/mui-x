@@ -12,6 +12,7 @@ import { GridColumnRawLookup } from '../columns/gridColumnsState';
 import { GridGroupingColumnGroupCell } from '../../../components/cell/GridGroupingColumnGroupCell';
 import { GridGroupingColumnLeafCell } from '../../../components/cell/GridGroupingColumnLeafCell';
 import { getCellValue, getGroupingColDefField } from './gridGroupingColumnsUtils';
+import { gridColumnLookupSelector } from '../columns';
 
 const GROUPING_COL_DEF_DEFAULT_VALUES: Partial<GridColDef> = {
   ...GRID_STRING_COL_DEF,
@@ -126,7 +127,7 @@ interface CreateGroupingColDefMonoCriteriaParams {
 }
 
 /**
- * Creates the `GridColDef` for a grouping column that only takes car of a single grouping criteria
+ * Creates the `GridColDef` for a grouping column that only takes care of a single grouping criteria
  */
 export const createGroupingColDefForOneGroupingCriteria = ({
   columnsLookup,
@@ -148,7 +149,9 @@ export const createGroupingColDefForOneGroupingCriteria = ({
       if (params.rowNode.groupingField == null) {
         if (leafColDef) {
           if (leafColDef.renderCell) {
-            return leafColDef.renderCell({ ...params, colDef: leafColDef, field: leafField! });
+            // We get the colDef from the state to have the preprocessed version with the `computedWidth`
+            const leafStateColDef = gridColumnLookupSelector(params.api.state)[leafColDef.field];
+            return leafColDef.renderCell({ ...params, colDef: leafStateColDef, field: leafField! });
           }
 
           return <GridGroupingColumnLeafCell {...params} />;
@@ -236,8 +239,7 @@ interface CreateGroupingColDefSeveralCriteriaParams {
 }
 
 /**
- * Creates the `GridColDef` for a grouping column that only takes car of a single grouping criteria
- * TODO: Handle valueFormatter
+ * Creates the `GridColDef` for a grouping column that takes care of all the grouping criteria
  */
 export const createGroupingColDefForAllGroupingCriteria = ({
   apiRef,
@@ -262,7 +264,9 @@ export const createGroupingColDefForAllGroupingCriteria = ({
       if (params.rowNode.groupingField == null) {
         if (leafColDef) {
           if (leafColDef.renderCell) {
-            return leafColDef.renderCell({ ...params, colDef: leafColDef, field: leafField! });
+            // We get the colDef from the state to have the preprocessed version with the `computedWidth`
+            const leafStateColDef = gridColumnLookupSelector(params.api.state)[leafColDef.field];
+            return leafColDef.renderCell({ ...params, colDef: leafStateColDef, field: leafField! });
           }
 
           return <GridGroupingColumnLeafCell {...params} />;

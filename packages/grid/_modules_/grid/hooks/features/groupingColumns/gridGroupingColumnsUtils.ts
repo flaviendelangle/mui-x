@@ -1,9 +1,12 @@
 import {
   GridColDef,
   GridRowId,
+  GridRowTreeConfig,
+  GridRowTreeNodeConfig,
   GridStateColDef,
   GridValueGetterSimpleParams,
 } from '../../../models';
+import { GridFilterState } from '../filter';
 
 export const getGroupingColDefField = (groupedByField: string | null) => {
   if (groupedByField === null) {
@@ -39,4 +42,82 @@ export const getCellValue = ({
   }
 
   return row[colDef.field];
+};
+
+interface FilterRowTreeFromTreeDataParams {
+  rowTree: GridRowTreeConfig;
+  isRowMatchingFilters: ((rowId: GridRowId) => boolean) | null;
+}
+
+/**
+ * A node is visible if one all the following criteria are met:
+ * - One of its children is passing the filter
+ * - It is passing the filter
+ */
+export const filterRowTreeFromGroupingColumns = (
+  params: FilterRowTreeFromTreeDataParams,
+): Pick<GridFilterState, 'visibleRowsLookup' | 'filteredDescendantCountLookup'> => {
+  const { rowTree, isRowMatchingFilters } = params;
+  const visibleRowsLookup: Record<GridRowId, boolean> = {};
+  const filteredDescendantCountLookup: Record<GridRowId, number> = {};
+
+  const filterTreeNode = (
+    node: GridRowTreeNodeConfig,
+    areAncestorsPassingChildren: boolean,
+    areAncestorsExpanded: boolean,
+  ): number => {
+    let isMatchingFilters: boolean;
+    if (!isRowMatchingFilters) {
+      isMatchingFilters = true;
+    } else {
+      isMatchingFilters = isRowMatchingFilters(node.id);
+    }
+
+    let filteredDescendantCount = 0;
+    node.children?.forEach((childId) => {
+      const childNode = rowTree[childId];
+      const childSubTreeSize = filterTreeNode(
+        childNode,
+        areAncestorsPassingChildren && isMatchingFilters,
+        areAncestorsExpanded && !!node.childrenExpanded,
+      );
+      filteredDescendantCount += childSubTreeSize;
+    });
+
+    let shouldPassFilters: boolean;
+    if (!areAncestorsPassingChildren) {
+      shouldPassFilters = false;
+    } else if (node.children?.length) {
+      shouldPassFilters = isMatchingFilters && filteredDescendantCount > 0;
+    } else {
+      shouldPassFilters = isMatchingFilters;
+    }
+
+    visibleRowsLookup[node.id] = shouldPassFilters && areAncestorsExpanded;
+
+    if (!shouldPassFilters) {
+      return 0;
+    }
+
+    filteredDescendantCountLookup[node.id] = filteredDescendantCount;
+
+    if (!node.children) {
+      return filteredDescendantCount + 1;
+    }
+
+    return filteredDescendantCount;
+  };
+
+  const nodes = Object.values(rowTree);
+  for (let i = 0; i < nodes.length; i += 1) {
+    const node = nodes[i];
+    if (node.depth === 0) {
+      filterTreeNode(node, true, true);
+    }
+  }
+
+  return {
+    visibleRowsLookup,
+    filteredDescendantCountLookup,
+  };
 };

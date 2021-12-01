@@ -17,7 +17,11 @@ import {
   gridGroupingRowsSanitizedModelSelector,
 } from './gridGroupingColumnsSelector';
 import { GridComponentProps } from '../../../GridComponentProps';
-import { getCellValue, getGroupingColDefField } from './gridGroupingColumnsUtils';
+import {
+  filterRowTreeFromGroupingColumns,
+  getCellValue,
+  getGroupingColDefField,
+} from './gridGroupingColumnsUtils';
 import {
   createGroupingColDefForOneGroupingCriteria,
   createGroupingColDefForAllGroupingCriteria,
@@ -28,7 +32,6 @@ import { GridColumnsRawState } from '../columns/gridColumnsState';
 import { useGridRegisterFilteringMethod } from '../filter/useGridRegisterFilteringMethod';
 import { GridFilteringMethod } from '../filter/gridFilterState';
 import { gridRowIdsSelector, gridRowTreeSelector } from '../rows';
-import { filterRowTree } from '../../../utils/tree/filterRowTree';
 import { useGridRegisterSortingMethod } from '../sorting/useGridRegisterSortingMethod';
 import { GridSortingMethod } from '../sorting/gridSortingState';
 import { sortRowTree } from '../../../utils/tree/sortRowTree';
@@ -54,8 +57,6 @@ export const useGridGroupingColumns = (
     | 'defaultGroupingExpansionDepth'
     | 'groupingColDef'
     | 'groupingColumnMode'
-    | 'disableChildrenFiltering'
-    | 'disableChildrenSorting'
   >,
 ) => {
   useGridStateInit(apiRef, (state) => ({
@@ -281,14 +282,12 @@ export const useGridGroupingColumns = (
     (params) => {
       const rowTree = gridRowTreeSelector(apiRef.current.state);
 
-      return filterRowTree({
+      return filterRowTreeFromGroupingColumns({
         rowTree,
         isRowMatchingFilters: params.isRowMatchingFilters,
-        disableChildrenFiltering: props.disableChildrenFiltering,
-        shouldOnlyCountDescendantLeaf: true,
       });
     },
-    [apiRef, props.disableChildrenFiltering],
+    [apiRef],
   );
 
   const sortingMethod = React.useCallback<GridSortingMethod>(
@@ -301,10 +300,10 @@ export const useGridGroupingColumns = (
         rowIds,
         sortRowList: params.sortRowList,
         comparatorList: params.comparatorList,
-        disableChildrenSorting: props.disableChildrenSorting,
+        disableChildrenSorting: false,
       });
     },
-    [apiRef, props.disableChildrenSorting],
+    [apiRef],
   );
 
   useGridRegisterPreProcessor(apiRef, GridPreProcessingGroup.hydrateColumns, updateGroupingColumn);

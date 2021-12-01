@@ -1,23 +1,21 @@
-import { GridRowId, GridRowTreeConfig, GridRowTreeNodeConfig } from '../../models';
-import { GridFilterState } from '../../hooks';
+import { GridFilterState } from '../filter';
+import { GridRowId, GridRowTreeConfig, GridRowTreeNodeConfig } from '../../../models';
 
-interface FilterRowTreeParams {
+interface FilterRowTreeFromTreeDataParams {
   rowTree: GridRowTreeConfig;
   disableChildrenFiltering: boolean;
   isRowMatchingFilters: ((rowId: GridRowId) => boolean) | null;
-  shouldOnlyCountDescendantLeaf: boolean;
 }
 
 /**
- * A node is visible if
+ * A node is visible if one of the following criteria is met:
  * - One of its children is passing the filter
  * - It is passing the filter
  */
-export const filterRowTree = (
-  params: FilterRowTreeParams,
+export const filterRowTreeFromTreeData = (
+  params: FilterRowTreeFromTreeDataParams,
 ): Pick<GridFilterState, 'visibleRowsLookup' | 'filteredDescendantCountLookup'> => {
-  const { rowTree, disableChildrenFiltering, isRowMatchingFilters, shouldOnlyCountDescendantLeaf } =
-    params;
+  const { rowTree, disableChildrenFiltering, isRowMatchingFilters } = params;
   const visibleRowsLookup: Record<GridRowId, boolean> = {};
   const filteredDescendantCountLookup: Record<GridRowId, number> = {};
 
@@ -72,11 +70,6 @@ export const filterRowTree = (
     }
 
     filteredDescendantCountLookup[node.id] = filteredDescendantCount;
-
-    if (shouldOnlyCountDescendantLeaf && filteredDescendantCount > 0) {
-      return filteredDescendantCount;
-    }
-
     return filteredDescendantCount + 1;
   };
 

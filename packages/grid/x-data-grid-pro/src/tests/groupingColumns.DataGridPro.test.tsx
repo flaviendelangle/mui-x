@@ -1,4 +1,4 @@
-import { createRenderer } from '@material-ui/monorepo/test/utils';
+import { createRenderer, fireEvent, screen } from '@material-ui/monorepo/test/utils';
 import { getColumnHeadersTextContent, getColumnValues, raf } from 'test/utils/helperFn';
 import * as React from 'react';
 import { expect } from 'chai';
@@ -7,6 +7,7 @@ import {
   DataGridProProps,
   GridApiRef,
   GridKeyGetterParams,
+  GridPreferencePanelsValue,
   GridRowsProp,
   useGridApiRef,
 } from '@mui/x-data-grid-pro';
@@ -15,11 +16,11 @@ import { spy } from 'sinon';
 const isJSDOM = /jsdom/.test(window.navigator.userAgent);
 
 const rows: GridRowsProp = [
-  { id: 0, category1: 'A', category2: 'Cat 1' },
-  { id: 1, category1: 'A', category2: 'Cat 2' },
-  { id: 2, category1: 'A', category2: 'Cat 2' },
-  { id: 3, category1: 'B', category2: 'Cat 2' },
-  { id: 4, category1: 'B', category2: 'Cat 1' },
+  { id: 0, category1: 'Cat A', category2: 'Cat 1' },
+  { id: 1, category1: 'Cat A', category2: 'Cat 2' },
+  { id: 2, category1: 'Cat A', category2: 'Cat 2' },
+  { id: 3, category1: 'Cat B', category2: 'Cat 2' },
+  { id: 4, category1: 'Cat B', category2: 'Cat 1' },
 ];
 
 const baselineProps: DataGridProProps = {
@@ -29,6 +30,7 @@ const baselineProps: DataGridProProps = {
   columns: [
     {
       field: 'id',
+      type: 'number',
     },
     {
       field: 'category1',
@@ -38,47 +40,47 @@ const baselineProps: DataGridProProps = {
     },
   ],
 };
-const GROUPING_COLS_SINGLE_CAT_1 = ['A (3)', '', '', '', 'B (2)', '', ''];
+const GROUPING_COLS_SINGLE_CAT_1 = ['Cat A (3)', '', '', '', 'Cat B (2)', '', ''];
 
 const GROUPING_COLS_SINGLE_CAT_2 = ['Cat 1 (2)', '', '', 'Cat 2 (3)', '', '', ''];
 
 const GROUPING_COLS_SINGLE_CAT_2_CAT_1 = [
   'Cat 1 (2)',
-  'A (1)',
+  'Cat A (1)',
   '',
-  'B (1)',
+  'Cat B (1)',
   '',
   'Cat 2 (3)',
-  'A (2)',
+  'Cat A (2)',
   '',
   '',
-  'B (1)',
+  'Cat B (1)',
   '',
 ];
 const GROUPING_COLS_SINGLE_CAT_1_CAT_2 = [
-  'A (3)',
+  'Cat A (3)',
   'Cat 1 (1)',
   '',
   'Cat 2 (2)',
   '',
   '',
-  'B (2)',
+  'Cat B (2)',
   'Cat 2 (1)',
   '',
   'Cat 1 (1)',
   '',
 ];
 const GROUPING_COLS_MULTIPLE_CAT_1_CAT_2 = [
-  ['A (3)', '', '', '', '', '', 'B (2)', '', '', '', ''],
+  ['Cat A (3)', '', '', '', '', '', 'Cat B (2)', '', '', '', ''],
   ['', 'Cat 1 (1)', '', 'Cat 2 (2)', '', '', '', 'Cat 2 (1)', '', 'Cat 1 (1)', ''],
 ];
 const GROUPING_COLS_MULTIPLE_CAT_2_CAT_1 = [
   ['Cat 1 (2)', '', '', '', '', 'Cat 2 (3)', '', '', '', '', ''],
-  ['', 'A (1)', '', 'B (1)', '', '', 'A (2)', '', '', 'B (1)', ''],
+  ['', 'Cat A (1)', '', 'Cat B (1)', '', '', 'Cat A (2)', '', '', 'Cat B (1)', ''],
 ];
 
 describe('<DataGridPro /> - Group Rows By Column', () => {
-  const { render } = createRenderer();
+  const { render, clock } = createRenderer();
 
   let apiRef: GridApiRef;
 
@@ -291,14 +293,22 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
             },
             {
               field: 'category1',
-              keyGetter: (params: GridKeyGetterParams<string>) => `key-${params.value}`,
+              keyGetter: (params: GridKeyGetterParams<string>) => `key ${params.value}`,
             },
           ]}
           initialState={{ groupingColumns: { model: ['category1'] } }}
           defaultGroupingExpansionDepth={-1}
         />,
       );
-      expect(getColumnValues(0)).to.deep.equal(['key-A (3)', '', '', '', 'key-B (2)', '', '']);
+      expect(getColumnValues(0)).to.deep.equal([
+        'key Cat A (3)',
+        '',
+        '',
+        '',
+        'key Cat B (2)',
+        '',
+        '',
+      ]);
       expect(getColumnValues(1)).to.deep.equal(['', '0', '1', '2', '', '3', '4']);
     });
 
@@ -333,7 +343,7 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
           initialState={{ groupingColumns: { model: ['category1', 'category2'] } }}
         />,
       );
-      expect(getColumnValues(0)).to.deep.equal(['A (3)', 'B (2)']);
+      expect(getColumnValues(0)).to.deep.equal(['Cat A (3)', 'Cat B (2)']);
     });
 
     it('should expand all top level rows if defaultGroupingExpansionDepth = 1', () => {
@@ -345,10 +355,10 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
         />,
       );
       expect(getColumnValues(0)).to.deep.equal([
-        'A (3)',
+        'Cat A (3)',
         'Cat 1 (1)',
         'Cat 2 (2)',
-        'B (2)',
+        'Cat B (2)',
         'Cat 2 (1)',
         'Cat 1 (1)',
       ]);
@@ -363,13 +373,13 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
         />,
       );
       expect(getColumnValues(0)).to.deep.equal([
-        'A (3)',
+        'Cat A (3)',
         'Cat 1 (1)',
         '0',
         'Cat 2 (2)',
         '1',
         '2',
-        'B (2)',
+        'Cat B (2)',
         'Cat 2 (1)',
         '3',
         'Cat 1 (1)',
@@ -386,13 +396,13 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
         />,
       );
       expect(getColumnValues(0)).to.deep.equal([
-        'A (3)',
+        'Cat A (3)',
         'Cat 1 (1)',
         '0',
         'Cat 2 (2)',
         '1',
         '2',
-        'B (2)',
+        'Cat B (2)',
         'Cat 2 (1)',
         '3',
         'Cat 1 (1)',
@@ -407,12 +417,22 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
           initialState={{ groupingColumns: { model: ['category1', 'category2'] } }}
         />,
       );
-      expect(getColumnValues(0)).to.deep.equal(['A (3)', 'B (2)']);
-      apiRef.current.setRowChildrenExpansion('auto-generated-row-category1/B', true);
+      expect(getColumnValues(0)).to.deep.equal(['Cat A (3)', 'Cat B (2)']);
+      apiRef.current.setRowChildrenExpansion('auto-generated-row-category1/Cat B', true);
       await raf();
-      expect(getColumnValues(0)).to.deep.equal(['A (3)', 'B (2)', 'Cat 2 (1)', 'Cat 1 (1)']);
+      expect(getColumnValues(0)).to.deep.equal([
+        'Cat A (3)',
+        'Cat B (2)',
+        'Cat 2 (1)',
+        'Cat 1 (1)',
+      ]);
       setProps({ sortModel: [{ field: '__row_group_by_columns_group__', sort: 'desc' }] });
-      expect(getColumnValues(0)).to.deep.equal(['B (2)', 'Cat 2 (1)', 'Cat 1 (1)', 'A (3)']);
+      expect(getColumnValues(0)).to.deep.equal([
+        'Cat B (2)',
+        'Cat 2 (1)',
+        'Cat 1 (1)',
+        'Cat A (3)',
+      ]);
     });
   });
 
@@ -553,12 +573,12 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
         );
 
         expect(getColumnValues(0)).to.deep.equal([
-          'B (2)',
+          'Cat B (2)',
           'Cat 2 (1)',
           '',
           'Cat 1 (1)',
           '',
-          'A (3)',
+          'Cat A (3)',
           'Cat 1 (1)',
           '',
           'Cat 2 (2)',
@@ -581,13 +601,13 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
           />,
         );
         expect(getColumnValues(0)).to.deep.equal([
-          'A (3)',
+          'Cat A (3)',
           'Cat 2 (2)',
           '1',
           '2',
           'Cat 1 (1)',
           '0',
-          'B (2)',
+          'Cat B (2)',
           'Cat 2 (1)',
           '3',
           'Cat 1 (1)',
@@ -609,13 +629,13 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
         );
 
         expect(getColumnValues(0)).to.deep.equal([
-          'A (3)',
+          'Cat A (3)',
           'Cat 1 (1)',
           '0',
           'Cat 2 (2)',
           '2',
           '1',
-          'B (2)',
+          'Cat B (2)',
           'Cat 2 (1)',
           '3',
           'Cat 1 (1)',
@@ -638,13 +658,13 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
         );
 
         expect(getColumnValues(0)).to.deep.equal([
-          'A (3)',
+          'Cat A (3)',
           'Cat 1 (1)',
           '0',
           'Cat 2 (2)',
           '2',
           '1',
-          'B (2)',
+          'Cat B (2)',
           'Cat 2 (1)',
           '3',
           'Cat 1 (1)',
@@ -664,7 +684,7 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
           />,
         );
 
-        expect(getColumnValues(0)).to.deep.equal(['B (2)', '', '', 'A (3)', '', '', '']);
+        expect(getColumnValues(0)).to.deep.equal(['Cat B (2)', '', '', 'Cat A (3)', '', '', '']);
       });
 
       it('should use the column grouping criteria for sorting if mainGroupingCriteria matches the column grouping criteria and leaf field is defined', () => {
@@ -681,7 +701,15 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
           />,
         );
 
-        expect(getColumnValues(0)).to.deep.equal(['B (2)', '3', '4', 'A (3)', '0', '1', '2']);
+        expect(getColumnValues(0)).to.deep.equal([
+          'Cat B (2)',
+          '3',
+          '4',
+          'Cat A (3)',
+          '0',
+          '1',
+          '2',
+        ]);
       });
 
       it('should use the leaf field for sorting if mainGroupingCriteria is not defined and leaf field is defined', () => {
@@ -697,7 +725,15 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
           />,
         );
 
-        expect(getColumnValues(0)).to.deep.equal(['A (3)', '2', '1', '0', 'B (2)', '4', '3']);
+        expect(getColumnValues(0)).to.deep.equal([
+          'Cat A (3)',
+          '2',
+          '1',
+          '0',
+          'Cat B (2)',
+          '4',
+          '3',
+        ]);
       });
 
       it("should use the leaf field for sorting if mainGroupingCriteria doesn't match the column grouping criteria and leaf field is defined", () => {
@@ -714,7 +750,232 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
           />,
         );
 
-        expect(getColumnValues(0)).to.deep.equal(['A (3)', '2', '1', '0', 'B (2)', '4', '3']);
+        expect(getColumnValues(0)).to.deep.equal([
+          'Cat A (3)',
+          '2',
+          '1',
+          '0',
+          'Cat B (2)',
+          '4',
+          '3',
+        ]);
+      });
+    });
+  });
+
+  describe('filtering', () => {
+    clock.withFakeTimers();
+
+    describe('props: groupingColumnMode = "single"', () => {
+      it('should use the top level grouping criteria for filtering if mainGroupingCriteria and leafField are not defined', () => {
+        render(
+          <Test
+            initialState={{
+              groupingColumns: { model: ['category1', 'category2'] },
+              preferencePanel: { open: true, openedPanelValue: GridPreferencePanelsValue.filters },
+            }}
+            groupingColumnMode="single"
+            defaultGroupingExpansionDepth={-1}
+          />,
+        );
+
+        fireEvent.change(screen.getByRole('textbox', { name: 'Value' }), {
+          target: { value: 'Cat A' },
+        });
+        clock.tick(500);
+
+        expect(getColumnValues(0)).to.deep.equal([
+          'Cat A (3)',
+          'Cat 1 (1)',
+          '',
+          'Cat 2 (2)',
+          '',
+          '',
+        ]);
+      });
+
+      it('should use the column grouping criteria for filtering if mainGroupingCriteria is one of the grouping criteria and leaf field is defined', () => {
+        render(
+          <Test
+            initialState={{
+              groupingColumns: { model: ['category1', 'category2'] },
+              preferencePanel: { open: true, openedPanelValue: GridPreferencePanelsValue.filters },
+            }}
+            groupingColumnMode="single"
+            groupingColDef={{
+              leafField: 'id',
+              mainGroupingCriteria: 'category2',
+            }}
+            defaultGroupingExpansionDepth={-1}
+          />,
+        );
+
+        fireEvent.change(screen.getByRole('textbox', { name: 'Value' }), {
+          target: { value: 'Cat 1' },
+        });
+        clock.tick(500);
+
+        expect(getColumnValues(0)).to.deep.equal([
+          'Cat A (1)',
+          'Cat 1 (1)',
+          '0',
+          'Cat B (1)',
+          'Cat 1 (1)',
+          '4',
+        ]);
+      });
+
+      it('should use the leaf field for filtering if mainGroupingCriteria is not defined and leaf field is defined', () => {
+        render(
+          <Test
+            initialState={{
+              groupingColumns: { model: ['category1', 'category2'] },
+              preferencePanel: { open: true, openedPanelValue: GridPreferencePanelsValue.filters },
+            }}
+            groupingColumnMode="single"
+            groupingColDef={{
+              leafField: 'id',
+            }}
+            defaultGroupingExpansionDepth={-1}
+          />,
+        );
+
+        fireEvent.change(screen.getByRole('combobox', { name: 'Operators' }), {
+          target: { value: '>' },
+        });
+        fireEvent.change(screen.getByRole('spinbutton', { name: 'Value' }), {
+          target: { value: 2 },
+        });
+        clock.tick(500);
+
+        expect(getColumnValues(0)).to.deep.equal(['Cat B (2)', 'Cat 2 (1)', '3', 'Cat 1 (1)', '4']);
+      });
+
+      it('should use the leaf field for filtering if mainGroupingCriteria is not one of the grouping criteria and leaf field is defined', () => {
+        render(
+          <Test
+            initialState={{
+              groupingColumns: { model: ['category1', 'category2'] },
+              preferencePanel: { open: true, openedPanelValue: GridPreferencePanelsValue.filters },
+            }}
+            groupingColumnMode="single"
+            groupingColDef={{
+              leafField: 'id',
+              mainGroupingCriteria: 'category3',
+            }}
+            defaultGroupingExpansionDepth={-1}
+          />,
+        );
+
+        fireEvent.change(screen.getByRole('combobox', { name: 'Operators' }), {
+          target: { value: '>' },
+        });
+        fireEvent.change(screen.getByRole('spinbutton', { name: 'Value' }), {
+          target: { value: 2 },
+        });
+        clock.tick(500);
+
+        expect(getColumnValues(0)).to.deep.equal(['Cat B (2)', 'Cat 2 (1)', '3', 'Cat 1 (1)', '4']);
+      });
+    });
+
+    describe('props: groupingColumnMode = "multiple"', () => {
+      it('should use the column grouping criteria for filtering if mainGroupingCriteria and leafField are not defined', () => {
+        render(
+          <Test
+            initialState={{
+              groupingColumns: { model: ['category1'] },
+              preferencePanel: { open: true, openedPanelValue: GridPreferencePanelsValue.filters },
+            }}
+            groupingColumnMode="multiple"
+            defaultGroupingExpansionDepth={-1}
+          />,
+        );
+
+        fireEvent.change(screen.getByRole('textbox', { name: 'Value' }), {
+          target: { value: 'Cat A' },
+        });
+        clock.tick(500);
+
+        expect(getColumnValues(0)).to.deep.equal(['Cat A (3)', '', '', '']);
+        expect(getColumnValues(1)).to.deep.equal(['', '0', '1', '2']);
+      });
+
+      it('should use the column grouping criteria for filtering if mainGroupingCriteria matches the column grouping criteria and leaf field is defined', () => {
+        render(
+          <Test
+            initialState={{
+              groupingColumns: { model: ['category1'] },
+              preferencePanel: { open: true, openedPanelValue: GridPreferencePanelsValue.filters },
+            }}
+            groupingColumnMode="multiple"
+            groupingColDef={{
+              leafField: 'id',
+              mainGroupingCriteria: 'category1',
+            }}
+            defaultGroupingExpansionDepth={-1}
+          />,
+        );
+
+        fireEvent.change(screen.getByRole('textbox', { name: 'Value' }), {
+          target: { value: 'Cat A' },
+        });
+        clock.tick(500);
+
+        expect(getColumnValues(0)).to.deep.equal(['Cat A (3)', '0', '1', '2']);
+      });
+
+      it('should use the leaf field for filtering if mainGroupingCriteria is not defined and leaf field is defined', () => {
+        render(
+          <Test
+            initialState={{
+              groupingColumns: { model: ['category1'] },
+              preferencePanel: { open: true, openedPanelValue: GridPreferencePanelsValue.filters },
+            }}
+            groupingColumnMode="multiple"
+            groupingColDef={{
+              leafField: 'id',
+            }}
+            defaultGroupingExpansionDepth={-1}
+          />,
+        );
+
+        fireEvent.change(screen.getByRole('combobox', { name: 'Operators' }), {
+          target: { value: '>' },
+        });
+        fireEvent.change(screen.getByRole('spinbutton', { name: 'Value' }), {
+          target: { value: 2 },
+        });
+        clock.tick(500);
+
+        expect(getColumnValues(0)).to.deep.equal(['Cat B (2)', '3', '4']);
+      });
+
+      it("should use the leaf field for filtering if mainGroupingCriteria doesn't match the column grouping criteria and leaf field is defined", () => {
+        render(
+          <Test
+            initialState={{
+              groupingColumns: { model: ['category1'] },
+              preferencePanel: { open: true, openedPanelValue: GridPreferencePanelsValue.filters },
+            }}
+            groupingColumnMode="multiple"
+            groupingColDef={{
+              leafField: 'id',
+              mainGroupingCriteria: 'category2',
+            }}
+            defaultGroupingExpansionDepth={-1}
+          />,
+        );
+
+        fireEvent.change(screen.getByRole('combobox', { name: 'Operators' }), {
+          target: { value: '>' },
+        });
+        fireEvent.change(screen.getByRole('spinbutton', { name: 'Value' }), {
+          target: { value: 2 },
+        });
+        clock.tick(500);
+
+        expect(getColumnValues(0)).to.deep.equal(['Cat B (2)', '3', '4']);
       });
     });
   });

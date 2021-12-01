@@ -17,11 +17,11 @@ import { GridPreProcessingGroup, useGridRegisterPreProcessor } from '../../core/
 import { GridColumnsRawState } from '../columns/gridColumnsState';
 import { GridFilteringMethod } from '../filter/gridFilterState';
 import { gridRowIdsSelector, gridRowTreeSelector } from '../rows';
-import { filterRowTree } from '../../../utils/tree/filterRowTree';
 import { useGridRegisterFilteringMethod } from '../filter/useGridRegisterFilteringMethod';
 import { useGridRegisterSortingMethod } from '../sorting/useGridRegisterSortingMethod';
 import { GridSortingMethod } from '../sorting/gridSortingState';
 import { sortRowTree } from '../../../utils/tree/sortRowTree';
+import { filterRowTreeFromTreeData } from './gridTreeDataUtils';
 
 const TREE_DATA_GROUPING_NAME = 'tree-data';
 
@@ -149,11 +149,10 @@ export const useGridTreeData = (
     (params) => {
       const rowTree = gridRowTreeSelector(apiRef.current.state);
 
-      return filterRowTree({
+      return filterRowTreeFromTreeData({
         rowTree,
         isRowMatchingFilters: params.isRowMatchingFilters,
         disableChildrenFiltering: props.disableChildrenFiltering,
-        shouldOnlyCountDescendantLeaf: false,
       });
     },
     [apiRef, props.disableChildrenFiltering],
