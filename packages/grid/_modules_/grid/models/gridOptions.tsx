@@ -119,7 +119,7 @@ export interface GridSimpleOptions {
    */
   disableMultipleColumnsFiltering: boolean;
   /**
-   * If `true`, the filtering will only be applied to the top level rows.
+   * If `true`, the filtering will only be applied to the top level rows when grouping rows with the `treeData` prop.
    * @default false
    */
   disableChildrenFiltering: boolean;
@@ -134,7 +134,7 @@ export interface GridSimpleOptions {
    */
   disableMultipleColumnsSorting: boolean;
   /**
-   * If `true`, the sorting will only be applied to the top level rows.
+   * If `true`, the sorting will only be applied to the top level rows when grouping rows with the `treeData` prop.
    * @default false
    */
   disableChildrenSorting: boolean;

@@ -80,7 +80,7 @@ export const useGridGroupingColumns = (
    * ROW GROUPING
    */
   const sanitizedGroupingColumnsModelOnLastRowPreProcessing =
-    React.useRef<GridGroupingColumnsModel>();
+    React.useRef<GridGroupingColumnsModel>([]);
 
   const updateRowGrouping = React.useCallback(() => {
     const groupRows: GridRowGroupingPreProcessing = (params) => {
@@ -369,7 +369,7 @@ export const useGridGroupingColumns = (
   );
 
   const handleColumnChange = React.useCallback<GridEventListener<GridEvents.columnsChange>>(() => {
-    const groupingColumnsModel = gridGroupingRowsModelSelector(apiRef.current.state);
+    const groupingColumnsModel = gridGroupingRowsSanitizedModelSelector(apiRef.current.state);
     const currentGroupingFields = sanitizedGroupingColumnsModelOnLastRowPreProcessing.current;
 
     if (!isDeepEqual(currentGroupingFields, groupingColumnsModel)) {
