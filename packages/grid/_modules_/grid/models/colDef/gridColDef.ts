@@ -226,18 +226,19 @@ export interface GridColumnsMeta {
   positions: number[];
 }
 
-export type GridColDefOverride<ForcedFields extends keyof GridColDef> = Omit<
-  Partial<GridColDef>,
-  ForcedFields
->;
-
-export type GridColDefOverrideCallback<ForcedFields extends keyof GridColDef> = (
-  params: GridColDefOverrideParams,
-) => GridColDefOverride<ForcedFields>;
+export interface GridGroupingColDefOverride
+  extends Omit<
+    GridColDef,
+    'editable' | 'valueSetter' | 'field' | 'preProcessEditCellProps' | 'renderEditCell'
+  > {}
 
 export interface GridColDefOverrideParams {
   /**
-   * The column we are generating before the override.
+   * The grouping column definition before the application of the overrides.
    */
   colDef: GridColDef;
+  /**
+   * The base columns this column is grouping.
+   */
+  sources: GridColDef[];
 }
