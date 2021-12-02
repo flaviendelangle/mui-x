@@ -320,6 +320,7 @@
   { "name": "gridRowCountSelector", "kind": "Variable" },
   { "name": "gridRowIdsSelector", "kind": "Variable" },
   { "name": "gridRowTreeDepthSelector", "kind": "Variable" },
+  { "name": "gridRowTreeGroupingNameSelector", "kind": "Variable" },
   { "name": "gridRowTreeSelector", "kind": "Variable" },
   { "name": "gridRowsLookupSelector", "kind": "Variable" },
   { "name": "gridSortColumnLookupSelector", "kind": "Variable" },
