@@ -283,7 +283,7 @@ DataGridProRaw.propTypes = {
   /**
    * The grouping column used by the tree data.
    */
-  groupingColDef: PropTypes.oneOfType([PropTypes.func, PropTypes.object]),
+  groupingColDef: PropTypes.object,
   /**
    * If `single`, all column we are grouping by will be represented in the same grouping the same column.
    * If `multiple`, each column we are grouping by will be represented in its own column.
