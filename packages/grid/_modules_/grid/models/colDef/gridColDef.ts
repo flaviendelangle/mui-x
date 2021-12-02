@@ -234,9 +234,10 @@ export interface GridGroupingColDefOverride
 
 export interface GridColDefOverrideParams {
   /**
-   * The grouping column definition before the application of the overrides.
+   * The name of the grouping algorithm currently building the grouping column.
    */
-  colDef: GridColDef;
+  treeGroupingName: string;
+
   /**
    * The base columns this column is grouping.
    */
