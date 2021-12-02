@@ -259,7 +259,7 @@ export interface GridGroupingColDefOverride
   hideDescendantCount?: boolean;
 }
 
-export interface GridColDefOverrideParams {
+export interface GridGroupingColDefOverrideParams {
   /**
    * The name of the grouping algorithm currently building the grouping column.
    */

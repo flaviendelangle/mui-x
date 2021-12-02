@@ -206,6 +206,7 @@ export const useGridGroupingColumns = (
         case 'single': {
           const colDefOverride = isFunction(propGroupingColDef)
             ? propGroupingColDef({
+                treeGroupingName: GROUP_ROWS_BY_COLUMN_NAME,
                 sources: groupingColumnsModel.map((field) => columnsState.lookup[field]),
               })
             : propGroupingColDef ?? {};
@@ -226,6 +227,7 @@ export const useGridGroupingColumns = (
 
             const colDefOverride = isFunction(propGroupingColDef)
               ? propGroupingColDef({
+                  treeGroupingName: GROUP_ROWS_BY_COLUMN_NAME,
                   sources: [groupedByColDef],
                 })
               : propGroupingColDef ?? {};
