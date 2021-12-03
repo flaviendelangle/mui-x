@@ -10,7 +10,7 @@ const GridGroupingColumnLeafCell = (props: GridRenderCellParams) => {
 
   const marginLeft = rootProps.groupingColumnMode === 'multiple' ? 1 : rowNode.depth * 2;
 
-  return <Box sx={{ ml: marginLeft }}>{props.value}</Box>;
+  return <Box sx={{ ml: marginLeft }}>{props.formattedValue ?? props.value}</Box>;
 };
 
 export { GridGroupingColumnLeafCell };

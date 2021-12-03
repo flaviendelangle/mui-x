@@ -8,6 +8,7 @@ import {
   GridApiRef,
   GridKeyGetterParams,
   GridPreferencePanelsValue,
+  GridRenderCellParams,
   GridRowsProp,
   useGridApiRef,
 } from '@mui/x-data-grid-pro';
@@ -79,7 +80,7 @@ const GROUPING_COLS_MULTIPLE_CAT_2_CAT_1 = [
   ['', 'Cat A (1)', '', 'Cat B (1)', '', '', 'Cat A (2)', '', '', 'Cat B (1)', ''],
 ];
 
-describe('<DataGridPro /> - Group Rows By Column', () => {
+describe.only('<DataGridPro /> - Group Rows By Column', () => {
   const { render, clock } = createRenderer();
 
   let apiRef: GridApiRef;
@@ -378,7 +379,6 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
       render(
         <Test
           defaultGroupingExpansionDepth={0}
-          groupingColDef={{ leafField: 'id' }}
           initialState={{ groupingColumns: { model: ['category1', 'category2'] } }}
         />,
       );
@@ -389,7 +389,6 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
       render(
         <Test
           defaultGroupingExpansionDepth={1}
-          groupingColDef={{ leafField: 'id' }}
           initialState={{ groupingColumns: { model: ['category1', 'category2'] } }}
         />,
       );
@@ -407,22 +406,21 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
       render(
         <Test
           defaultGroupingExpansionDepth={2}
-          groupingColDef={{ leafField: 'id' }}
           initialState={{ groupingColumns: { model: ['category1', 'category2'] } }}
         />,
       );
       expect(getColumnValues(0)).to.deep.equal([
         'Cat A (3)',
         'Cat 1 (1)',
-        '0',
+        '',
         'Cat 2 (2)',
-        '1',
-        '2',
+        '',
+        '',
         'Cat B (2)',
         'Cat 2 (1)',
-        '3',
+        '',
         'Cat 1 (1)',
-        '4',
+        '',
       ]);
     });
 
@@ -430,31 +428,27 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
       render(
         <Test
           defaultGroupingExpansionDepth={-1}
-          groupingColDef={{ leafField: 'id' }}
           initialState={{ groupingColumns: { model: ['category1', 'category2'] } }}
         />,
       );
       expect(getColumnValues(0)).to.deep.equal([
         'Cat A (3)',
         'Cat 1 (1)',
-        '0',
+        '',
         'Cat 2 (2)',
-        '1',
-        '2',
+        '',
+        '',
         'Cat B (2)',
         'Cat 2 (1)',
-        '3',
+        '',
         'Cat 1 (1)',
-        '4',
+        '',
       ]);
     });
 
     it('should not re-apply default expansion on rerender after expansion manually toggled', async () => {
       const { setProps } = render(
-        <Test
-          groupingColDef={{ leafField: 'id', mainGroupingCriteria: 'category1' }}
-          initialState={{ groupingColumns: { model: ['category1', 'category2'] } }}
-        />,
+        <Test initialState={{ groupingColumns: { model: ['category1', 'category2'] } }} />,
       );
       expect(getColumnValues(0)).to.deep.equal(['Cat A (3)', 'Cat B (2)']);
       apiRef.current.setRowChildrenExpansion('auto-generated-row-category1/Cat B', true);
@@ -535,6 +529,99 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
           'category2',
         ]);
       });
+
+      it('should render the leafField `value` on leaves', () => {
+        render(
+          <Test
+            initialState={{ groupingColumns: { model: ['category1'] } }}
+            groupingColumnMode="single"
+            groupingColDef={{ leafField: 'id' }}
+            defaultGroupingExpansionDepth={-1}
+          />,
+        );
+
+        expect(getColumnValues(0)).to.deep.equal([
+          'Cat A (3)',
+          '0',
+          '1',
+          '2',
+          'Cat B (2)',
+          '3',
+          '4',
+        ]);
+      });
+
+      it('should render the leafField `formattedValue` on leaves if `valueFormatter` is defined on the leafColDef', () => {
+        render(
+          <Test
+            columns={[
+              {
+                field: 'id',
+                type: 'number',
+                valueFormatter: (params) => {
+                  if (params.value == null) {
+                    return null;
+                  }
+
+                  return `#${params.value}`;
+                },
+              },
+              {
+                field: 'category1',
+              },
+            ]}
+            initialState={{ groupingColumns: { model: ['category1'] } }}
+            groupingColumnMode="single"
+            groupingColDef={{ leafField: 'id' }}
+            defaultGroupingExpansionDepth={-1}
+          />,
+        );
+
+        expect(getColumnValues(0)).to.deep.equal([
+          'Cat A (3)',
+          '#0',
+          '#1',
+          '#2',
+          'Cat B (2)',
+          '#3',
+          '#4',
+        ]);
+      });
+
+      it('should render the leafField `renderCell` on leaves  if `renderCell` is defined on the leafColDef', () => {
+        const renderIdCell = spy(() => 'Custom leaf');
+
+        render(
+          <Test
+            columns={[
+              {
+                field: 'id',
+                type: 'number',
+                renderCell: renderIdCell,
+              },
+              {
+                field: 'category1',
+              },
+            ]}
+            initialState={{ groupingColumns: { model: ['category1'] } }}
+            groupingColumnMode="single"
+            groupingColDef={{ leafField: 'id' }}
+            defaultGroupingExpansionDepth={-1}
+          />,
+        );
+
+        expect(renderIdCell.lastCall.firstArg.id).to.equal(4);
+        expect(renderIdCell.lastCall.firstArg.field).to.equal('id');
+        expect(getColumnValues(0)).to.deep.equal([
+          'Cat A (3)',
+          'Custom leaf',
+          'Custom leaf',
+          'Custom leaf',
+          'Cat B (2)',
+          'Custom leaf',
+          'Custom leaf',
+        ]);
+      });
     });
 
     describe('props: groupingColumnMode = "multiple"', () => {
@@ -594,6 +681,173 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
           'id',
           'category1',
           'category2',
+        ]);
+      });
+
+      it('should render the leafField `value` on leaves', () => {
+        render(
+          <Test
+            initialState={{ groupingColumns: { model: ['category1', 'category2'] } }}
+            groupingColumnMode="multiple"
+            groupingColDef={(params) =>
+              params.sources.some((colDef) => colDef.field === 'category2')
+                ? {
+                    leafField: 'id',
+                  }
+                : {}
+            }
+            defaultGroupingExpansionDepth={-1}
+          />,
+        );
+        expect(getColumnValues(0)).to.deep.equal([
+          'Cat A (3)',
+          '',
+          '',
+          '',
+          '',
+          '',
+          'Cat B (2)',
+          '',
+          '',
+          '',
+          '',
+        ]);
+        expect(getColumnValues(1)).to.deep.equal([
+          '',
+          'Cat 1 (1)',
+          '0',
+          'Cat 2 (2)',
+          '1',
+          '2',
+          '',
+          'Cat 2 (1)',
+          '3',
+          'Cat 1 (1)',
+          '4',
+        ]);
+      });
+
+      it.only('should render the leafField `formattedValue` on leaves if `valueFormatter` is defined on the leafColDef', () => {
+        render(
+          <Test
+            columns={[
+              {
+                field: 'id',
+                type: 'number',
+                valueFormatter: (params) => {
+                  if (params.value == null) {
+                    return null;
+                  }
+
+                  return `#${params.value}`;
+                },
+              },
+              {
+                field: 'category1',
+              },
+              {
+                field: 'category2',
+              },
+            ]}
+            initialState={{ groupingColumns: { model: ['category1', 'category2'] } }}
+            groupingColumnMode="multiple"
+            groupingColDef={(params) =>
+              params.sources.some((colDef) => colDef.field === 'category2')
+                ? {
+                    leafField: 'id',
+                  }
+                : {}
+            }
+            defaultGroupingExpansionDepth={-1}
+          />,
+        );
+
+        expect(getColumnValues(0)).to.deep.equal([
+          'Cat A (3)',
+          '',
+          '',
+          '',
+          '',
+          '',
+          'Cat B (2)',
+          '',
+          '',
+          '',
+          '',
+        ]);
+        expect(getColumnValues(1)).to.deep.equal([
+          '',
+          'Cat 1 (1)',
+          '#0',
+          'Cat 2 (2)',
+          '#1',
+          '#2',
+          '',
+          'Cat 2 (1)',
+          '#3',
+          'Cat 1 (1)',
+          '#4',
+        ]);
+      });
+
+      it.only('should render the leafField `renderCell` on leaves  if `renderCell` is defined on the leafColDef', () => {
+        const renderIdCell = spy(() => 'Custom leaf');
+
+        render(
+          <Test
+            columns={[
+              {
+                field: 'id',
+                type: 'number',
+                renderCell: renderIdCell,
+              },
+              {
+                field: 'category1',
+              },
+              {
+                field: 'category2',
+              },
+            ]}
+            initialState={{ groupingColumns: { model: ['category1', 'category2'] } }}
+            groupingColumnMode="multiple"
+            groupingColDef={(params) =>
+              params.sources.some((colDef) => colDef.field === 'category2')
+                ? {
+                    leafField: 'id',
+                  }
+                : {}
+            }
+            defaultGroupingExpansionDepth={-1}
+          />,
+        );
+
+        expect(renderIdCell.lastCall.firstArg.id).to.equal(4);
+        expect(renderIdCell.lastCall.firstArg.field).to.equal('id');
+        expect(getColumnValues(0)).to.deep.equal([
+          'Cat A (3)',
+          '',
+          '',
+          '',
+          '',
+          '',
+          'Cat B (2)',
+          '',
+          '',
+          '',
+          '',
+        ]);
+        expect(getColumnValues(1)).to.deep.equal([
+          '',
+          'Cat 1 (1)',
+          'Custom leaf',
+          'Cat 2 (2)',
+          'Custom leaf',
+          'Custom leaf',
+          '',
+          'Cat 2 (1)',
+          'Custom leaf',
+          'Cat 1 (1)',
+          'Custom leaf',
         ]);
       });
     });

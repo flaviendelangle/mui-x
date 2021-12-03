@@ -17,6 +17,12 @@ const COLUMNS: GridColumns = [
     headerName: 'Gross',
     type: 'number',
     width: 150,
+    valueFormatter: ({ value }) => {
+      if (!value || typeof value !== 'number') {
+        return value;
+      }
+      return `${value.toLocaleString()}$`;
+    },
   },
   {
     field: 'company',

@@ -148,13 +148,15 @@ export const createGroupingColDefForOneGroupingCriteria = ({
     renderCell: (params: GridRenderCellParams) => {
       if (params.rowNode.groupingField == null) {
         if (leafColDef) {
+          const leafParams: GridRenderCellParams = {
+            ...params.api.getCellParams(params.id, leafField!),
+            api: params.api,
+          };
           if (leafColDef.renderCell) {
-            // We get the colDef from the state to have the preprocessed version with the `computedWidth`
-            const leafStateColDef = gridColumnLookupSelector(params.api.state)[leafColDef.field];
-            return leafColDef.renderCell({ ...params, colDef: leafStateColDef, field: leafField! });
+            return leafColDef.renderCell(leafParams);
           }
 
-          return <GridGroupingColumnLeafCell {...params} />;
+          return <GridGroupingColumnLeafCell {...leafParams} />;
         }
 
         return null;
@@ -263,13 +265,15 @@ export const createGroupingColDefForAllGroupingCriteria = ({
     renderCell: (params) => {
       if (params.rowNode.groupingField == null) {
         if (leafColDef) {
+          const leafParams: GridRenderCellParams = {
+            ...params.api.getCellParams(params.id, leafField!),
+            api: params.api,
+          };
           if (leafColDef.renderCell) {
-            // We get the colDef from the state to have the preprocessed version with the `computedWidth`
-            const leafStateColDef = gridColumnLookupSelector(params.api.state)[leafColDef.field];
-            return leafColDef.renderCell({ ...params, colDef: leafStateColDef, field: leafField! });
+            return leafColDef.renderCell(leafParams);
           }
 
-          return <GridGroupingColumnLeafCell {...params} />;
+          return <GridGroupingColumnLeafCell {...leafParams} />;
         }
 
         return null;
