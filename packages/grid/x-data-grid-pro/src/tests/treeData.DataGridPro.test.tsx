@@ -47,7 +47,7 @@ const baselineProps: DataGridProProps = {
   getRowId: (row) => row.name,
 };
 
-describe.only('<DataGridPro /> - Tree Data', () => {
+describe('<DataGridPro /> - Tree Data', () => {
   const { render } = createRenderer();
 
   let apiRef: GridApiRef;
@@ -95,7 +95,7 @@ describe.only('<DataGridPro /> - Tree Data', () => {
       ]);
     });
 
-    it.only('should support enabling treeData after apiRef.current.updateRows has modified the rows', async () => {
+    it('should support enabling treeData after apiRef.current.updateRows has modified the rows', async () => {
       const { setProps } = render(<Test treeData={false} defaultGroupingExpansionDepth={-1} />);
       expect(getColumnHeadersTextContent()).to.deep.equal(['name']);
       expect(getColumnValues(0)).to.deep.equal([

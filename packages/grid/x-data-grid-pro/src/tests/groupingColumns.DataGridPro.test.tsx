@@ -283,7 +283,7 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
     });
   });
 
-  describe('colDef: keyGetter', () => {
+  describe('colDef: keyGetter & valueGetter', () => {
     it('should use keyGetter to group rows when defined', () => {
       render(
         <Test
@@ -312,26 +312,65 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
       expect(getColumnValues(1)).to.deep.equal(['', '0', '1', '2', '', '3', '4']);
     });
 
-    // TODO: Uncomment once `useGridGroupRowsByColumn` handles `valueGetter`
-    // it('should pass the return of valueGetter to the keyGetter callback when both defined', () => {
-    //   render(<Test
-    //       columns={[
-    //         {
-    //           field: 'id',
-    //         },
-    //         {
-    //           field: 'category1',
-    //           groupRows: true,
-    //           groupRowIndex: 2,
-    //           hide: true,
-    //           valueGetter: (params) => `value-${params.value}`,
-    //           keyGetter: (params: GridKeyGetterParams<string>) => `test-${params.value}`,
-    //         },
-    //       ]}
-    //       defaultGroupingExpansionDepth={-1}
-    //   />)
-    //   expect(getColumnValues(0)).to.deep.equal(['test-key-A (3)', '', '', '', 'test-key-B (2)', '', '']);
-    //   expect(getColumnValues(1)).to.deep.equal(['', '0', '1', '2', '', '3', '4']);
+    it('should use valueGetter to group the rows when defined', () => {
+      render(
+        <Test
+          columns={[
+            {
+              field: 'id',
+            },
+            {
+              field: 'complexCategory1',
+              valueGetter: (params) => `value ${params.row.category1}`,
+            },
+          ]}
+          initialState={{ groupingColumns: { model: ['complexCategory1'] } }}
+          defaultGroupingExpansionDepth={-1}
+        />,
+      );
+      expect(getColumnValues(0)).to.deep.equal([
+        'value Cat A (3)',
+        '',
+        '',
+        '',
+        'value Cat B (2)',
+        '',
+        '',
+      ]);
+      expect(getColumnValues(1)).to.deep.equal(['', '0', '1', '2', '', '3', '4']);
+    });
+
+    it('should pass the return value of valueGetter to the keyGetter callback when both defined', () => {
+      render(
+        <Test
+          initialState={{
+            groupingColumns: { model: ['complexCategory1'] },
+          }}
+          columns={[
+            {
+              field: 'id',
+            },
+            {
+              field: 'complexCategory1',
+              hide: true,
+              valueGetter: (params) => `value ${params.row.category1}`,
+              keyGetter: (params: GridKeyGetterParams<string>) => `key ${params.value}`,
+            },
+          ]}
+          defaultGroupingExpansionDepth={-1}
+        />,
+      );
+      expect(getColumnValues(0)).to.deep.equal([
+        'key value Cat A (3)',
+        '',
+        '',
+        '',
+        'key value Cat B (2)',
+        '',
+        '',
+      ]);
+      expect(getColumnValues(1)).to.deep.equal(['', '0', '1', '2', '', '3', '4']);
+    });
   });
 
   describe('prop: defaultGroupingExpansionDepth', () => {
