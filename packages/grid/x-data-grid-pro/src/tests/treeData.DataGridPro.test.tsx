@@ -47,7 +47,7 @@ const baselineProps: DataGridProProps = {
   getRowId: (row) => row.name,
 };
 
-describe('<DataGridPro /> - Tree Data', () => {
+describe.only('<DataGridPro /> - Tree Data', () => {
   const { render } = createRenderer();
 
   let apiRef: GridApiRef;
@@ -153,20 +153,52 @@ describe('<DataGridPro /> - Tree Data', () => {
 
   describe('prop: getTreeDataPath', () => {
     it('should allow to transform path', () => {
-      render(<Test getTreeDataPath={(row) => [...row.name.split('.').reverse()]} />);
-      expect(getColumnValues(1)).to.deep.equal(['A', 'B', 'C']);
-      fireEvent.click(getCell(0, 0).querySelector('button'));
-      expect(getColumnValues(1)).to.deep.equal(['A', 'A.A', 'B.A', 'B', 'C']);
+      render(
+        <Test
+          getTreeDataPath={(row) => [...row.name.split('.').reverse()]}
+          defaultGroupingExpansionDepth={-1}
+        />,
+      );
+      expect(getColumnValues(1)).to.deep.equal([
+        'A',
+        'A.A',
+        '',
+        'B.B.A.A',
+        'B.A',
+        'B.B.A',
+        'B',
+        'A.B',
+        'B.B',
+        'C',
+      ]);
     });
 
     it('should support new getTreeDataPath', () => {
-      const { setProps } = render(<Test />);
-      expect(getColumnValues(1)).to.deep.equal(['A', 'B', 'C']);
-      fireEvent.click(getCell(0, 0).querySelector('button'));
-      expect(getColumnValues(1)).to.deep.equal(['A', 'A.A', 'A.B', 'B', 'C']);
+      const { setProps } = render(<Test defaultGroupingExpansionDepth={-1} />);
+      expect(getColumnValues(1)).to.deep.equal([
+        'A',
+        'A.A',
+        'A.B',
+        'B',
+        'B.A',
+        'B.B',
+        'B.B.A',
+        'B.B.A.A',
+        'C',
+      ]);
       setProps({ getTreeDataPath: (row) => [...row.name.split('.').reverse()] });
-      fireEvent.click(getCell(0, 0).querySelector('button'));
-      expect(getColumnValues(1)).to.deep.equal(['A', 'A.A', 'B.A', 'B', 'C']);
+      expect(getColumnValues(1)).to.deep.equal([
+        'A',
+        'A.A',
+        '',
+        'B.B.A.A',
+        'B.A',
+        'B.B.A',
+        'B',
+        'A.B',
+        'B.B',
+        'C',
+      ]);
     });
   });
 
@@ -275,10 +307,8 @@ describe('<DataGridPro /> - Tree Data', () => {
     });
 
     it('should add auto generated rows if some parents do not exist', () => {
-      render(<Test rows={rowsWithGap} />);
-      expect(getColumnValues(1)).to.deep.equal(['A', '']);
-      fireEvent.click(getCell(1, 0).querySelector('button'));
-      expect(getColumnValues(1)).to.deep.equal(['A', '', 'B.A', 'B.B']);
+      render(<Test rows={rowsWithGap} defaultGroupingExpansionDepth={-1} />);
+      expect(getColumnValues(1)).to.deep.equal(['A', 'A.B', 'A.A', '', 'B.A', 'B.B']);
     });
   });
 
@@ -493,8 +523,18 @@ describe('<DataGridPro /> - Tree Data', () => {
     });
 
     it('should update the order server side', () => {
-      const { setProps } = render(<Test sortingMode="server" />);
-      expect(getColumnValues(1)).to.deep.equal(['A', 'B', 'C']);
+      const { setProps } = render(<Test sortingMode="server" defaultGroupingExpansionDepth={-1} />);
+      expect(getColumnValues(1)).to.deep.equal([
+        'A',
+        'A.A',
+        'A.B',
+        'B',
+        'B.A',
+        'B.B',
+        'B.B.A',
+        'B.B.A.A',
+        'C',
+      ]);
       setProps({
         rows: [
           { name: 'C' },
@@ -508,9 +548,17 @@ describe('<DataGridPro /> - Tree Data', () => {
           { name: 'A.A' },
         ],
       });
-      expect(getColumnValues(1)).to.deep.equal(['C', 'B', 'A']);
-      fireEvent.click(getCell(2, 0).querySelector('button'));
-      expect(getColumnValues(1)).to.deep.equal(['C', 'B', 'A', 'A.B', 'A.A']);
+      expect(getColumnValues(1)).to.deep.equal([
+        'C',
+        'B',
+        'B.B',
+        'B.B.A',
+        'B.B.A.A',
+        'B.A',
+        'A',
+        'A.B',
+        'A.A',
+      ]);
     });
   });
 });
