@@ -95,8 +95,8 @@ describe.only('<DataGridPro /> - Tree Data', () => {
       ]);
     });
 
-    it('should support enabling treeData after apiRef.current.updateRows has modified the rows', async () => {
-      const { setProps } = render(<Test treeData={false} />);
+    it.only('should support enabling treeData after apiRef.current.updateRows has modified the rows', async () => {
+      const { setProps } = render(<Test treeData={false} defaultGroupingExpansionDepth={-1} />);
       expect(getColumnHeadersTextContent()).to.deep.equal(['name']);
       expect(getColumnValues(0)).to.deep.equal([
         'A',
@@ -122,9 +122,16 @@ describe.only('<DataGridPro /> - Tree Data', () => {
       ]);
       setProps({ treeData: true });
       expect(getColumnHeadersTextContent()).to.deep.equal(['Group', 'name']);
-      expect(getColumnValues(1)).to.deep.equal(['A', 'B', 'C']);
-      fireEvent.click(getCell(0, 0).querySelector('button'));
-      expect(getColumnValues(1)).to.deep.equal(['A', 'A.B', 'B', 'C']);
+      expect(getColumnValues(1)).to.deep.equal([
+        'A',
+        'A.B',
+        'B',
+        'B.A',
+        'B.B',
+        'B.B.A',
+        'B.B.A.A',
+        'C',
+      ]);
     });
 
     it('should support new dataset', () => {
