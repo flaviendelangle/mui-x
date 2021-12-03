@@ -11,16 +11,23 @@ import {
 import { GridColumnRawLookup } from '../columns/gridColumnsState';
 import { GridGroupingColumnGroupCell } from '../../../components/cell/GridGroupingColumnGroupCell';
 import { GridGroupingColumnLeafCell } from '../../../components/cell/GridGroupingColumnLeafCell';
-import { getCellValue, getGroupingColDefField } from './gridGroupingColumnsUtils';
-import { gridColumnLookupSelector } from '../columns';
+import {
+  getCellValue,
+  getGroupingColDefFieldFromGroupingCriteriaField,
+} from './gridGroupingColumnsUtils';
 
-const GROUPING_COL_DEF_DEFAULT_VALUES: Partial<GridColDef> = {
+const GROUPING_COL_DEF_DEFAULT_PROPERTIES: Omit<GridColDef, 'field'> = {
   ...GRID_STRING_COL_DEF,
-  type: 'rowGroupByColumnsGroup',
   disableReorder: true,
   hide: false,
   align: 'left',
   headerAlign: 'left',
+};
+
+const GROUPING_COL_DEF_FORCED_PROPERTIES: Pick<GridColDef, 'type' | 'editable' | 'canBeGrouped'> = {
+  type: 'rowGroupByColumnsGroup',
+  editable: false,
+  canBeGrouped: false,
 };
 
 const getLeafProperties = (leafColDef: GridColDef): Partial<GridColDef> => ({
@@ -212,12 +219,12 @@ export const createGroupingColDefForOneGroupingCriteria = ({
 
   // The properties that can't be overridden with `colDefOverride`
   const forcedProperties: Pick<GridColDef, 'field' | 'editable'> = {
-    field: getGroupingColDefField(groupedByField),
-    editable: false,
+    field: getGroupingColDefFieldFromGroupingCriteriaField(groupedByField),
+    ...GROUPING_COL_DEF_FORCED_PROPERTIES,
   };
 
   return {
-    ...GROUPING_COL_DEF_DEFAULT_VALUES,
+    ...GROUPING_COL_DEF_DEFAULT_PROPERTIES,
     ...commonProperties,
     ...sourceProperties,
     ...colDefOverrideProperties,
@@ -255,7 +262,7 @@ export const createGroupingColDefForAllGroupingCriteria = ({
 
   // The properties that do not depend on the presence of a `leafColDef` and that can be overridden by `colDefOverride`
   const commonProperties: Partial<GridColDef> = {
-    headerName: apiRef.current.getLocaleText('treeDataGroupingHeaderName'),
+    headerName: apiRef.current.getLocaleText('groupingColumnHeaderName'),
     width: Math.max(
       ...groupingColumnsModel.map(
         (field) => (columnsLookup[field].width ?? GRID_STRING_COL_DEF.width!) + 40,
@@ -326,12 +333,12 @@ export const createGroupingColDefForAllGroupingCriteria = ({
 
   // The properties that can't be overridden with `colDefOverride`
   const forcedProperties: Pick<GridColDef, 'field' | 'editable'> = {
-    field: getGroupingColDefField(null),
-    editable: false,
+    field: getGroupingColDefFieldFromGroupingCriteriaField(null),
+    ...GROUPING_COL_DEF_FORCED_PROPERTIES,
   };
 
   return {
-    ...GROUPING_COL_DEF_DEFAULT_VALUES,
+    ...GROUPING_COL_DEF_DEFAULT_PROPERTIES,
     ...commonProperties,
     ...sourceProperties,
     ...colDefOverrideProperties,

@@ -8,13 +8,29 @@ import {
 } from '../../../models';
 import { GridFilterState } from '../filter';
 
-export const getGroupingColDefField = (groupedByField: string | null) => {
+export const GROUPING_COLUMN_SINGLE = '__row_group_by_columns_group__';
+
+export const getGroupingColDefFieldFromGroupingCriteriaField = (groupedByField: string | null) => {
   if (groupedByField === null) {
-    return '__row_group_by_columns_group__';
+    return GROUPING_COLUMN_SINGLE;
   }
 
   return `__row_group_by_columns_group_${groupedByField}__`;
 };
+
+export const getGroupingCriteriaFieldFromGroupingColDefField = (groupingColDefField: string) => {
+  const match = groupingColDefField.match(/^__row_group_by_columns_group_(.*)__$/);
+
+  if (!match) {
+    return null;
+  }
+
+  return match[1];
+};
+
+export const isGroupingColumn = (field: string) =>
+  field === GROUPING_COLUMN_SINGLE ||
+  getGroupingCriteriaFieldFromGroupingColDefField(field) !== null;
 
 export const getCellValue = ({
   colDef,

@@ -2,6 +2,7 @@ export type PreProcessorCallback = (value: any, params?: any) => any;
 
 export enum GridPreProcessingGroup {
   hydrateColumns = 'hydrateColumns',
+  columnMenu = 'columnMenu',
   registerFiltering = 'registerFiltering',
   registerSorting = 'registerSorting',
 }

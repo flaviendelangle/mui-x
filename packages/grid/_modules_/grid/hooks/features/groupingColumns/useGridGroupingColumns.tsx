@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Divider } from '@mui/material';
 import type {
   GridApiRef,
   GridRowModel,
@@ -20,7 +21,7 @@ import { GridComponentProps } from '../../../GridComponentProps';
 import {
   filterRowTreeFromGroupingColumns,
   getCellValue,
-  getGroupingColDefField,
+  getGroupingColDefFieldFromGroupingCriteriaField,
 } from './gridGroupingColumnsUtils';
 import {
   createGroupingColDefForOneGroupingCriteria,
@@ -40,6 +41,7 @@ import { useGridStateInit } from '../../utils/useGridStateInit';
 import { GridGroupingColumnsApi, GridGroupingColumnsModel } from './gridGroupingColumnsInterfaces';
 import { useGridApiMethod, useGridState } from '../../utils';
 import { gridColumnLookupSelector } from '../columns';
+import { GridGroupingColumnsMenuItems } from '../../../components/menu/columnMenu/GridGroupingColumnsMenuItems';
 
 const GROUP_ROWS_BY_COLUMN_NAME = 'group-rows-by-columns';
 
@@ -280,6 +282,10 @@ export const useGridGroupingColumns = (
     [getGroupingColDefs],
   );
 
+  const addColumnMenuButtons = React.useCallback((initialValue: JSX.Element[]) => {
+    return [...initialValue, <Divider />, <GridGroupingColumnsMenuItems />];
+  }, []);
+
   const filteringMethod = React.useCallback<GridFilteringMethod>(
     (params) => {
       const rowTree = gridRowTreeSelector(apiRef.current.state);
@@ -309,6 +315,7 @@ export const useGridGroupingColumns = (
   );
 
   useGridRegisterPreProcessor(apiRef, GridPreProcessingGroup.hydrateColumns, updateGroupingColumn);
+  useGridRegisterPreProcessor(apiRef, GridPreProcessingGroup.columnMenu, addColumnMenuButtons);
   useGridRegisterFilteringMethod(apiRef, GROUP_ROWS_BY_COLUMN_NAME, filteringMethod);
   useGridRegisterSortingMethod(apiRef, GROUP_ROWS_BY_COLUMN_NAME, sortingMethod);
 
@@ -332,10 +339,71 @@ export const useGridGroupingColumns = (
     [apiRef, setGridState, forceUpdate, updateRowGrouping],
   );
 
+  const addGroupingField = React.useCallback<GridGroupingColumnsApi['addGroupingField']>(
+    (field, hideGroupedColumn, groupingIndex) => {
+      const currentModel = gridGroupingRowsModelSelector(apiRef.current.state);
+      if (currentModel.includes(field)) {
+        return;
+      }
+
+      const cleanGroupingIndex = groupingIndex ?? currentModel.length;
+
+      const updatedModel = [
+        ...currentModel.slice(0, cleanGroupingIndex),
+        field,
+        ...currentModel.slice(cleanGroupingIndex),
+      ];
+
+      apiRef.current.setGroupingColumnsModel(updatedModel);
+
+      if (hideGroupedColumn) {
+        apiRef.current.updateColumns([{ field, hide: true }]);
+      }
+    },
+    [apiRef],
+  );
+
+  const removeGroupingField = React.useCallback<GridGroupingColumnsApi['removeGroupingField']>(
+    (field, showGroupedColumn) => {
+      const currentModel = gridGroupingRowsModelSelector(apiRef.current.state);
+      if (!currentModel.includes(field)) {
+        return;
+      }
+      apiRef.current.setGroupingColumnsModel(currentModel.filter((el) => el !== field));
+
+      if (showGroupedColumn) {
+        apiRef.current.updateColumns([{ field, hide: false }]);
+      }
+    },
+    [apiRef],
+  );
+
+  const setGroupingCriteriaIndex = React.useCallback<
+    GridGroupingColumnsApi['setGroupingCriteriaIndex']
+  >(
+    (field, targetIndex) => {
+      const currentModel = gridGroupingRowsModelSelector(apiRef.current.state);
+      const currentTargetIndex = currentModel.indexOf(field);
+
+      if (currentTargetIndex === -1) {
+        return;
+      }
+
+      const updatedModel = [...currentModel];
+      updatedModel.splice(targetIndex, 0, updatedModel.splice(currentTargetIndex, 1)[0]);
+
+      apiRef.current.setGroupingColumnsModel(updatedModel);
+    },
+    [apiRef],
+  );
+
   useGridApiMethod<GridGroupingColumnsApi>(
     apiRef,
     {
       setGroupingColumnsModel,
+      addGroupingField,
+      removeGroupingField,
+      setGroupingCriteriaIndex,
     },
     'GridGroupingColumnsApi',
   );
@@ -359,7 +427,8 @@ export const useGridGroupingColumns = (
 
         const isOnGroupingCell =
           props.groupingColumnMode === 'single' ||
-          getGroupingColDefField(params.rowNode.groupingField) === params.field;
+          getGroupingColDefFieldFromGroupingCriteriaField(params.rowNode.groupingField) ===
+            params.field;
         if (!isOnGroupingCell || filteredDescendantCount === 0) {
           return;
         }
@@ -370,17 +439,29 @@ export const useGridGroupingColumns = (
     [apiRef, props.groupingColumnMode],
   );
 
-  const handleColumnChange = React.useCallback<GridEventListener<GridEvents.columnsChange>>(() => {
+  const checkGroupingColumnsModelDiff = React.useCallback<
+    GridEventListener<GridEvents.columnsChange>
+  >(() => {
     const groupingColumnsModel = gridGroupingRowsSanitizedModelSelector(apiRef.current.state);
-    const currentGroupingFields = sanitizedGroupingColumnsModelOnLastRowPreProcessing.current;
+    const lastGroupingColumnsModelApplied =
+      sanitizedGroupingColumnsModelOnLastRowPreProcessing.current;
 
-    if (!isDeepEqual(currentGroupingFields, groupingColumnsModel)) {
+    if (!isDeepEqual(lastGroupingColumnsModelApplied, groupingColumnsModel)) {
+      sanitizedGroupingColumnsModelOnLastRowPreProcessing.current = groupingColumnsModel;
+
+      // Refresh the column pre-processing
+      apiRef.current.updateColumns([]);
       updateRowGrouping();
     }
   }, [apiRef, updateRowGrouping]);
 
   useGridApiEventHandler(apiRef, GridEvents.cellKeyDown, handleCellKeyDown);
-  useGridApiEventHandler(apiRef, GridEvents.columnsChange, handleColumnChange);
+  useGridApiEventHandler(apiRef, GridEvents.columnsChange, checkGroupingColumnsModelDiff);
+  useGridApiEventHandler(
+    apiRef,
+    GridEvents.groupingColumnsModelChange,
+    checkGroupingColumnsModelDiff,
+  );
 
   /**
    * UPDATES

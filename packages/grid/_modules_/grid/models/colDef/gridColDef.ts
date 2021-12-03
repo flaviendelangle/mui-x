@@ -85,6 +85,11 @@ export interface GridColDef {
    */
   editable?: boolean;
   /**
+   * If `true`, the column can be grouped through the grouping columns panel or through the column menu
+   * @default true
+   */
+  canBeGrouped?: boolean;
+  /**
    * A comparator function used to sort rows.
    */
   sortComparator?: GridComparatorFn;
@@ -236,7 +241,7 @@ export interface GridColumnsMeta {
 export interface GridGroupingColDefOverride
   extends Omit<
     GridColDef,
-    'editable' | 'valueSetter' | 'field' | 'preProcessEditCellProps' | 'renderEditCell'
+    'editable' | 'valueSetter' | 'field' | 'type' | 'preProcessEditCellProps' | 'renderEditCell'
   > {
   /**
    * The field from which we want to apply the sorting and the filtering for the grouping column.

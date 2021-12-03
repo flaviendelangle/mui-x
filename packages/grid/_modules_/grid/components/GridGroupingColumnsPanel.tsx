@@ -55,69 +55,17 @@ export const GridGroupingColumnsPanel = () => {
       return;
     }
 
-    let newGroupingColumnsModel: string[];
-    if (!targetField) {
-      newGroupingColumnsModel = [
-        ...groupingColumnsModel.filter((field) => field !== dragField),
-        dragField,
-      ];
+    const targetIndex =
+      targetField == null ? groupingColumnsModel.length : groupingColumnsModel.indexOf(targetField);
+    if (groupingColumnsModel.includes(dragField)) {
+      apiRef.current.setGroupingCriteriaIndex(dragField, targetIndex);
     } else {
-      const currentDragFieldPosition = groupingColumnsModel.findIndex(
-        (field) => field === dragField,
-      );
-      const currentTargetFieldPosition = groupingColumnsModel.findIndex(
-        (field) => field === targetField,
-      );
-
-      if (currentDragFieldPosition < currentTargetFieldPosition) {
-        newGroupingColumnsModel = [
-          ...(currentDragFieldPosition > 0
-            ? groupingColumnsModel.slice(0, currentDragFieldPosition)
-            : []),
-          ...groupingColumnsModel.slice(currentDragFieldPosition + 1, currentTargetFieldPosition),
-          targetField,
-          dragField,
-          ...groupingColumnsModel.slice(currentTargetFieldPosition + 1),
-        ];
-      } else {
-        newGroupingColumnsModel = [
-          ...groupingColumnsModel.slice(0, currentTargetFieldPosition),
-          ...groupingColumnsModel.slice(currentTargetFieldPosition + 1, currentDragFieldPosition),
-          dragField,
-          targetField,
-          ...groupingColumnsModel.slice(currentDragFieldPosition + 1),
-        ];
-      }
+      apiRef.current.addGroupingField(dragField, true, targetIndex);
     }
-
-    // TODO: Hide columns when adding them to the groupingColumnsModel
-    // const colUpdates: GridColDef[] = newGroupingFields.map((field, fieldIndex) => {
-    //   const col: GridColDef = {
-    //     field,
-    //     groupRows: true,
-    //     groupRowIndex: fieldIndex,
-    //   };
-    //
-    //   if (field === colHeaderDragField) {
-    //     col.hide = true;
-    //   }
-    //
-    //   return col;
-    // });
-
-    apiRef.current.setGroupingColumnsModel(newGroupingColumnsModel);
   };
 
-  const handleRemoveGroupingCol = (field: string) => {
-    apiRef.current.setGroupingColumnsModel(groupingColumnsModel.filter((el) => el !== field));
-    // TODO: Show column when removing it from groupingColumnsModel
-    // apiRef.current.updateColumn({
-    //   ...apiRef.current.getColumn(field),
-    //   hide: false,
-    //   groupRows: false,
-    //   groupRowIndex: undefined,
-    // });
-  };
+  const handleRemoveGroupingCol = (field: string) =>
+    apiRef.current.removeGroupingField(field, true);
 
   useGridApiEventHandler(apiRef, GridEvents.columnHeaderDragStart, handleColumnReorderStart);
   useGridApiEventHandler(apiRef, GridEvents.columnHeaderDragEnd, handleColumnReorderStop);

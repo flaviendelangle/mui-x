@@ -107,6 +107,11 @@ export interface GridLocaleText {
   treeDataExpand: string;
   treeDataCollapse: string;
 
+  // Grouping columns
+  groupingColumnHeaderName: string;
+  groupColumn: (name: string) => string;
+  unGroupColumn: (name: string) => string;
+
   // Used core components translation keys
   MuiTablePagination: Omit<
     ComponentsPropsList['MuiTablePagination'],
