@@ -12,6 +12,7 @@ import {
   useGridApiRef,
 } from '@mui/x-data-grid-pro';
 import { spy } from 'sinon';
+import { waitFor } from '@testing-library/react';
 
 const isJSDOM = /jsdom/.test(window.navigator.userAgent);
 
@@ -79,7 +80,7 @@ const GROUPING_COLS_MULTIPLE_CAT_2_CAT_1 = [
   ['', 'Cat A (1)', '', 'Cat B (1)', '', '', 'Cat A (2)', '', '', 'Cat B (1)', ''],
 ];
 
-describe.only('<DataGridPro /> - Group Rows By Column', () => {
+describe('<DataGridPro /> - Group Rows By Column', () => {
   const { render, clock } = createRenderer();
 
   let apiRef: GridApiRef;
@@ -153,6 +154,29 @@ describe.only('<DataGridPro /> - Group Rows By Column', () => {
       render(
         <Test
           initialState={{ groupingColumns: { model: ['category1', 'category3'] } }}
+          defaultGroupingExpansionDepth={-1}
+        />,
+      );
+      expect(getColumnValues(0)).to.deep.equal(GROUPING_COLS_SINGLE_CAT_1);
+    });
+
+    it('should ignore grouping fields with colDef.canBeGrouped = false', () => {
+      render(
+        <Test
+          columns={[
+            {
+              field: 'id',
+              type: 'number',
+            },
+            {
+              field: 'category1',
+            },
+            {
+              field: 'category2',
+              canBeGrouped: false,
+            },
+          ]}
+          initialState={{ groupingColumns: { model: ['category1', 'category2'] } }}
           defaultGroupingExpansionDepth={-1}
         />,
       );
@@ -910,6 +934,197 @@ describe.only('<DataGridPro /> - Group Rows By Column', () => {
     });
   });
 
+  describe('column menu', () => {
+    it('should add a "Group by {field}" menu item on ungrouped columns when coLDef.canBeGrouped is not defined', async () => {
+      render(
+        <Test
+          columns={[
+            {
+              field: 'id',
+            },
+            {
+              field: 'category1',
+            },
+          ]}
+        />,
+      );
+      apiRef.current.showColumnMenu('category1');
+      await waitFor(() => expect(screen.queryByRole('menu')).not.to.equal(null));
+      const menuItem = screen.queryByRole('menuitem', { name: 'Group by category1' });
+      fireEvent.click(menuItem);
+      expect(apiRef.current.state.groupingColumns.model).to.deep.equal(['category1']);
+    });
+
+    it('should not add a "Group by {field}" menu item on ungrouped columns when coLDef.canBeGrouped = false', async () => {
+      render(
+        <Test
+          columns={[
+            {
+              field: 'id',
+            },
+            {
+              field: 'category1',
+              canBeGrouped: false,
+            },
+          ]}
+        />,
+      );
+      apiRef.current.showColumnMenu('category1');
+      await waitFor(() => expect(screen.queryByRole('menu')).not.to.equal(null));
+      expect(screen.queryByRole('menuitem', { name: 'Group by category1' })).to.equal(null);
+    });
+
+    it('should add a "Stop grouping by {field}" menu item on grouped column', async () => {
+      render(
+        <Test
+          columns={[
+            {
+              field: 'id',
+            },
+            {
+              field: 'category1',
+            },
+          ]}
+          initialState={{
+            groupingColumns: {
+              model: ['category1'],
+            },
+          }}
+        />,
+      );
+      apiRef.current.showColumnMenu('category1');
+      await waitFor(() => expect(screen.queryByRole('menu')).not.to.equal(null));
+      const menuItem = screen.queryByRole('menuitem', { name: 'Stop grouping by category1' });
+      fireEvent.click(menuItem);
+      expect(apiRef.current.state.groupingColumns.model).to.deep.equal([]);
+    });
+
+    it('should add a "Stop grouping by {field} menu item on each grouping column when prop.groupingColumnMode = "multiple"', async () => {
+      render(
+        <Test
+          columns={[
+            {
+              field: 'id',
+            },
+            {
+              field: 'category1',
+            },
+            {
+              field: 'category2',
+            },
+          ]}
+          initialState={{
+            groupingColumns: {
+              model: ['category1', 'category2'],
+            },
+          }}
+          groupingColumnMode="multiple"
+        />,
+      );
+
+      apiRef.current.showColumnMenu('__row_group_by_columns_group_category1__');
+      await waitFor(() => expect(screen.queryByRole('menu')).not.to.equal(null));
+      const menuItemCategory1 = screen.queryByRole('menuitem', {
+        name: 'Stop grouping by category1',
+      });
+      fireEvent.click(menuItemCategory1);
+      expect(apiRef.current.state.groupingColumns.model).to.deep.equal(['category2']);
+
+      apiRef.current.hideColumnMenu();
+      await waitFor(() => expect(screen.queryByRole('menu')).to.equal(null));
+
+      apiRef.current.showColumnMenu('__row_group_by_columns_group_category2__');
+      await waitFor(() => expect(screen.queryByRole('menu')).not.to.equal(null));
+      const menuItemCategory2 = screen.queryByRole('menuitem', {
+        name: 'Stop grouping by category2',
+      });
+      fireEvent.click(menuItemCategory2);
+      expect(apiRef.current.state.groupingColumns.model).to.deep.equal([]);
+    });
+
+    it('should add a "Stop grouping {field} menu item for each grouping criteria on the grouping column when prop.groupingColumnMode = "single"', async () => {
+      render(
+        <Test
+          columns={[
+            {
+              field: 'id',
+            },
+            {
+              field: 'category1',
+            },
+            {
+              field: 'category2',
+            },
+          ]}
+          initialState={{
+            groupingColumns: {
+              model: ['category1', 'category2'],
+            },
+          }}
+          groupingColumnMode="single"
+        />,
+      );
+
+      apiRef.current.showColumnMenu('__row_group_by_columns_group__');
+      await waitFor(() => expect(screen.queryByRole('menu')).not.to.equal(null));
+      const menuItemCategory1 = screen.queryByRole('menuitem', {
+        name: 'Stop grouping by category1',
+      });
+      fireEvent.click(menuItemCategory1);
+      expect(apiRef.current.state.groupingColumns.model).to.deep.equal(['category2']);
+      const menuItemCategory2 = screen.queryByRole('menuitem', {
+        name: 'Stop grouping by category2',
+      });
+      fireEvent.click(menuItemCategory2);
+      expect(apiRef.current.state.groupingColumns.model).to.deep.equal([]);
+    });
+
+    it('should use the colDef.headerName property for grouping menu item label', async () => {
+      render(
+        <Test
+          columns={[
+            {
+              field: 'id',
+            },
+            {
+              field: 'category1',
+              headerName: 'Category 1',
+            },
+          ]}
+        />,
+      );
+      apiRef.current.showColumnMenu('category1');
+      await waitFor(() => expect(screen.queryByRole('menu')).not.to.equal(null));
+      expect(screen.queryByRole('menuitem', { name: 'Group by Category 1' })).not.to.equal(null);
+    });
+
+    it('should use the colDef.headerName property for ungrouping menu item label', async () => {
+      render(
+        <Test
+          columns={[
+            {
+              field: 'id',
+            },
+            {
+              field: 'category1',
+              headerName: 'Category 1',
+            },
+          ]}
+          initialState={{
+            groupingColumns: {
+              model: ['category1'],
+            },
+          }}
+        />,
+      );
+      apiRef.current.showColumnMenu('category1');
+      await waitFor(() => expect(screen.queryByRole('menu')).not.to.equal(null));
+      expect(screen.queryByRole('menuitem', { name: 'Stop grouping by Category 1' })).not.to.equal(
+        null,
+      );
+    });
+  });
+
   describe('sorting', () => {
     describe('props: groupingColumnMode = "single"', () => {
       it('should use the top level grouping criteria for sorting if mainGroupingCriteria and leafField are not defined', () => {
@@ -1327,6 +1542,36 @@ describe.only('<DataGridPro /> - Group Rows By Column', () => {
 
         expect(getColumnValues(0)).to.deep.equal(['Cat B (2)', '3', '4']);
       });
+    });
+  });
+
+  describe('apiRef: addGroupingCriteria', () => {
+    it('should add grouping field to model', () => {
+      render(<Test initialState={{ groupingColumns: { model: ['category1'] } }} />);
+      apiRef.current.addGroupingCriteria('category2');
+      expect(apiRef.current.state.groupingColumns.model).to.deep.equal(['category1', 'category2']);
+    });
+
+    it('should add grouping field to model at the right position', () => {
+      render(<Test initialState={{ groupingColumns: { model: ['category1'] } }} />);
+      apiRef.current.addGroupingCriteria('category2', 0);
+      expect(apiRef.current.state.groupingColumns.model).to.deep.equal(['category2', 'category1']);
+    });
+  });
+
+  describe('apiRef: removeGroupingCriteria', () => {
+    it('should remove field from model', () => {
+      render(<Test initialState={{ groupingColumns: { model: ['category1'] } }} />);
+      apiRef.current.removeGroupingCriteria('category1');
+      expect(apiRef.current.state.groupingColumns.model).to.deep.equal([]);
+    });
+  });
+
+  describe('apiRef: setGroupingCriteriaIndex', () => {
+    it('should change the grouping criteria order', () => {
+      render(<Test initialState={{ groupingColumns: { model: ['category1', 'category2'] } }} />);
+      apiRef.current.setGroupingCriteriaIndex('category1', 1);
+      expect(apiRef.current.state.groupingColumns.model).to.deep.equal(['category2', 'category1']);
     });
   });
 });

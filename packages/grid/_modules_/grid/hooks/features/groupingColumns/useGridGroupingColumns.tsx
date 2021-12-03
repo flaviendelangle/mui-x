@@ -339,8 +339,8 @@ export const useGridGroupingColumns = (
     [apiRef, setGridState, forceUpdate, updateRowGrouping],
   );
 
-  const addGroupingField = React.useCallback<GridGroupingColumnsApi['addGroupingField']>(
-    (field, hideGroupedColumn, groupingIndex) => {
+  const addGroupingCriteria = React.useCallback<GridGroupingColumnsApi['addGroupingCriteria']>(
+    (field, groupingIndex) => {
       const currentModel = gridGroupingRowsModelSelector(apiRef.current.state);
       if (currentModel.includes(field)) {
         return;
@@ -355,25 +355,19 @@ export const useGridGroupingColumns = (
       ];
 
       apiRef.current.setGroupingColumnsModel(updatedModel);
-
-      if (hideGroupedColumn) {
-        apiRef.current.updateColumns([{ field, hide: true }]);
-      }
     },
     [apiRef],
   );
 
-  const removeGroupingField = React.useCallback<GridGroupingColumnsApi['removeGroupingField']>(
-    (field, showGroupedColumn) => {
+  const removeGroupingCriteria = React.useCallback<
+    GridGroupingColumnsApi['removeGroupingCriteria']
+  >(
+    (field) => {
       const currentModel = gridGroupingRowsModelSelector(apiRef.current.state);
       if (!currentModel.includes(field)) {
         return;
       }
       apiRef.current.setGroupingColumnsModel(currentModel.filter((el) => el !== field));
-
-      if (showGroupedColumn) {
-        apiRef.current.updateColumns([{ field, hide: false }]);
-      }
     },
     [apiRef],
   );
@@ -401,8 +395,8 @@ export const useGridGroupingColumns = (
     apiRef,
     {
       setGroupingColumnsModel,
-      addGroupingField,
-      removeGroupingField,
+      addGroupingCriteria,
+      removeGroupingCriteria,
       setGroupingCriteriaIndex,
     },
     'GridGroupingColumnsApi',

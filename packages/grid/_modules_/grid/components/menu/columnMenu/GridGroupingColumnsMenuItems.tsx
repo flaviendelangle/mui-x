@@ -10,6 +10,7 @@ import {
   GROUPING_COLUMN_SINGLE,
   isGroupingColumn,
 } from '../../../hooks/features/groupingColumns/gridGroupingColumnsUtils';
+import { gridColumnLookupSelector } from '../../../hooks';
 
 interface GridColumnPinningMenuItemsProps {
   column?: GridColDef;
@@ -20,26 +21,47 @@ const GridGroupingColumnsMenuItems = (props: GridColumnPinningMenuItemsProps) =>
   const { column, onClick } = props;
   const apiRef = useGridApiContext();
   const groupingColumnsModel = useGridSelector(apiRef, gridGroupingRowsSanitizedModelSelector);
+  const columnsLookup = useGridSelector(apiRef, gridColumnLookupSelector);
 
   const isGrouped = React.useMemo(
     () => column?.field && groupingColumnsModel.includes(column.field),
     [column, groupingColumnsModel],
   );
 
-  const groupColumn = (event: React.MouseEvent<HTMLElement>, field: string) => {
-    apiRef.current.addGroupingField(field, true);
+  const renderGroupingMenuItem = (field: string) => {
+    const name = columnsLookup[field].headerName ?? field;
 
-    if (onClick) {
-      onClick(event);
-    }
+    const groupColumn = (event: React.MouseEvent<HTMLElement>) => {
+      apiRef.current.addGroupingCriteria(field);
+      apiRef.current.updateColumns([{ field, hide: true }]);
+
+      if (onClick) {
+        onClick(event);
+      }
+    };
+
+    return (
+      <MenuItem onClick={groupColumn}>{apiRef.current.getLocaleText('groupColumn')(name)}</MenuItem>
+    );
   };
 
-  const ungroupColumn = (event: React.MouseEvent<HTMLElement>, field: string) => {
-    apiRef.current.removeGroupingField(field, true);
+  const renderUnGroupingMenuItem = (field: string) => {
+    const ungroupColumn = (event: React.MouseEvent<HTMLElement>) => {
+      apiRef.current.removeGroupingCriteria(field);
+      apiRef.current.updateColumns([{ field, hide: false }]);
 
-    if (onClick) {
-      onClick(event);
-    }
+      if (onClick) {
+        onClick(event);
+      }
+    };
+
+    const name = columnsLookup[field].headerName ?? field;
+
+    return (
+      <MenuItem onClick={ungroupColumn} key={field}>
+        {apiRef.current.getLocaleText('unGroupColumn')(name)}
+      </MenuItem>
+    );
   };
 
   if (!column) {
@@ -48,42 +70,21 @@ const GridGroupingColumnsMenuItems = (props: GridColumnPinningMenuItemsProps) =>
 
   if (isGroupingColumn(column.field)) {
     if (column.field === GROUPING_COLUMN_SINGLE) {
-      return (
-        <React.Fragment>
-          {groupingColumnsModel.map((groupingField) => (
-            <MenuItem onClick={(event) => ungroupColumn(event, groupingField)}>
-              {apiRef.current.getLocaleText('unGroupColumn')(groupingField)}
-            </MenuItem>
-          ))}
-        </React.Fragment>
-      );
+      return <React.Fragment>{groupingColumnsModel.map(renderUnGroupingMenuItem)}</React.Fragment>;
     }
 
-    const groupingCriteriaField = getGroupingCriteriaFieldFromGroupingColDefField(column.field)!;
-    return (
-      <MenuItem onClick={(event) => ungroupColumn(event, groupingCriteriaField)}>
-        {apiRef.current.getLocaleText('unGroupColumn')(groupingCriteriaField)}
-      </MenuItem>
-    );
+    return renderUnGroupingMenuItem(getGroupingCriteriaFieldFromGroupingColDefField(column.field)!);
   }
 
   if (isGrouped) {
-    return (
-      <MenuItem onClick={(event) => ungroupColumn(event, column.field)}>
-        {apiRef.current.getLocaleText('unGroupColumn')(column.field)}
-      </MenuItem>
-    );
+    return renderUnGroupingMenuItem(column.field);
   }
 
   if (!column.canBeGrouped) {
     return null;
   }
 
-  return (
-    <MenuItem onClick={(event) => groupColumn(event, column.field)}>
-      {apiRef.current.getLocaleText('groupColumn')(column.field)}
-    </MenuItem>
-  );
+  return renderGroupingMenuItem(column.field);
 };
 
 GridGroupingColumnsMenuItems.propTypes = {

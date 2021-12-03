@@ -60,12 +60,15 @@ export const GridGroupingColumnsPanel = () => {
     if (groupingColumnsModel.includes(dragField)) {
       apiRef.current.setGroupingCriteriaIndex(dragField, targetIndex);
     } else {
-      apiRef.current.addGroupingField(dragField, true, targetIndex);
+      apiRef.current.addGroupingCriteria(dragField, targetIndex);
+      apiRef.current.updateColumns([{ field: dragField, hide: true }]);
     }
   };
 
-  const handleRemoveGroupingCol = (field: string) =>
-    apiRef.current.removeGroupingField(field, true);
+  const handleRemoveGroupingCol = (field: string) => {
+    apiRef.current.removeGroupingCriteria(field);
+    apiRef.current.updateColumns([{ field, hide: false }]);
+  };
 
   useGridApiEventHandler(apiRef, GridEvents.columnHeaderDragStart, handleColumnReorderStart);
   useGridApiEventHandler(apiRef, GridEvents.columnHeaderDragEnd, handleColumnReorderStop);
