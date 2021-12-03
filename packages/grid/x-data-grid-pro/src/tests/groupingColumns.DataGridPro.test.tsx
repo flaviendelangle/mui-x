@@ -8,7 +8,6 @@ import {
   GridApiRef,
   GridKeyGetterParams,
   GridPreferencePanelsValue,
-  GridRenderCellParams,
   GridRowsProp,
   useGridApiRef,
 } from '@mui/x-data-grid-pro';
@@ -95,62 +94,95 @@ describe.only('<DataGridPro /> - Group Rows By Column', () => {
     );
   };
 
-  describe('initialState: groupingColumns.model', () => {
-    it('should allow to initialize the grouping columns', () => {
+  describe('Setting grouping fields', () => {
+    describe('initialState: groupingColumns.model', () => {
+      it('should allow to initialize the grouping columns', () => {
+        render(
+          <Test
+            initialState={{ groupingColumns: { model: ['category1'] } }}
+            defaultGroupingExpansionDepth={-1}
+          />,
+        );
+        expect(getColumnValues(0)).to.deep.equal(GROUPING_COLS_SINGLE_CAT_1);
+      });
+
+      it('should not react to initial state updates', () => {
+        const { setProps } = render(
+          <Test
+            initialState={{ groupingColumns: { model: ['category1'] } }}
+            defaultGroupingExpansionDepth={-1}
+          />,
+        );
+        expect(getColumnValues(0)).to.deep.equal(GROUPING_COLS_SINGLE_CAT_1);
+
+        setProps({ initialState: { groupingColumns: { model: ['category2'] } } });
+        expect(getColumnValues(0)).to.deep.equal(GROUPING_COLS_SINGLE_CAT_1);
+      });
+    });
+
+    describe('prop: groupingColumnsModel', () => {
+      it('should not call onGroupingColumnsModelChange on initialisation or on groupingColumnsModel prop change', () => {
+        const onGroupingColumnsModelChange = spy();
+
+        const { setProps } = render(
+          <Test
+            groupingColumnsModel={['category1']}
+            onGroupingColumnsModelChange={onGroupingColumnsModelChange}
+          />,
+        );
+
+        expect(onGroupingColumnsModelChange.callCount).to.equal(0);
+        setProps({ groupingColumnsModel: ['category2'] });
+
+        expect(onGroupingColumnsModelChange.callCount).to.equal(0);
+      });
+
+      it('should allow to update the grouping columns model from the outside', () => {
+        const { setProps } = render(
+          <Test groupingColumnsModel={['category1']} defaultGroupingExpansionDepth={-1} />,
+        );
+        expect(getColumnValues(0)).to.deep.equal(GROUPING_COLS_SINGLE_CAT_1);
+        setProps({ groupingColumnsModel: ['category2'] });
+        expect(getColumnValues()).to.deep.equal(GROUPING_COLS_SINGLE_CAT_2);
+        setProps({ groupingColumnsModel: ['category1', 'category2'] });
+        expect(getColumnValues()).to.deep.equal(GROUPING_COLS_SINGLE_CAT_1_CAT_2);
+      });
+    });
+
+    it('should ignore grouping fields that do not match any column', () => {
       render(
         <Test
-          initialState={{ groupingColumns: { model: ['category1'] } }}
+          initialState={{ groupingColumns: { model: ['category1', 'category3'] } }}
           defaultGroupingExpansionDepth={-1}
         />,
       );
       expect(getColumnValues(0)).to.deep.equal(GROUPING_COLS_SINGLE_CAT_1);
     });
 
-    it('should not react to initial state updates', () => {
-      const { setProps } = render(
+    it('should allow to use several time the same grouping field', () => {
+      render(
         <Test
-          initialState={{ groupingColumns: { model: ['category1'] } }}
+          initialState={{ groupingColumns: { model: ['category1', 'category1'] } }}
           defaultGroupingExpansionDepth={-1}
         />,
       );
-      expect(getColumnValues(0)).to.deep.equal(GROUPING_COLS_SINGLE_CAT_1);
 
-      setProps({ initialState: { groupingColumns: { model: ['category2'] } } });
-      expect(getColumnValues(0)).to.deep.equal(GROUPING_COLS_SINGLE_CAT_1);
-    });
-  });
-
-  describe('prop: groupingColumnsModel', () => {
-    it('should not call onGroupingColumnsModelChange on initialisation or on groupingColumnsModel prop change', () => {
-      const onGroupingColumnsModelChange = spy();
-
-      const { setProps } = render(
-        <Test
-          groupingColumnsModel={['category1']}
-          onGroupingColumnsModelChange={onGroupingColumnsModelChange}
-        />,
-      );
-
-      expect(onGroupingColumnsModelChange.callCount).to.equal(0);
-      setProps({ groupingColumnsModel: ['category2'] });
-
-      expect(onGroupingColumnsModelChange.callCount).to.equal(0);
-    });
-
-    it('should allow to update the grouping columns model from the outside', () => {
-      const { setProps } = render(
-        <Test groupingColumnsModel={['category1']} defaultGroupingExpansionDepth={-1} />,
-      );
-      expect(getColumnValues(0)).to.deep.equal(GROUPING_COLS_SINGLE_CAT_1);
-      setProps({ groupingColumnsModel: ['category2'] });
-      expect(getColumnValues()).to.deep.equal(GROUPING_COLS_SINGLE_CAT_2);
-      setProps({ groupingColumnsModel: ['category1', 'category2'] });
-      expect(getColumnValues()).to.deep.equal(GROUPING_COLS_SINGLE_CAT_1_CAT_2);
+      expect(getColumnValues(0)).to.deep.equal([
+        'Cat A (3)',
+        'Cat A (3)',
+        '',
+        '',
+        '',
+        'Cat B (2)',
+        'Cat B (2)',
+        '',
+        '',
+      ]);
     });
   });
 
   describe('props: groupingColumnMode', () => {
-    it('should gather call the grouping fields in a single column when groupingColumnMode is not defined', () => {
+    it('should gather call the grouping fields into a single column when groupingColumnMode is not defined', () => {
       render(
         <Test
           initialState={{ groupingColumns: { model: ['category1', 'category2'] } }}
@@ -167,7 +199,7 @@ describe.only('<DataGridPro /> - Group Rows By Column', () => {
       expect(getColumnValues(0)).to.deep.equal(GROUPING_COLS_SINGLE_CAT_1_CAT_2);
     });
 
-    it('should gather call the grouping fields in a single column when groupingColumnMode = "single"', () => {
+    it('should gather call the grouping fields into a single column when groupingColumnMode = "single"', () => {
       render(
         <Test
           initialState={{ groupingColumns: { model: ['category1', 'category2'] } }}
@@ -185,7 +217,7 @@ describe.only('<DataGridPro /> - Group Rows By Column', () => {
       expect(getColumnValues(0)).to.deep.equal(GROUPING_COLS_SINGLE_CAT_1_CAT_2);
     });
 
-    it('should gather call the grouping fields in a single column when groupingColumnMode = "multiple"', () => {
+    it('should create on grouping column per grouping fields when groupingColumnMode = "multiple"', () => {
       render(
         <Test
           initialState={{ groupingColumns: { model: ['category1', 'category2'] } }}
@@ -284,96 +316,6 @@ describe.only('<DataGridPro /> - Group Rows By Column', () => {
     });
   });
 
-  describe('colDef: keyGetter & valueGetter', () => {
-    it('should use keyGetter to group rows when defined', () => {
-      render(
-        <Test
-          columns={[
-            {
-              field: 'id',
-            },
-            {
-              field: 'category1',
-              keyGetter: (params: GridKeyGetterParams<string>) => `key ${params.value}`,
-            },
-          ]}
-          initialState={{ groupingColumns: { model: ['category1'] } }}
-          defaultGroupingExpansionDepth={-1}
-        />,
-      );
-      expect(getColumnValues(0)).to.deep.equal([
-        'key Cat A (3)',
-        '',
-        '',
-        '',
-        'key Cat B (2)',
-        '',
-        '',
-      ]);
-      expect(getColumnValues(1)).to.deep.equal(['', '0', '1', '2', '', '3', '4']);
-    });
-
-    it('should use valueGetter to group the rows when defined', () => {
-      render(
-        <Test
-          columns={[
-            {
-              field: 'id',
-            },
-            {
-              field: 'complexCategory1',
-              valueGetter: (params) => `value ${params.row.category1}`,
-            },
-          ]}
-          initialState={{ groupingColumns: { model: ['complexCategory1'] } }}
-          defaultGroupingExpansionDepth={-1}
-        />,
-      );
-      expect(getColumnValues(0)).to.deep.equal([
-        'value Cat A (3)',
-        '',
-        '',
-        '',
-        'value Cat B (2)',
-        '',
-        '',
-      ]);
-      expect(getColumnValues(1)).to.deep.equal(['', '0', '1', '2', '', '3', '4']);
-    });
-
-    it('should pass the return value of valueGetter to the keyGetter callback when both defined', () => {
-      render(
-        <Test
-          initialState={{
-            groupingColumns: { model: ['complexCategory1'] },
-          }}
-          columns={[
-            {
-              field: 'id',
-            },
-            {
-              field: 'complexCategory1',
-              hide: true,
-              valueGetter: (params) => `value ${params.row.category1}`,
-              keyGetter: (params: GridKeyGetterParams<string>) => `key ${params.value}`,
-            },
-          ]}
-          defaultGroupingExpansionDepth={-1}
-        />,
-      );
-      expect(getColumnValues(0)).to.deep.equal([
-        'key value Cat A (3)',
-        '',
-        '',
-        '',
-        'key value Cat B (2)',
-        '',
-        '',
-      ]);
-      expect(getColumnValues(1)).to.deep.equal(['', '0', '1', '2', '', '3', '4']);
-    });
-  });
-
   describe('prop: defaultGroupingExpansionDepth', () => {
     it('should not expand any row if defaultGroupingExpansionDepth = 0', () => {
       render(
@@ -446,6 +388,25 @@ describe.only('<DataGridPro /> - Group Rows By Column', () => {
       ]);
     });
 
+    it('should react to defaultGroupingExpansionDepth updates', () => {
+      const { setProps } = render(
+        <Test
+          defaultGroupingExpansionDepth={0}
+          initialState={{ groupingColumns: { model: ['category1', 'category2'] } }}
+        />,
+      );
+      expect(getColumnValues(0)).to.deep.equal(['Cat A (3)', 'Cat B (2)']);
+      setProps({ defaultGroupingExpansionDepth: 1 });
+      expect(getColumnValues(0)).to.deep.equal([
+        'Cat A (3)',
+        'Cat 1 (1)',
+        'Cat 2 (2)',
+        'Cat B (2)',
+        'Cat 2 (1)',
+        'Cat 1 (1)',
+      ]);
+    });
+
     it('should not re-apply default expansion on rerender after expansion manually toggled', async () => {
       const { setProps } = render(
         <Test initialState={{ groupingColumns: { model: ['category1', 'category2'] } }} />,
@@ -469,67 +430,25 @@ describe.only('<DataGridPro /> - Group Rows By Column', () => {
     });
   });
 
-  describe('props: groupingColDef', () => {
-    describe('props: groupingColumnMode = "single"', () => {
-      it('should not allow to override the field', () => {
-        render(
-          <Test
-            initialState={{ groupingColumns: { model: ['category1'] } }}
-            groupingColumnMode="multiple"
-            groupingColDef={{
-              // @ts-expect-error
-              field: 'custom-field',
-            }}
-          />,
-        );
+  describe('props: groupingColDef when groupingColumMode = "single"', () => {
+    it('should not allow to override the field', () => {
+      render(
+        <Test
+          initialState={{ groupingColumns: { model: ['category1'] } }}
+          groupingColumnMode="multiple"
+          groupingColDef={{
+            // @ts-expect-error
+            field: 'custom-field',
+          }}
+        />,
+      );
 
-        expect(apiRef.current.getAllColumns()[0].field).to.equal(
-          '__row_group_by_columns_group_category1__',
-        );
-      });
+      expect(apiRef.current.getAllColumns()[0].field).to.equal(
+        '__row_group_by_columns_group_category1__',
+      );
+    });
 
-      it('should allow to override the headerName in object mode', () => {
-        render(
-          <Test
-            initialState={{ groupingColumns: { model: ['category1', 'category2'] } }}
-            groupingColumnMode="single"
-            groupingColDef={{
-              headerName: 'Main category',
-            }}
-          />,
-        );
-
-        expect(getColumnHeadersTextContent()).to.deep.equal([
-          'Main category',
-          'id',
-          'category1',
-          'category2',
-        ]);
-      });
-
-      it('should allow to override the headerName in callback mode', () => {
-        render(
-          <Test
-            initialState={{ groupingColumns: { model: ['category1', 'category2'] } }}
-            groupingColumnMode="single"
-            groupingColDef={(params) =>
-              params.sources.some((colDef) => colDef.field === 'category1')
-                ? {
-                    headerName: 'Main category',
-                  }
-                : {}
-            }
-          />,
-        );
-
-        expect(getColumnHeadersTextContent()).to.deep.equal([
-          'Main category',
-          'id',
-          'category1',
-          'category2',
-        ]);
-      });
-
+    describe('prop: groupColDef.leafField', () => {
       it('should render the leafField `value` on leaves', () => {
         render(
           <Test
@@ -624,27 +543,12 @@ describe.only('<DataGridPro /> - Group Rows By Column', () => {
       });
     });
 
-    describe('props: groupingColumnMode = "multiple"', () => {
-      it('should not allow to override the field', () => {
-        render(
-          <Test
-            initialState={{ groupingColumns: { model: ['category1'] } }}
-            groupingColumnMode="single"
-            groupingColDef={{
-              // @ts-expect-error
-              field: 'custom-field',
-            }}
-          />,
-        );
-
-        expect(apiRef.current.getAllColumns()[0].field).to.equal('__row_group_by_columns_group__');
-      });
-
+    describe('prop: groupColDef.headerName', () => {
       it('should allow to override the headerName in object mode', () => {
         render(
           <Test
             initialState={{ groupingColumns: { model: ['category1', 'category2'] } }}
-            groupingColumnMode="multiple"
+            groupingColumnMode="single"
             groupingColDef={{
               headerName: 'Main category',
             }}
@@ -652,7 +556,6 @@ describe.only('<DataGridPro /> - Group Rows By Column', () => {
         );
 
         expect(getColumnHeadersTextContent()).to.deep.equal([
-          'Main category',
           'Main category',
           'id',
           'category1',
@@ -664,7 +567,7 @@ describe.only('<DataGridPro /> - Group Rows By Column', () => {
         render(
           <Test
             initialState={{ groupingColumns: { model: ['category1', 'category2'] } }}
-            groupingColumnMode="multiple"
+            groupingColumnMode="single"
             groupingColDef={(params) =>
               params.sources.some((colDef) => colDef.field === 'category1')
                 ? {
@@ -677,13 +580,31 @@ describe.only('<DataGridPro /> - Group Rows By Column', () => {
 
         expect(getColumnHeadersTextContent()).to.deep.equal([
           'Main category',
-          'category2',
           'id',
           'category1',
           'category2',
         ]);
       });
+    });
+  });
 
+  describe('props: groupingColDef when groupingColumMode = "multiple"', () => {
+    it('should not allow to override the field', () => {
+      render(
+        <Test
+          initialState={{ groupingColumns: { model: ['category1'] } }}
+          groupingColumnMode="single"
+          groupingColDef={{
+            // @ts-expect-error
+            field: 'custom-field',
+          }}
+        />,
+      );
+
+      expect(apiRef.current.getAllColumns()[0].field).to.equal('__row_group_by_columns_group__');
+    });
+
+    describe('prop: groupColDef.leafField', () => {
       it('should render the leafField `value` on leaves', () => {
         render(
           <Test
@@ -727,7 +648,7 @@ describe.only('<DataGridPro /> - Group Rows By Column', () => {
         ]);
       });
 
-      it.only('should render the leafField `formattedValue` on leaves if `valueFormatter` is defined on the leafColDef', () => {
+      it('should render the leafField `formattedValue` on leaves if `valueFormatter` is defined on the leafColDef', () => {
         render(
           <Test
             columns={[
@@ -790,7 +711,7 @@ describe.only('<DataGridPro /> - Group Rows By Column', () => {
         ]);
       });
 
-      it.only('should render the leafField `renderCell` on leaves  if `renderCell` is defined on the leafColDef', () => {
+      it('should render the leafField `renderCell` on leaves  if `renderCell` is defined on the leafColDef', () => {
         const renderIdCell = spy(() => 'Custom leaf');
 
         render(
@@ -850,6 +771,142 @@ describe.only('<DataGridPro /> - Group Rows By Column', () => {
           'Custom leaf',
         ]);
       });
+    });
+
+    describe('prop: groupColDef.headerName', () => {
+      it('should allow to override the headerName in object mode', () => {
+        render(
+          <Test
+            initialState={{ groupingColumns: { model: ['category1', 'category2'] } }}
+            groupingColumnMode="multiple"
+            groupingColDef={{
+              headerName: 'Main category',
+            }}
+          />,
+        );
+
+        expect(getColumnHeadersTextContent()).to.deep.equal([
+          'Main category',
+          'Main category',
+          'id',
+          'category1',
+          'category2',
+        ]);
+      });
+
+      it('should allow to override the headerName in callback mode', () => {
+        render(
+          <Test
+            initialState={{ groupingColumns: { model: ['category1', 'category2'] } }}
+            groupingColumnMode="multiple"
+            groupingColDef={(params) =>
+              params.sources.some((colDef) => colDef.field === 'category1')
+                ? {
+                    headerName: 'Main category',
+                  }
+                : {}
+            }
+          />,
+        );
+
+        expect(getColumnHeadersTextContent()).to.deep.equal([
+          'Main category',
+          'category2',
+          'id',
+          'category1',
+          'category2',
+        ]);
+      });
+    });
+  });
+
+  describe('colDef: keyGetter & valueGetter', () => {
+    it('should use keyGetter to group rows when defined', () => {
+      render(
+        <Test
+          columns={[
+            {
+              field: 'id',
+            },
+            {
+              field: 'category1',
+              keyGetter: (params: GridKeyGetterParams<string>) => `key ${params.value}`,
+            },
+          ]}
+          initialState={{ groupingColumns: { model: ['category1'] } }}
+          defaultGroupingExpansionDepth={-1}
+        />,
+      );
+      expect(getColumnValues(0)).to.deep.equal([
+        'key Cat A (3)',
+        '',
+        '',
+        '',
+        'key Cat B (2)',
+        '',
+        '',
+      ]);
+      expect(getColumnValues(1)).to.deep.equal(['', '0', '1', '2', '', '3', '4']);
+    });
+
+    it('should use valueGetter to group the rows when defined', () => {
+      render(
+        <Test
+          columns={[
+            {
+              field: 'id',
+            },
+            {
+              field: 'complexCategory1',
+              valueGetter: (params) => `value ${params.row.category1}`,
+            },
+          ]}
+          initialState={{ groupingColumns: { model: ['complexCategory1'] } }}
+          defaultGroupingExpansionDepth={-1}
+        />,
+      );
+      expect(getColumnValues(0)).to.deep.equal([
+        'value Cat A (3)',
+        '',
+        '',
+        '',
+        'value Cat B (2)',
+        '',
+        '',
+      ]);
+      expect(getColumnValues(1)).to.deep.equal(['', '0', '1', '2', '', '3', '4']);
+    });
+
+    it('should pass the return value of valueGetter to the keyGetter callback when both defined', () => {
+      render(
+        <Test
+          initialState={{
+            groupingColumns: { model: ['complexCategory1'] },
+          }}
+          columns={[
+            {
+              field: 'id',
+            },
+            {
+              field: 'complexCategory1',
+              hide: true,
+              valueGetter: (params) => `value ${params.row.category1}`,
+              keyGetter: (params: GridKeyGetterParams<string>) => `key ${params.value}`,
+            },
+          ]}
+          defaultGroupingExpansionDepth={-1}
+        />,
+      );
+      expect(getColumnValues(0)).to.deep.equal([
+        'key value Cat A (3)',
+        '',
+        '',
+        '',
+        'key value Cat B (2)',
+        '',
+        '',
+      ]);
+      expect(getColumnValues(1)).to.deep.equal(['', '0', '1', '2', '', '3', '4']);
     });
   });
 
