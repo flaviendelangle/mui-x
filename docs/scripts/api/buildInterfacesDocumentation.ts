@@ -28,6 +28,7 @@ const INTERFACES_WITH_DEDICATED_PAGES = [
   'GridScrollApi',
   'GridEditRowApi',
   'GridGroupingColumnsApi',
+  'GridColumnPinningApi',
   'GridEvents',
 ];
 

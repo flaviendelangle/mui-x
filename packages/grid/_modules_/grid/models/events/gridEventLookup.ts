@@ -23,10 +23,13 @@ import type { MuiBaseEvent } from '../muiEvent';
 import type { GridRowId, GridRowTreeNodeConfig } from '../gridRows';
 import type { GridPreProcessingGroup } from '../../hooks/core/preProcessing';
 import type { GridGroupingColumnsModel } from '../../hooks/features/groupingColumns';
+import type { GridPinnedColumns } from '../api/gridColumnPinningApi';
 
 export interface GridRowEventLookup {
   rowClick: { params: GridRowParams; event: React.MouseEvent<HTMLElement> };
   rowDoubleClick: { params: GridRowParams; event: React.MouseEvent<HTMLElement> };
+  rowMouseEnter: { params: GridRowParams; event: React.MouseEvent<HTMLElement> };
+  rowMouseLeave: { params: GridRowParams; event: React.MouseEvent<HTMLElement> };
 }
 
 export interface GridColumnHeaderEventLookup {
@@ -127,6 +130,7 @@ export interface GridControlledStateEventLookup {
   editRowsModelChange: { params: GridEditRowsModel };
   selectionChange: { params: GridSelectionModel };
   groupingColumnsModelChange: { params: GridGroupingColumnsModel };
+  pinnedColumnsChange: { params: GridPinnedColumns };
 }
 
 export interface GridEventLookup
@@ -197,6 +201,7 @@ export interface GridEventLookup
   // Scroll
   rowsScroll: { params: GridScrollParams };
   rowsScrollEnd: { params: GridRowScrollEndParams };
+  virtualScrollerContentSizeChange: {};
 
   // Selection
   headerSelectionCheckboxChange: { params: GridHeaderSelectionCheckboxParams };

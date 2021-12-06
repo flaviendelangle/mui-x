@@ -21,6 +21,7 @@ import { GridSortApi } from './gridSortApi';
 import { GridStateApi } from './gridStateApi';
 import { GridLoggerApi } from './gridLoggerApi';
 import { GridScrollApi } from './gridScrollApi';
+import { GridColumnPinningApi } from './gridColumnPinningApi';
 import type { GridPreProcessingApi } from '../../hooks/core/preProcessing';
 import type { GridRowGroupsPreProcessingApi } from '../../hooks/core/rowGroupsPerProcessing';
 import type { GridDimensionsApi } from '../../hooks/features/dimensions';
@@ -56,4 +57,5 @@ export interface GridApi
     GridControlStateApi,
     GridClipboardApi,
     GridScrollApi,
-    GridGroupingColumnsApi {}
+    GridGroupingColumnsApi,
+    GridColumnPinningApi {}

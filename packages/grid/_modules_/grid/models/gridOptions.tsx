@@ -11,7 +11,7 @@ export type GridMergedOptions = {
 };
 
 /**
- * The grid options with a default in value which is merged with the the value given through props
+ * The grid options with a default in value which is merged with the value given through props.
  */
 export interface GridProcessedMergedOptions {
   /**
@@ -148,6 +148,11 @@ export interface GridSimpleOptions {
    * @default false
    */
   disableVirtualization: boolean;
+  /**
+   * If `true`, the column pinning is disabled.
+   * @default false
+   */
+  disableColumnPinning: boolean;
   /**
    * Controls whether to use the cell or row editing.
    * @default "cell"
@@ -289,6 +294,7 @@ export const GRID_DEFAULT_SIMPLE_OPTIONS: GridSimpleOptions = {
   disableExtendRowFullWidth: false,
   disableColumnFilter: false,
   disableColumnMenu: false,
+  disableColumnPinning: false,
   disableColumnReorder: false,
   disableColumnResize: false,
   disableColumnSelector: false,

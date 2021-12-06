@@ -24,6 +24,7 @@ import type {
   GridGroupingColumnsState,
   GridGroupingColumnsInitialState,
 } from '../hooks/features/groupingColumns';
+import { GridColumnPinningState } from '../hooks/features/columnPinning/gridColumnPinningState';
 
 /**
  * TODO: Distinguish pro and community states
@@ -45,6 +46,7 @@ export interface GridState {
   density: GridDensityState;
   groupingColumns: GridGroupingColumnsState;
   error?: any;
+  pinnedColumns: GridColumnPinningState;
 }
 
 export interface GridInitialState {
@@ -52,4 +54,5 @@ export interface GridInitialState {
   filter?: GridFilterInitialState;
   preferencePanel?: GridPreferencePanelInitialState;
   groupingColumns?: GridGroupingColumnsInitialState;
+  pinnedColumns?: GridColumnPinningState;
 }
