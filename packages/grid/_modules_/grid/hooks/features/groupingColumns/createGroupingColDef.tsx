@@ -130,7 +130,7 @@ interface CreateGroupingColDefMonoCriteriaParams {
    * The col def properties the user wants to override.
    * This value comes prop `prop.groupingColDef`
    */
-  colDefOverride: GridGroupingColDefOverride;
+  colDefOverride: GridGroupingColDefOverride | null | undefined;
 }
 
 /**
@@ -143,7 +143,7 @@ export const createGroupingColDefForOneGroupingCriteria = ({
   colDefOverride,
 }: CreateGroupingColDefMonoCriteriaParams): GridColDef => {
   const { leafField, mainGroupingCriteria, hideDescendantCount, ...colDefOverrideProperties } =
-    colDefOverride;
+    colDefOverride ?? {};
   const leafColDef = leafField ? columnsLookup[leafField] : null;
 
   // The properties that do not depend on the presence of a `leafColDef` and that can be overridden by `colDefOverride`
@@ -247,7 +247,7 @@ interface CreateGroupingColDefSeveralCriteriaParams {
   /**
    * The col def properties the user wants to override.
    */
-  colDefOverride: GridGroupingColDefOverride;
+  colDefOverride: GridGroupingColDefOverride | null | undefined;
 }
 
 /**
@@ -260,7 +260,7 @@ export const createGroupingColDefForAllGroupingCriteria = ({
   colDefOverride,
 }: CreateGroupingColDefSeveralCriteriaParams): GridColDef => {
   const { leafField, mainGroupingCriteria, hideDescendantCount, ...colDefOverrideProperties } =
-    colDefOverride;
+    colDefOverride ?? {};
   const leafColDef = leafField ? columnsLookup[leafField] : null;
 
   // The properties that do not depend on the presence of a `leafColDef` and that can be overridden by `colDefOverride`

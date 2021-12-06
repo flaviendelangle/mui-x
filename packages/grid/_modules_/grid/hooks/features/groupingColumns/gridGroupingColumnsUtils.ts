@@ -1,5 +1,6 @@
 import {
   GridColDef,
+  GridGroupingColDefOverride,
   GridRowId,
   GridRowTreeConfig,
   GridRowTreeNodeConfig,
@@ -7,8 +8,11 @@ import {
   GridValueGetterSimpleParams,
 } from '../../../models';
 import { GridFilterState } from '../filter';
+import { GridComponentProps } from '../../../GridComponentProps';
 
 export const GROUPING_COLUMN_SINGLE = '__row_group_by_columns_group__';
+
+export const GROUPING_COLUMNS_FEATURE_NAME = 'grouping-columns';
 
 export const getGroupingColDefFieldFromGroupingCriteriaField = (groupedByField: string | null) => {
   if (groupedByField === null) {
@@ -136,4 +140,18 @@ export const filterRowTreeFromGroupingColumns = (
     visibleRowsLookup,
     filteredDescendantCountLookup,
   };
+};
+
+export const getColDefOverrides = (
+  propGroupingColDef: GridComponentProps['groupingColDef'],
+  fields: string[],
+) => {
+  if (typeof propGroupingColDef === 'function') {
+    return propGroupingColDef({
+      groupingName: GROUPING_COLUMNS_FEATURE_NAME,
+      fields,
+    });
+  }
+
+  return propGroupingColDef;
 };

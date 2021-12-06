@@ -21,12 +21,14 @@ import {
   filterRowTreeFromGroupingColumns,
   getCellValue,
   getGroupingColDefFieldFromGroupingCriteriaField,
+  getColDefOverrides,
+  GROUPING_COLUMNS_FEATURE_NAME,
 } from './gridGroupingColumnsUtils';
 import {
   createGroupingColDefForOneGroupingCriteria,
   createGroupingColDefForAllGroupingCriteria,
 } from './createGroupingColDef';
-import { isDeepEqual, isFunction } from '../../../utils/utils';
+import { isDeepEqual } from '../../../utils/utils';
 import { GridPreProcessingGroup, useGridRegisterPreProcessor } from '../../core/preProcessing';
 import { GridColumnsRawState } from '../columns/gridColumnsState';
 import { useGridRegisterFilteringMethod } from '../filter/useGridRegisterFilteringMethod';
@@ -41,8 +43,6 @@ import { GridGroupingColumnsApi, GridGroupingColumnsModel } from './gridGrouping
 import { useGridApiMethod, useGridState } from '../../utils';
 import { gridColumnLookupSelector } from '../columns';
 import { GridGroupingColumnsMenuItems } from '../../../components/menu/columnMenu/GridGroupingColumnsMenuItems';
-
-const GROUP_ROWS_BY_COLUMN_NAME = 'group-rows-by-columns';
 
 /**
  * Only available in DataGridPro
@@ -166,7 +166,7 @@ export const useGridGroupingColumns = (
         ...params,
         rows,
         defaultGroupingExpansionDepth: props.defaultGroupingExpansionDepth,
-        groupingName: GROUP_ROWS_BY_COLUMN_NAME,
+        groupingName: GROUPING_COLUMNS_FEATURE_NAME,
       });
     };
 
@@ -205,41 +205,25 @@ export const useGridGroupingColumns = (
 
       switch (props.groupingColumnMode) {
         case 'single': {
-          const colDefOverride = isFunction(propGroupingColDef)
-            ? propGroupingColDef({
-                groupingName: GROUP_ROWS_BY_COLUMN_NAME,
-                fields: groupingColumnsModel,
-              })
-            : propGroupingColDef ?? {};
-
           return [
             createGroupingColDefForAllGroupingCriteria({
               apiRef,
               groupingColumnsModel,
-              colDefOverride,
+              colDefOverride: getColDefOverrides(propGroupingColDef, groupingColumnsModel),
               columnsLookup: columnsState.lookup,
             }),
           ];
         }
 
         case 'multiple': {
-          return groupingColumnsModel.map((groupedByField) => {
-            const groupedByColDef = columnsState.lookup[groupedByField];
-
-            const colDefOverride = isFunction(propGroupingColDef)
-              ? propGroupingColDef({
-                  groupingName: GROUP_ROWS_BY_COLUMN_NAME,
-                  fields: [groupedByColDef.field],
-                })
-              : propGroupingColDef ?? {};
-
-            return createGroupingColDefForOneGroupingCriteria({
+          return groupingColumnsModel.map((groupedByField) =>
+            createGroupingColDefForOneGroupingCriteria({
               groupedByField,
-              groupedByColDef,
-              colDefOverride,
+              colDefOverride: getColDefOverrides(propGroupingColDef, [groupedByField]),
+              groupedByColDef: columnsState.lookup[groupedByField],
               columnsLookup: columnsState.lookup,
-            });
-          });
+            }),
+          );
         }
 
         default: {
@@ -315,8 +299,8 @@ export const useGridGroupingColumns = (
 
   useGridRegisterPreProcessor(apiRef, GridPreProcessingGroup.hydrateColumns, updateGroupingColumn);
   useGridRegisterPreProcessor(apiRef, GridPreProcessingGroup.columnMenu, addColumnMenuButtons);
-  useGridRegisterFilteringMethod(apiRef, GROUP_ROWS_BY_COLUMN_NAME, filteringMethod);
-  useGridRegisterSortingMethod(apiRef, GROUP_ROWS_BY_COLUMN_NAME, sortingMethod);
+  useGridRegisterFilteringMethod(apiRef, GROUPING_COLUMNS_FEATURE_NAME, filteringMethod);
+  useGridRegisterSortingMethod(apiRef, GROUPING_COLUMNS_FEATURE_NAME, sortingMethod);
 
   /**
    * API METHODS
