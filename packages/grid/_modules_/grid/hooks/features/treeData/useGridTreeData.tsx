@@ -100,7 +100,7 @@ export const useGridTreeData = (
   const getGroupingColDef = React.useCallback((): GridColDef => {
     const propGroupingColDef = props.groupingColDef;
 
-    let colDefOverride: GridGroupingColDefOverride;
+    let colDefOverride: GridGroupingColDefOverride | null | undefined;
     if (typeof propGroupingColDef === 'function') {
       const params: GridGroupingColDefOverrideParams = {
         groupingName: TREE_DATA_GROUPING_NAME,
@@ -109,10 +109,10 @@ export const useGridTreeData = (
 
       colDefOverride = propGroupingColDef(params);
     } else {
-      colDefOverride = propGroupingColDef ?? {};
+      colDefOverride = propGroupingColDef;
     }
 
-    const { hideDescendantCount, ...colDefOverrideProperties } = colDefOverride;
+    const { hideDescendantCount, ...colDefOverrideProperties } = colDefOverride ?? {};
 
     const commonProperties: Omit<GridColDef, 'field' | 'editable'> = {
       ...GRID_TREE_DATA_GROUP_COL_DEF,
