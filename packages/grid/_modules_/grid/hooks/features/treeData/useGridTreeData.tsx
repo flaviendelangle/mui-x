@@ -73,7 +73,7 @@ export const useGridTreeData = (
         rows,
         ...params,
         defaultGroupingExpansionDepth: props.defaultGroupingExpansionDepth,
-        treeGroupingName: TREE_DATA_GROUPING_NAME,
+        groupingName: TREE_DATA_GROUPING_NAME,
       });
     };
 
