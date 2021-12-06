@@ -167,7 +167,7 @@ export const useGridGroupingColumns = (
         ...params,
         rows,
         defaultGroupingExpansionDepth: props.defaultGroupingExpansionDepth,
-        treeGroupingName: GROUP_ROWS_BY_COLUMN_NAME,
+        groupingName: GROUP_ROWS_BY_COLUMN_NAME,
       });
     };
 
@@ -208,8 +208,8 @@ export const useGridGroupingColumns = (
         case 'single': {
           const colDefOverride = isFunction(propGroupingColDef)
             ? propGroupingColDef({
-                treeGroupingName: GROUP_ROWS_BY_COLUMN_NAME,
-                sources: groupingColumnsModel.map((field) => columnsState.lookup[field]),
+                groupingName: GROUP_ROWS_BY_COLUMN_NAME,
+                fields: groupingColumnsModel,
               })
             : propGroupingColDef ?? {};
 
@@ -229,8 +229,8 @@ export const useGridGroupingColumns = (
 
             const colDefOverride = isFunction(propGroupingColDef)
               ? propGroupingColDef({
-                  treeGroupingName: GROUP_ROWS_BY_COLUMN_NAME,
-                  sources: [groupedByColDef],
+                  groupingName: GROUP_ROWS_BY_COLUMN_NAME,
+                  fields: [groupedByColDef.field],
                 })
               : propGroupingColDef ?? {};
 
