@@ -1398,7 +1398,7 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
         ]);
       });
 
-      it.only('should sort unbalanced grouped by index of the groupingField in the model when sorting by a grouping criteria', () => {
+      it('should sort unbalanced grouped by index of the groupingField in the model when sorting by a grouping criteria', () => {
         render(
           <Test
             rows={unbalancedRows}
@@ -1422,7 +1422,7 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
         ]);
       });
 
-      it.only('should sort unbalanced grouped by index of the groupingField in the model when sorting by leaves', () => {
+      it('should sort unbalanced grouped by index of the groupingField in the model when sorting by leaves', () => {
         render(
           <Test
             rows={unbalancedRows}
