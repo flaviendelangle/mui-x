@@ -28,7 +28,7 @@ export default function GroupingColumnsSortingMultipleGroupingColDef() {
         }}
         groupingColumnMode="multiple"
         groupingColDef={(params) =>
-          params.sources[0].field === 'director'
+          params.fields.includes('director')
             ? {
                 leafField: 'title',
                 mainGroupingCriteria: 'director',

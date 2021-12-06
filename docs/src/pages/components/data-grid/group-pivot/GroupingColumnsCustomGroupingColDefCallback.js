@@ -47,7 +47,7 @@ export default function GroupingColumnsCustomGroupingColDefObject() {
           disableSelectionOnClick
           groupingColumnsModel={groupingColumnsModel}
           groupingColDef={(params) =>
-            params.sources.some((colDef) => colDef.field === 'director')
+            params.fields.includes('director')
               ? {
                   headerName: 'Director',
                 }

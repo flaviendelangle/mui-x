@@ -1,5 +1,5 @@
-import { createRenderer, fireEvent, screen } from '@material-ui/monorepo/test/utils';
-import { getColumnHeadersTextContent, getColumnValues, raf } from 'test/utils/helperFn';
+import { createRenderer, fireEvent, screen, act, waitFor } from '@material-ui/monorepo/test/utils';
+import { getColumnHeadersTextContent, getColumnValues } from 'test/utils/helperFn';
 import * as React from 'react';
 import { expect } from 'chai';
 import {
@@ -12,7 +12,6 @@ import {
   useGridApiRef,
 } from '@mui/x-data-grid-pro';
 import { spy } from 'sinon';
-import { waitFor } from '@testing-library/react';
 
 const isJSDOM = /jsdom/.test(window.navigator.userAgent);
 
@@ -436,8 +435,9 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
         <Test initialState={{ groupingColumns: { model: ['category1', 'category2'] } }} />,
       );
       expect(getColumnValues(0)).to.deep.equal(['Cat A (3)', 'Cat B (2)']);
-      apiRef.current.setRowChildrenExpansion('auto-generated-row-category1/Cat B', true);
-      await raf();
+      act(() => {
+        apiRef.current.setRowChildrenExpansion('auto-generated-row-category1/Cat B', true);
+      });
       expect(getColumnValues(0)).to.deep.equal([
         'Cat A (3)',
         'Cat B (2)',
@@ -456,21 +456,46 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
 
   describe('props: groupingColDef when groupingColumMode = "single"', () => {
     it('should not allow to override the field', () => {
-      render(
+      const { setProps } = render(
         <Test
-          initialState={{ groupingColumns: { model: ['category1'] } }}
+          initialState={{ groupingColumns: { model: ['category1', 'category2'] } }}
           groupingColumnMode="multiple"
-          groupingColDef={{
-            // @ts-expect-error
-            field: 'custom-field',
-          }}
+          groupingColDef={(params) =>
+            params.fields.includes('category1')
+              ? {
+                  headerName: 'Custom group',
+                }
+              : {}
+          }
         />,
       );
 
-      expect(apiRef.current.getAllColumns()[0].field).to.equal(
-        '__row_group_by_columns_group_category1__',
-      );
+      expect(getColumnHeadersTextContent()).to.deep.equal([
+        'Custom group',
+        'category2',
+        'id',
+        'category1',
+        'category2',
+      ]);
+
+      setProps({
+        groupingColDef: (params) =>
+          params.fields.includes('category2')
+            ? {
+                headerName: 'Custom group',
+              }
+            : {},
+      });
+      expect(getColumnHeadersTextContent()).to.deep.equal([
+        'category1',
+        'Custom group',
+        'id',
+        'category1',
+        'category2',
+      ]);
     });
+
+    it('should react to groupingColDef update', () => {});
 
     describe('prop: groupColDef.leafField', () => {
       it('should render the leafField `value` on leaves', () => {
@@ -593,7 +618,7 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
             initialState={{ groupingColumns: { model: ['category1', 'category2'] } }}
             groupingColumnMode="single"
             groupingColDef={(params) =>
-              params.sources.some((colDef) => colDef.field === 'category1')
+              params.fields.includes('category1')
                 ? {
                     headerName: 'Main category',
                   }
@@ -635,7 +660,7 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
             initialState={{ groupingColumns: { model: ['category1', 'category2'] } }}
             groupingColumnMode="multiple"
             groupingColDef={(params) =>
-              params.sources.some((colDef) => colDef.field === 'category2')
+              params.fields.includes('category2')
                 ? {
                     leafField: 'id',
                   }
@@ -697,7 +722,7 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
             initialState={{ groupingColumns: { model: ['category1', 'category2'] } }}
             groupingColumnMode="multiple"
             groupingColDef={(params) =>
-              params.sources.some((colDef) => colDef.field === 'category2')
+              params.fields.includes('category2')
                 ? {
                     leafField: 'id',
                   }
@@ -756,7 +781,7 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
             initialState={{ groupingColumns: { model: ['category1', 'category2'] } }}
             groupingColumnMode="multiple"
             groupingColDef={(params) =>
-              params.sources.some((colDef) => colDef.field === 'category2')
+              params.fields.includes('category2')
                 ? {
                     leafField: 'id',
                   }
@@ -824,7 +849,7 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
             initialState={{ groupingColumns: { model: ['category1', 'category2'] } }}
             groupingColumnMode="multiple"
             groupingColDef={(params) =>
-              params.sources.some((colDef) => colDef.field === 'category1')
+              params.fields.includes('category1')
                 ? {
                     headerName: 'Main category',
                   }

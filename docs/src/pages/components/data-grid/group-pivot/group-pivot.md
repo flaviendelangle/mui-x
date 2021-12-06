@@ -13,7 +13,7 @@ Use grouping columns to group the rows according to one or several columns value
 > ⚠️ This feature is temporarily available in beta on the pro plan.
 > It will be moved to the premium plan once available.
 
-### Set grouping columns
+### Grouping columns definition
 
 #### Initializing the grouping columns
 
@@ -36,8 +36,6 @@ Use it together with `onGroupingColumnsModelChange` to know when a grouping crit
 
 {{"demo": "pages/components/data-grid/group-pivot/GroupingColumnsControlled.js", "bg": "inline", "defaultCodeOpen": false}}
 
-### Grouping column mode
-
 #### Single grouping column
 
 By default, the grid will create only one grouping column even if you have several grouping fields:
@@ -50,7 +48,7 @@ To have a grouping column for each grouping fields, set the `groupingColumnMode`
 
 {{"demo": "pages/components/data-grid/group-pivot/GroupingColumnsMultipleGroupingCol.js", "bg": "inline", "defaultCodeOpen": false}}
 
-### Custom grouping columns
+### Grouping columns customization
 
 Use the `groupingColDef` prop to customize the rendering of the grouping column. You can override any property of the `GridColDef` interface except the `field` and the properties related to the edition.
 
