@@ -1,6 +1,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import MenuItem from '@mui/material/MenuItem';
+import Divider from '@mui/material/Divider';
 import { useGridApiContext } from '../../../hooks/utils/useGridApiContext';
 import { GridColDef } from '../../../models/colDef/gridColDef';
 import { useGridSelector } from '../../../hooks/utils/useGridSelector';
@@ -11,7 +12,6 @@ import {
   isGroupingColumn,
 } from '../../../hooks/features/groupingColumns/gridGroupingColumnsUtils';
 import { gridColumnLookupSelector } from '../../../hooks';
-import { Divider } from '@mui/material';
 
 interface GridColumnPinningMenuItemsProps {
   column?: GridColDef;
