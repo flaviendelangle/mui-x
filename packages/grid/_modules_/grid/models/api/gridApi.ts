@@ -9,8 +9,6 @@ import { GridEditRowApi } from './gridEditRowApi';
 import { GridFilterApi } from './gridFilterApi';
 import { GridFocusApi } from './gridFocusApi';
 import { GridLocaleTextApi } from './gridLocaleTextApi';
-import { GridPageApi } from './gridPageApi';
-import { GridPageSizeApi } from './gridPageSizeApi';
 import { GridParamsApi } from './gridParamsApi';
 import { GridPreferencesPanelApi } from './gridPreferencesPanelApi';
 import { GridPrintExportApi } from './gridPrintExportApi';
@@ -26,6 +24,7 @@ import type { GridPreProcessingApi } from '../../hooks/core/preProcessing';
 import type { GridRowGroupsPreProcessingApi } from '../../hooks/core/rowGroupsPerProcessing';
 import type { GridDimensionsApi } from '../../hooks/features/dimensions';
 import type { GridGroupingColumnsApi } from '../../hooks/features/groupingColumns';
+import type { GridPaginationApi } from '../../hooks/features/pagination';
 
 /**
  * The full grid API.
@@ -44,8 +43,7 @@ export interface GridApi
     GridColumnApi,
     GridSelectionApi,
     GridSortApi,
-    GridPageApi,
-    GridPageSizeApi,
+    GridPaginationApi,
     GridCsvExportApi,
     GridFocusApi,
     GridFilterApi,
