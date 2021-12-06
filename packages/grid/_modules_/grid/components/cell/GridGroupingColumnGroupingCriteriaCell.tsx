@@ -26,11 +26,13 @@ const useUtilityClasses = (ownerState: OwnerState) => {
   return composeClasses(slots, getDataGridUtilityClass, classes);
 };
 
-interface GridGroupingColumnGroupCellProps extends GridRenderCellParams {
+interface GridGroupingColumnGroupingCriteriaCellProps extends GridRenderCellParams {
   hideDescendantCount?: boolean;
 }
 
-const GridGroupingColumnGroupingCriteriaCell = (props: GridGroupingColumnGroupCellProps) => {
+const GridGroupingColumnGroupingCriteriaCell = (
+  props: GridGroupingColumnGroupingCriteriaCellProps,
+) => {
   const { id, field, rowNode, hideDescendantCount } = props;
 
   const rootProps = useGridRootProps();

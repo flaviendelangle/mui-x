@@ -9,7 +9,7 @@ import {
   GridValueGetterFullParams,
 } from '../../../models';
 import { GridColumnRawLookup } from '../columns/gridColumnsState';
-import { GridGroupingColumnGroupingCriteriaCell } from '../../../components/cell/GridGroupingColumnGroupCell';
+import { GridGroupingColumnGroupingCriteriaCell } from '../../../components/cell/GridGroupingColumnGroupingCriteriaCell';
 import { GridGroupingColumnLeafCell } from '../../../components/cell/GridGroupingColumnLeafCell';
 import {
   getCellValue,
