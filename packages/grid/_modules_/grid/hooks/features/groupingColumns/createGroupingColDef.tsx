@@ -7,6 +7,7 @@ import {
   GridRenderCellParams,
   GridStateColDef,
   GridValueGetterFullParams,
+  GridComparatorFn,
 } from '../../../models';
 import { GridColumnRawLookup } from '../columns/gridColumnsState';
 import { GridGroupingColumnGroupingCriteriaCell } from '../../../components/cell/GridGroupingColumnGroupingCriteriaCell';
@@ -15,6 +16,7 @@ import {
   getCellValue,
   getGroupingColDefFieldFromGroupingCriteriaField,
 } from './gridGroupingColumnsUtils';
+import { gridGroupingColumnsSanitizedModelSelector } from './gridGroupingColumnsSelector';
 
 const GROUPING_COL_DEF_DEFAULT_PROPERTIES: Omit<GridColDef, 'field'> = {
   ...GRID_STRING_COL_DEF,
@@ -28,6 +30,35 @@ const GROUPING_COL_DEF_FORCED_PROPERTIES: Pick<GridColDef, 'type' | 'editable' |
   type: 'rowGroupByColumnsGroup',
   editable: false,
   canBeGrouped: false,
+};
+
+/**
+ * When sorting two cells with different grouping fields, we consider that the cell with the grouping field coming first in the model should be displayed below.
+ * This can occur when some rows don't have all the fields. In which case we want the rows with the missing field to be displayed above.
+ * TODO: Make this index comparator depth invariant, the logic should not be inverted when sorting in the "desc" direction (but the current return format of `sortComparator` does not support this behavior).
+ */
+const groupingFieldIndexComparator: GridComparatorFn = (v1, v2, cellParams1, cellParams2) => {
+  const groupingColumnsModel = gridGroupingColumnsSanitizedModelSelector(cellParams1.api.state);
+  const groupingField1 = cellParams1.rowNode.groupingField;
+  const groupingField2 = cellParams2.rowNode.groupingField;
+
+  if (groupingField1 == null && groupingField2 == null) {
+    return 0;
+  }
+
+  if (groupingField1 == null) {
+    return -1;
+  }
+
+  if (groupingField2 == null) {
+    return 1;
+  }
+
+  if (groupingColumnsModel.indexOf(groupingField1) < groupingColumnsModel.indexOf(groupingField2)) {
+    return -1;
+  }
+
+  return 1;
 };
 
 const getLeafProperties = (leafColDef: GridColDef): Partial<GridColDef> => ({
@@ -52,25 +83,12 @@ const getLeafProperties = (leafColDef: GridColDef): Partial<GridColDef> => ({
       };
     },
   })),
-  // We only want to sort leaves
-  // TODO: Handle unbalanced object sorting with two non-null groups of same depth but different field (should sort by the depth of the field in the model).
   sortComparator: (v1, v2, cellParams1, cellParams2) => {
-    const groupingField1 = cellParams1.rowNode.groupingField;
-    const groupingField2 = cellParams2.rowNode.groupingField;
-
-    if (groupingField1 == null && groupingField2 == null) {
+    if (cellParams1.rowNode.groupingField === null && cellParams2.rowNode.groupingField === null) {
       return leafColDef.sortComparator!(v1, v2, cellParams1, cellParams2);
     }
 
-    if (groupingField1 == null) {
-      return 1;
-    }
-
-    if (groupingField2 == null) {
-      return -1;
-    }
-
-    return 0;
+    return groupingFieldIndexComparator(v1, v2, cellParams1, cellParams2);
   },
 });
 
@@ -79,12 +97,14 @@ const getGroupingCriteriaProperties = (groupedByColDef: GridColDef, applyHeaderN
     sortable: groupedByColDef.sortable,
     filterable: groupedByColDef.filterable,
     sortComparator: (v1, v2, cellParams1, cellParams2) => {
-      // We only want to sort the groups of the current grouping criteria
-      if (cellParams1.rowNode.groupingField !== groupedByColDef.field) {
-        return 0;
+      if (
+        cellParams1.rowNode.groupingField === groupedByColDef.field &&
+        cellParams2.rowNode.groupingField === groupedByColDef.field
+      ) {
+        return groupedByColDef.sortComparator!(v1, v2, cellParams1, cellParams2);
       }
 
-      return groupedByColDef.sortComparator!(v1, v2, cellParams1, cellParams2);
+      return groupingFieldIndexComparator(v1, v2, cellParams1, cellParams2);
     },
     filterOperators: groupedByColDef.filterOperators?.map((operator) => ({
       ...operator,

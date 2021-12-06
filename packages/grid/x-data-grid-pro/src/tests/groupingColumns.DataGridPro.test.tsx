@@ -23,6 +23,15 @@ const rows: GridRowsProp = [
   { id: 4, category1: 'Cat B', category2: 'Cat 1' },
 ];
 
+const unbalancedRows: GridRowsProp = [
+  { id: 0, category1: 'Cat A' },
+  { id: 1, category1: 'Cat A' },
+  { id: 2, category1: 'Cat B' },
+  { id: 3, category1: 'Cat B' },
+  { id: 4, category1: null },
+  { id: 5, category1: null },
+];
+
 const baselineProps: DataGridProProps = {
   autoHeight: isJSDOM,
   disableVirtualization: true,
@@ -1385,6 +1394,54 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
           'Cat 2 (1)',
           '3',
           'Cat 1 (1)',
+          '4',
+        ]);
+      });
+
+      it.only('should sort unbalanced grouped by index of the groupingField in the model when sorting by a grouping criteria', () => {
+        render(
+          <Test
+            rows={unbalancedRows}
+            initialState={{ groupingColumns: { model: ['category1'] } }}
+            groupingColumnMode="single"
+            sortModel={[{ field: '__row_group_by_columns_group__', sort: 'desc' }]}
+            defaultGroupingExpansionDepth={-1}
+            groupingColDef={{ mainGroupingCriteria: 'category1', leafField: 'id' }}
+          />,
+        );
+
+        expect(getColumnValues(0)).to.deep.equal([
+          'Cat B (2)',
+          '2',
+          '3',
+          'Cat A (2)',
+          '0',
+          '1',
+          '4',
+          '5',
+        ]);
+      });
+
+      it.only('should sort unbalanced grouped by index of the groupingField in the model when sorting by leaves', () => {
+        render(
+          <Test
+            rows={unbalancedRows}
+            initialState={{ groupingColumns: { model: ['category1'] } }}
+            groupingColumnMode="single"
+            sortModel={[{ field: '__row_group_by_columns_group__', sort: 'desc' }]}
+            defaultGroupingExpansionDepth={-1}
+            groupingColDef={{ leafField: 'id' }}
+          />,
+        );
+
+        expect(getColumnValues(0)).to.deep.equal([
+          'Cat B (2)',
+          '3',
+          '2',
+          'Cat A (2)',
+          '1',
+          '0',
+          '5',
           '4',
         ]);
       });

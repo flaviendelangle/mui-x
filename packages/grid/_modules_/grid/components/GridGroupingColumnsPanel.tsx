@@ -5,7 +5,7 @@ import { useGridApiEventHandler } from '../hooks/utils/useGridApiEventHandler';
 import { useGridApiContext } from '../hooks/utils/useGridApiContext';
 import { useGridSelector } from '../hooks/utils/useGridSelector';
 import { GridEventListener, GridEvents } from '../models/events';
-import { gridGroupingRowsSanitizedModelSelector } from '../hooks/features/groupingColumns';
+import { gridGroupingColumnsSanitizedModelSelector } from '../hooks/features/groupingColumns';
 import { gridColumnLookupSelector } from '../hooks/features/columns';
 import { GridDragIcon } from './icons';
 
@@ -34,7 +34,7 @@ export const GridGroupingColumnsPanel = () => {
   const apiRef = useGridApiContext();
   const [colHeaderDragField, setColHeaderDragField] = React.useState('');
   const [chipDragField, setChipDragField] = React.useState('');
-  const groupingColumnsModel = useGridSelector(apiRef, gridGroupingRowsSanitizedModelSelector);
+  const groupingColumnsModel = useGridSelector(apiRef, gridGroupingColumnsSanitizedModelSelector);
   const columnsLookup = useGridSelector(apiRef, gridColumnLookupSelector);
   const handleColumnReorderStart = React.useCallback<
     GridEventListener<GridEvents.columnHeaderDragStart>

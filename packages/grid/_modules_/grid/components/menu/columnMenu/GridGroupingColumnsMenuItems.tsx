@@ -5,7 +5,7 @@ import Divider from '@mui/material/Divider';
 import { useGridApiContext } from '../../../hooks/utils/useGridApiContext';
 import { GridColDef } from '../../../models/colDef/gridColDef';
 import { useGridSelector } from '../../../hooks/utils/useGridSelector';
-import { gridGroupingRowsSanitizedModelSelector } from '../../../hooks/features/groupingColumns/gridGroupingColumnsSelector';
+import { gridGroupingColumnsSanitizedModelSelector } from '../../../hooks/features/groupingColumns/gridGroupingColumnsSelector';
 import {
   getGroupingCriteriaFieldFromGroupingColDefField,
   GROUPING_COLUMN_SINGLE,
@@ -21,7 +21,7 @@ interface GridColumnPinningMenuItemsProps {
 const GridGroupingColumnsMenuItems = (props: GridColumnPinningMenuItemsProps) => {
   const { column, onClick } = props;
   const apiRef = useGridApiContext();
-  const groupingColumnsModel = useGridSelector(apiRef, gridGroupingRowsSanitizedModelSelector);
+  const groupingColumnsModel = useGridSelector(apiRef, gridGroupingColumnsSanitizedModelSelector);
   const columnsLookup = useGridSelector(apiRef, gridColumnLookupSelector);
 
   const isGrouped = React.useMemo(

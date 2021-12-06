@@ -13,8 +13,8 @@ import { isSpaceKey } from '../../../utils/keyboardUtils';
 import { buildRowTree, BuildRowTreeGroupingCriteria } from '../../../utils/tree/buildRowTree';
 import { useGridApiEventHandler } from '../../utils/useGridApiEventHandler';
 import {
-  gridGroupingRowsModelSelector,
-  gridGroupingRowsSanitizedModelSelector,
+  gridGroupingColumnsModelSelector,
+  gridGroupingColumnsSanitizedModelSelector,
 } from './gridGroupingColumnsSelector';
 import { GridComponentProps } from '../../../GridComponentProps';
 import {
@@ -73,7 +73,7 @@ export const useGridGroupingColumns = (
     stateId: 'groupingColumns',
     propModel: props.groupingColumnsModel,
     propOnChange: props.onGroupingColumnsModelChange,
-    stateSelector: gridGroupingRowsModelSelector,
+    stateSelector: gridGroupingColumnsModelSelector,
     changeEvent: GridEvents.groupingColumnsModelChange,
   });
 
@@ -85,7 +85,7 @@ export const useGridGroupingColumns = (
 
   const updateRowGrouping = React.useCallback(() => {
     const groupRows: GridRowGroupingPreProcessing = (params) => {
-      const groupingColumnsModel = gridGroupingRowsSanitizedModelSelector(apiRef.current.state);
+      const groupingColumnsModel = gridGroupingColumnsSanitizedModelSelector(apiRef.current.state);
       const columnsLookup = gridColumnLookupSelector(apiRef.current.state);
       sanitizedGroupingColumnsModelOnLastRowPreProcessing.current = groupingColumnsModel;
 
@@ -195,7 +195,7 @@ export const useGridGroupingColumns = (
       const propGroupingColDef = props.groupingColDef;
 
       // We can't use `gridGroupingRowsSanitizedModelSelector` here because the new columns are not in the state yet
-      const groupingColumnsModel = gridGroupingRowsModelSelector(apiRef.current.state).filter(
+      const groupingColumnsModel = gridGroupingColumnsModelSelector(apiRef.current.state).filter(
         (field) => !!columnsState.lookup[field],
       );
 
@@ -309,7 +309,7 @@ export const useGridGroupingColumns = (
     GridGroupingColumnsApi['setGroupingColumnsModel']
   >(
     (model) => {
-      const currentModel = gridGroupingRowsModelSelector(apiRef.current.state);
+      const currentModel = gridGroupingColumnsModelSelector(apiRef.current.state);
       if (currentModel !== model) {
         setGridState((state) => ({
           ...state,
@@ -324,7 +324,7 @@ export const useGridGroupingColumns = (
 
   const addGroupingCriteria = React.useCallback<GridGroupingColumnsApi['addGroupingCriteria']>(
     (field, groupingIndex) => {
-      const currentModel = gridGroupingRowsModelSelector(apiRef.current.state);
+      const currentModel = gridGroupingColumnsModelSelector(apiRef.current.state);
       if (currentModel.includes(field)) {
         return;
       }
@@ -346,7 +346,7 @@ export const useGridGroupingColumns = (
     GridGroupingColumnsApi['removeGroupingCriteria']
   >(
     (field) => {
-      const currentModel = gridGroupingRowsModelSelector(apiRef.current.state);
+      const currentModel = gridGroupingColumnsModelSelector(apiRef.current.state);
       if (!currentModel.includes(field)) {
         return;
       }
@@ -359,7 +359,7 @@ export const useGridGroupingColumns = (
     GridGroupingColumnsApi['setGroupingCriteriaIndex']
   >(
     (field, targetIndex) => {
-      const currentModel = gridGroupingRowsModelSelector(apiRef.current.state);
+      const currentModel = gridGroupingColumnsModelSelector(apiRef.current.state);
       const currentTargetIndex = currentModel.indexOf(field);
 
       if (currentTargetIndex === -1) {
@@ -419,7 +419,7 @@ export const useGridGroupingColumns = (
   const checkGroupingColumnsModelDiff = React.useCallback<
     GridEventListener<GridEvents.columnsChange>
   >(() => {
-    const groupingColumnsModel = gridGroupingRowsSanitizedModelSelector(apiRef.current.state);
+    const groupingColumnsModel = gridGroupingColumnsSanitizedModelSelector(apiRef.current.state);
     const lastGroupingColumnsModelApplied =
       sanitizedGroupingColumnsModelOnLastRowPreProcessing.current;
 
