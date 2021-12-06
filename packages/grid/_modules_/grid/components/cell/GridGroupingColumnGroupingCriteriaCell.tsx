@@ -1,6 +1,6 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { makeStyles } from '@mui/styles';
+import { unstable_composeClasses as composeClasses } from '@mui/base';
 import IconButton from '@mui/material/IconButton';
 import Box from '@mui/material/Box';
 import { useGridRootProps } from '../../hooks/utils/useGridRootProps';
@@ -10,30 +10,33 @@ import { useGridSelector } from '../../hooks/utils/useGridSelector';
 import { gridFilteredDescendantCountLookupSelector } from '../../hooks/features/filter/gridFilterSelector';
 import { isNavigationKey, isSpaceKey } from '../../utils/keyboardUtils';
 import { GridEvents } from '../../models/events';
+import { getDataGridUtilityClass } from '../../gridClasses';
+import { GridComponentProps } from '../../GridComponentProps';
 
-const useStyles = makeStyles({
-  root: {
-    display: 'flex',
-    alignItems: 'center',
-    width: '100%',
-  },
-  toggle: {
-    flex: '0 0 28px',
-    alignSelf: 'stretch',
-    marginRight: 16,
-  },
-});
+type OwnerState = { classes: GridComponentProps['classes'] };
+
+const useUtilityClasses = (ownerState: OwnerState) => {
+  const { classes } = ownerState;
+
+  const slots = {
+    root: ['groupingColumnGroupingCriteriaCell'],
+    toggle: ['groupingColumnGroupingCriteriaCellToggle'],
+  };
+
+  return composeClasses(slots, getDataGridUtilityClass, classes);
+};
 
 interface GridGroupingColumnGroupCellProps extends GridRenderCellParams {
   hideDescendantCount?: boolean;
 }
 
-const GridGroupingColumnGroupCell = (props: GridGroupingColumnGroupCellProps) => {
+const GridGroupingColumnGroupingCriteriaCell = (props: GridGroupingColumnGroupCellProps) => {
   const { id, field, rowNode, hideDescendantCount } = props;
 
   const rootProps = useGridRootProps();
   const apiRef = useGridApiContext();
-  const classes = useStyles();
+  const ownerState: OwnerState = { classes: rootProps.classes };
+  const classes = useUtilityClasses(ownerState);
   const filteredDescendantCountLookup = useGridSelector(
     apiRef,
     gridFilteredDescendantCountLookupSelector,
@@ -88,7 +91,7 @@ const GridGroupingColumnGroupCell = (props: GridGroupingColumnGroupCellProps) =>
   );
 };
 
-GridGroupingColumnGroupCell.propTypes = {
+GridGroupingColumnGroupingCriteriaCell.propTypes = {
   // ----------------------------- Warning --------------------------------
   // | These PropTypes are generated from the TypeScript type definitions |
   // | To update them edit the TypeScript types and run "yarn proptypes"  |
@@ -158,4 +161,4 @@ GridGroupingColumnGroupCell.propTypes = {
   ]),
 } as any;
 
-export { GridGroupingColumnGroupCell };
+export { GridGroupingColumnGroupingCriteriaCell };

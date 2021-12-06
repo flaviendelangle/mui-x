@@ -300,6 +300,16 @@ export const GridRootStyles = styled('div', {
       alignSelf: 'stretch',
       marginRight: theme.spacing(2),
     },
+    [`& .${gridClasses.groupingColumnGroupingCriteriaCell}`]: {
+      display: 'flex',
+      alignItems: 'center',
+      width: '100%',
+    },
+    [`& .${gridClasses.groupingColumnGroupingCriteriaCellToggle}`]: {
+      flex: '0 0 28px',
+      alignSelf: 'stretch',
+      marginRight: theme.spacing(2),
+    },
   };
 
   return gridStyle;

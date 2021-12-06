@@ -9,7 +9,7 @@ import {
   GridValueGetterFullParams,
 } from '../../../models';
 import { GridColumnRawLookup } from '../columns/gridColumnsState';
-import { GridGroupingColumnGroupCell } from '../../../components/cell/GridGroupingColumnGroupCell';
+import { GridGroupingColumnGroupingCriteriaCell } from '../../../components/cell/GridGroupingColumnGroupCell';
 import { GridGroupingColumnLeafCell } from '../../../components/cell/GridGroupingColumnLeafCell';
 import {
   getCellValue,
@@ -171,7 +171,10 @@ export const createGroupingColDefForOneGroupingCriteria = ({
 
       if (params.rowNode.groupingField === groupedByField) {
         return (
-          <GridGroupingColumnGroupCell {...params} hideDescendantCount={hideDescendantCount} />
+          <GridGroupingColumnGroupingCriteriaCell
+            {...params}
+            hideDescendantCount={hideDescendantCount}
+          />
         );
       }
 
@@ -286,7 +289,12 @@ export const createGroupingColDefForAllGroupingCriteria = ({
         return null;
       }
 
-      return <GridGroupingColumnGroupCell {...params} hideDescendantCount={hideDescendantCount} />;
+      return (
+        <GridGroupingColumnGroupingCriteriaCell
+          {...params}
+          hideDescendantCount={hideDescendantCount}
+        />
+      );
     },
     valueGetter: (params) => {
       const fullParams = params as GridValueGetterFullParams;
