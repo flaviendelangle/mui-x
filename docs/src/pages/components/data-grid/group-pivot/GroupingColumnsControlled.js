@@ -27,7 +27,6 @@ export default function GroupingColumnsControlled() {
         columns={columns}
         groupingColumnsModel={groupingColumnsModel}
         onGroupingColumnsModelChange={(model) => setGroupingColumnsModel(model)}
-        groupingColumnsPanel
       />
     </div>
   );

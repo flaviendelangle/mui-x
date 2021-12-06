@@ -283,7 +283,7 @@ export const useGridGroupingColumns = (
   );
 
   const addColumnMenuButtons = React.useCallback((initialValue: JSX.Element[]) => {
-    return [...initialValue, <Divider />, <GridGroupingColumnsMenuItems />];
+    return [...initialValue, <GridGroupingColumnsMenuItems />];
   }, []);
 
   const filteringMethod = React.useCallback<GridFilteringMethod>(

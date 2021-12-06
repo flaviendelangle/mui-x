@@ -36,12 +36,6 @@ Use it together with `onGroupingColumnsModelChange` to know when a grouping crit
 
 {{"demo": "pages/components/data-grid/group-pivot/GroupingColumnsControlled.js", "bg": "inline", "defaultCodeOpen": false}}
 
-#### Using the grouping panel
-
-To enable the grouping panel, you simply have to use the `groupingColumnsPanel` prop:
-
-{{"demo": "pages/components/data-grid/group-pivot/GroupingColumnsPanel.js", "bg": "inline", "defaultCodeOpen": false}}
-
 ### Grouping column mode
 
 #### Single grouping column
@@ -156,6 +150,10 @@ In the example below:
 ### Full example
 
 {{"demo": "pages/components/data-grid/group-pivot/GroupingColumnsFullExample.js", "bg": "inline", "defaultCodeOpen": false}}
+
+### apiRef [<span class="plan-pro"></span>](https://mui.com/store/items/material-ui-pro/)
+
+{{"demo": "pages/components/data-grid/group-pivot/GroupingColumnsApiNoSnap.js", "bg": "inline", "hideToolbar": true}}
 
 ## Tree Data [<span class="plan-pro"></span>](https://mui.com/store/items/material-ui-pro/)
 

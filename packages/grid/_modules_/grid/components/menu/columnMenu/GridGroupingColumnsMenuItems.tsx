@@ -11,6 +11,7 @@ import {
   isGroupingColumn,
 } from '../../../hooks/features/groupingColumns/gridGroupingColumnsUtils';
 import { gridColumnLookupSelector } from '../../../hooks';
+import {Divider} from "@mui/material";
 
 interface GridColumnPinningMenuItemsProps {
   column?: GridColDef;
@@ -70,21 +71,31 @@ const GridGroupingColumnsMenuItems = (props: GridColumnPinningMenuItemsProps) =>
 
   if (isGroupingColumn(column.field)) {
     if (column.field === GROUPING_COLUMN_SINGLE) {
-      return <React.Fragment>{groupingColumnsModel.map(renderUnGroupingMenuItem)}</React.Fragment>;
+      return <React.Fragment><Divider />{groupingColumnsModel.map(renderUnGroupingMenuItem)}</React.Fragment>;
     }
 
-    return renderUnGroupingMenuItem(getGroupingCriteriaFieldFromGroupingColDefField(column.field)!);
+    return <React.Fragment><Divider />{renderUnGroupingMenuItem(getGroupingCriteriaFieldFromGroupingColDefField(column.field)!)}</React.Fragment>;
   }
 
   if (isGrouped) {
-    return renderUnGroupingMenuItem(column.field);
+    return (
+        <React.Fragment>
+          <Divider />
+          {renderUnGroupingMenuItem(column.field)}
+        </React.Fragment>
+    )
   }
 
   if (!column.canBeGrouped) {
     return null;
   }
 
-  return renderGroupingMenuItem(column.field);
+  return (
+      <React.Fragment>
+        <Divider />
+        {renderGroupingMenuItem(column.field)}
+      </React.Fragment>
+  )
 };
 
 GridGroupingColumnsMenuItems.propTypes = {

@@ -10,7 +10,7 @@ export interface GridGroupingColumnsInitialState {
 
 export interface GridGroupingColumnsApi {
   /**
-   * Sets the columns to use as grouping criteria
+   * Sets the columns to use as grouping criteria.
    * @param {GridGroupingColumnsModel} model The columns to use as grouping criteria.
    */
   setGroupingColumnsModel: (model: GridGroupingColumnsModel) => void;
@@ -29,7 +29,7 @@ export interface GridGroupingColumnsApi {
   removeGroupingCriteria: (field: string) => void;
 
   /**
-   * Sets the grouping index of a grouping criteria inside the groupingColumnsModel
+   * Sets the grouping index of a grouping criteria.
    * @param {string} groupingCriteriaField The field of the grouping criteria from which we want to change the grouping index.
    * @param {number} groupingIndex The new grouping index of this grouping criteria.
    */
