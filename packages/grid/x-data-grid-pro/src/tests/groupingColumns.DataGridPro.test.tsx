@@ -1,4 +1,4 @@
-import { createRenderer, fireEvent, screen, act, waitFor } from '@material-ui/monorepo/test/utils';
+import { createRenderer, fireEvent, screen, act } from '@material-ui/monorepo/test/utils';
 import { getColumnHeadersTextContent, getColumnValues } from 'test/utils/helperFn';
 import * as React from 'react';
 import { expect } from 'chai';
@@ -40,47 +40,9 @@ const baselineProps: DataGridProProps = {
     },
   ],
 };
-const GROUPING_COLS_SINGLE_CAT_1 = ['Cat A (3)', '', '', '', 'Cat B (2)', '', ''];
-
-const GROUPING_COLS_SINGLE_CAT_2 = ['Cat 1 (2)', '', '', 'Cat 2 (3)', '', '', ''];
-
-const GROUPING_COLS_SINGLE_CAT_2_CAT_1 = [
-  'Cat 1 (2)',
-  'Cat A (1)',
-  '',
-  'Cat B (1)',
-  '',
-  'Cat 2 (3)',
-  'Cat A (2)',
-  '',
-  '',
-  'Cat B (1)',
-  '',
-];
-const GROUPING_COLS_SINGLE_CAT_1_CAT_2 = [
-  'Cat A (3)',
-  'Cat 1 (1)',
-  '',
-  'Cat 2 (2)',
-  '',
-  '',
-  'Cat B (2)',
-  'Cat 2 (1)',
-  '',
-  'Cat 1 (1)',
-  '',
-];
-const GROUPING_COLS_MULTIPLE_CAT_1_CAT_2 = [
-  ['Cat A (3)', '', '', '', '', '', 'Cat B (2)', '', '', '', ''],
-  ['', 'Cat 1 (1)', '', 'Cat 2 (2)', '', '', '', 'Cat 2 (1)', '', 'Cat 1 (1)', ''],
-];
-const GROUPING_COLS_MULTIPLE_CAT_2_CAT_1 = [
-  ['Cat 1 (2)', '', '', '', '', 'Cat 2 (3)', '', '', '', '', ''],
-  ['', 'Cat A (1)', '', 'Cat B (1)', '', '', 'Cat A (2)', '', '', 'Cat B (1)', ''],
-];
 
 describe('<DataGridPro /> - Group Rows By Column', () => {
-  const { render, clock } = createRenderer();
+  const { render, clock } = createRenderer({ clock: 'fake' });
 
   let apiRef: GridApiRef;
 
@@ -103,7 +65,7 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
             defaultGroupingExpansionDepth={-1}
           />,
         );
-        expect(getColumnValues(0)).to.deep.equal(GROUPING_COLS_SINGLE_CAT_1);
+        expect(getColumnValues(0)).to.deep.equal(['Cat A (3)', '', '', '', 'Cat B (2)', '', '']);
       });
 
       it('should not react to initial state updates', () => {
@@ -113,10 +75,10 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
             defaultGroupingExpansionDepth={-1}
           />,
         );
-        expect(getColumnValues(0)).to.deep.equal(GROUPING_COLS_SINGLE_CAT_1);
+        expect(getColumnValues(0)).to.deep.equal(['Cat A (3)', '', '', '', 'Cat B (2)', '', '']);
 
         setProps({ initialState: { groupingColumns: { model: ['category2'] } } });
-        expect(getColumnValues(0)).to.deep.equal(GROUPING_COLS_SINGLE_CAT_1);
+        expect(getColumnValues(0)).to.deep.equal(['Cat A (3)', '', '', '', 'Cat B (2)', '', '']);
       });
     });
 
@@ -141,11 +103,23 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
         const { setProps } = render(
           <Test groupingColumnsModel={['category1']} defaultGroupingExpansionDepth={-1} />,
         );
-        expect(getColumnValues(0)).to.deep.equal(GROUPING_COLS_SINGLE_CAT_1);
+        expect(getColumnValues(0)).to.deep.equal(['Cat A (3)', '', '', '', 'Cat B (2)', '', '']);
         setProps({ groupingColumnsModel: ['category2'] });
-        expect(getColumnValues()).to.deep.equal(GROUPING_COLS_SINGLE_CAT_2);
+        expect(getColumnValues()).to.deep.equal(['Cat 1 (2)', '', '', 'Cat 2 (3)', '', '', '']);
         setProps({ groupingColumnsModel: ['category1', 'category2'] });
-        expect(getColumnValues()).to.deep.equal(GROUPING_COLS_SINGLE_CAT_1_CAT_2);
+        expect(getColumnValues()).to.deep.equal([
+          'Cat A (3)',
+          'Cat 1 (1)',
+          '',
+          'Cat 2 (2)',
+          '',
+          '',
+          'Cat B (2)',
+          'Cat 2 (1)',
+          '',
+          'Cat 1 (1)',
+          '',
+        ]);
       });
     });
 
@@ -156,7 +130,7 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
           defaultGroupingExpansionDepth={-1}
         />,
       );
-      expect(getColumnValues(0)).to.deep.equal(GROUPING_COLS_SINGLE_CAT_1);
+      expect(getColumnValues(0)).to.deep.equal(['Cat A (3)', '', '', '', 'Cat B (2)', '', '']);
     });
 
     it('should ignore grouping fields with colDef.canBeGrouped = false', () => {
@@ -179,7 +153,7 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
           defaultGroupingExpansionDepth={-1}
         />,
       );
-      expect(getColumnValues(0)).to.deep.equal(GROUPING_COLS_SINGLE_CAT_1);
+      expect(getColumnValues(0)).to.deep.equal(['Cat A (3)', '', '', '', 'Cat B (2)', '', '']);
     });
 
     it('should allow to use several time the same grouping field', () => {
@@ -219,7 +193,19 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
         'category1',
         'category2',
       ]);
-      expect(getColumnValues(0)).to.deep.equal(GROUPING_COLS_SINGLE_CAT_1_CAT_2);
+      expect(getColumnValues(0)).to.deep.equal([
+        'Cat A (3)',
+        'Cat 1 (1)',
+        '',
+        'Cat 2 (2)',
+        '',
+        '',
+        'Cat B (2)',
+        'Cat 2 (1)',
+        '',
+        'Cat 1 (1)',
+        '',
+      ]);
     });
 
     it('should gather call the grouping fields into a single column when groupingColumnMode = "single"', () => {
@@ -237,7 +223,19 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
         'category1',
         'category2',
       ]);
-      expect(getColumnValues(0)).to.deep.equal(GROUPING_COLS_SINGLE_CAT_1_CAT_2);
+      expect(getColumnValues(0)).to.deep.equal([
+        'Cat A (3)',
+        'Cat 1 (1)',
+        '',
+        'Cat 2 (2)',
+        '',
+        '',
+        'Cat B (2)',
+        'Cat 2 (1)',
+        '',
+        'Cat 1 (1)',
+        '',
+      ]);
     });
 
     it('should create on grouping column per grouping fields when groupingColumnMode = "multiple"', () => {
@@ -256,8 +254,32 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
         'category1',
         'category2',
       ]);
-      expect(getColumnValues(0)).to.deep.equal(GROUPING_COLS_MULTIPLE_CAT_1_CAT_2[0]);
-      expect(getColumnValues(1)).to.deep.equal(GROUPING_COLS_MULTIPLE_CAT_1_CAT_2[1]);
+      expect(getColumnValues(0)).to.deep.equal([
+        'Cat A (3)',
+        '',
+        '',
+        '',
+        '',
+        '',
+        'Cat B (2)',
+        '',
+        '',
+        '',
+        '',
+      ]);
+      expect(getColumnValues(1)).to.deep.equal([
+        '',
+        'Cat 1 (1)',
+        '',
+        'Cat 2 (2)',
+        '',
+        '',
+        '',
+        'Cat 2 (1)',
+        '',
+        'Cat 1 (1)',
+        '',
+      ]);
     });
 
     it('should support groupingColumnMode switch', () => {
@@ -276,8 +298,32 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
         'category1',
         'category2',
       ]);
-      expect(getColumnValues(0)).to.deep.equal(GROUPING_COLS_MULTIPLE_CAT_1_CAT_2[0]);
-      expect(getColumnValues(1)).to.deep.equal(GROUPING_COLS_MULTIPLE_CAT_1_CAT_2[1]);
+      expect(getColumnValues(0)).to.deep.equal([
+        'Cat A (3)',
+        '',
+        '',
+        '',
+        '',
+        '',
+        'Cat B (2)',
+        '',
+        '',
+        '',
+        '',
+      ]);
+      expect(getColumnValues(1)).to.deep.equal([
+        '',
+        'Cat 1 (1)',
+        '',
+        'Cat 2 (2)',
+        '',
+        '',
+        '',
+        'Cat 2 (1)',
+        '',
+        'Cat 1 (1)',
+        '',
+      ]);
 
       setProps({ groupingColumnMode: 'single' });
       expect(getColumnHeadersTextContent()).to.deep.equal([
@@ -286,7 +332,19 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
         'category1',
         'category2',
       ]);
-      expect(getColumnValues(0)).to.deep.equal(GROUPING_COLS_SINGLE_CAT_1_CAT_2);
+      expect(getColumnValues(0)).to.deep.equal([
+        'Cat A (3)',
+        'Cat 1 (1)',
+        '',
+        'Cat 2 (2)',
+        '',
+        '',
+        'Cat B (2)',
+        'Cat 2 (1)',
+        '',
+        'Cat 1 (1)',
+        '',
+      ]);
 
       setProps({ groupingColumnMode: 'multiple' });
       expect(getColumnHeadersTextContent()).to.deep.equal([
@@ -296,8 +354,32 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
         'category1',
         'category2',
       ]);
-      expect(getColumnValues(0)).to.deep.equal(GROUPING_COLS_MULTIPLE_CAT_1_CAT_2[0]);
-      expect(getColumnValues(1)).to.deep.equal(GROUPING_COLS_MULTIPLE_CAT_1_CAT_2[1]);
+      expect(getColumnValues(0)).to.deep.equal([
+        'Cat A (3)',
+        '',
+        '',
+        '',
+        '',
+        '',
+        'Cat B (2)',
+        '',
+        '',
+        '',
+        '',
+      ]);
+      expect(getColumnValues(1)).to.deep.equal([
+        '',
+        'Cat 1 (1)',
+        '',
+        'Cat 2 (2)',
+        '',
+        '',
+        '',
+        'Cat 2 (1)',
+        '',
+        'Cat 1 (1)',
+        '',
+      ]);
     });
 
     it('should respect the model grouping order when groupingColumnMode = "single"', () => {
@@ -315,7 +397,19 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
         'category1',
         'category2',
       ]);
-      expect(getColumnValues(0)).to.deep.equal(GROUPING_COLS_SINGLE_CAT_2_CAT_1);
+      expect(getColumnValues(0)).to.deep.equal([
+        'Cat 1 (2)',
+        'Cat A (1)',
+        '',
+        'Cat B (1)',
+        '',
+        'Cat 2 (3)',
+        'Cat A (2)',
+        '',
+        '',
+        'Cat B (1)',
+        '',
+      ]);
     });
 
     it('should respect the model grouping order when groupingColumnMode = "multiple"', () => {
@@ -334,8 +428,32 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
         'category1',
         'category2',
       ]);
-      expect(getColumnValues(0)).to.deep.equal(GROUPING_COLS_MULTIPLE_CAT_2_CAT_1[0]);
-      expect(getColumnValues(1)).to.deep.equal(GROUPING_COLS_MULTIPLE_CAT_2_CAT_1[1]);
+      expect(getColumnValues(0)).to.deep.equal([
+        'Cat 1 (2)',
+        '',
+        '',
+        '',
+        '',
+        'Cat 2 (3)',
+        '',
+        '',
+        '',
+        '',
+        '',
+      ]);
+      expect(getColumnValues(1)).to.deep.equal([
+        '',
+        'Cat A (1)',
+        '',
+        'Cat B (1)',
+        '',
+        '',
+        'Cat A (2)',
+        '',
+        '',
+        'Cat B (1)',
+        '',
+      ]);
     });
   });
 
@@ -430,7 +548,7 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
       ]);
     });
 
-    it('should not re-apply default expansion on rerender after expansion manually toggled', async () => {
+    it('should not re-apply default expansion on rerender after expansion manually toggled', () => {
       const { setProps } = render(
         <Test initialState={{ groupingColumns: { model: ['category1', 'category2'] } }} />,
       );
@@ -960,7 +1078,7 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
   });
 
   describe('column menu', () => {
-    it('should add a "Group by {field}" menu item on ungrouped columns when coLDef.canBeGrouped is not defined', async () => {
+    it('should add a "Group by {field}" menu item on ungrouped columns when coLDef.canBeGrouped is not defined', () => {
       render(
         <Test
           columns={[
@@ -974,13 +1092,14 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
         />,
       );
       apiRef.current.showColumnMenu('category1');
-      await waitFor(() => expect(screen.queryByRole('menu')).not.to.equal(null));
+      clock.runToLast();
+      expect(screen.queryByRole('menu')).not.to.equal(null);
       const menuItem = screen.queryByRole('menuitem', { name: 'Group by category1' });
       fireEvent.click(menuItem);
       expect(apiRef.current.state.groupingColumns.model).to.deep.equal(['category1']);
     });
 
-    it('should not add a "Group by {field}" menu item on ungrouped columns when coLDef.canBeGrouped = false', async () => {
+    it('should not add a "Group by {field}" menu item on ungrouped columns when coLDef.canBeGrouped = false', () => {
       render(
         <Test
           columns={[
@@ -995,11 +1114,12 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
         />,
       );
       apiRef.current.showColumnMenu('category1');
-      await waitFor(() => expect(screen.queryByRole('menu')).not.to.equal(null));
+      clock.runToLast();
+      expect(screen.queryByRole('menu')).not.to.equal(null);
       expect(screen.queryByRole('menuitem', { name: 'Group by category1' })).to.equal(null);
     });
 
-    it('should add a "Stop grouping by {field}" menu item on grouped column', async () => {
+    it('should add a "Stop grouping by {field}" menu item on grouped column', () => {
       render(
         <Test
           columns={[
@@ -1018,13 +1138,14 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
         />,
       );
       apiRef.current.showColumnMenu('category1');
-      await waitFor(() => expect(screen.queryByRole('menu')).not.to.equal(null));
+      clock.runToLast();
+      expect(screen.queryByRole('menu')).not.to.equal(null);
       const menuItem = screen.queryByRole('menuitem', { name: 'Stop grouping by category1' });
       fireEvent.click(menuItem);
       expect(apiRef.current.state.groupingColumns.model).to.deep.equal([]);
     });
 
-    it('should add a "Stop grouping by {field} menu item on each grouping column when prop.groupingColumnMode = "multiple"', async () => {
+    it('should add a "Stop grouping by {field} menu item on each grouping column when prop.groupingColumnMode = "multiple"', () => {
       render(
         <Test
           columns={[
@@ -1048,7 +1169,8 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
       );
 
       apiRef.current.showColumnMenu('__row_group_by_columns_group_category1__');
-      await waitFor(() => expect(screen.queryByRole('menu')).not.to.equal(null));
+      clock.runToLast();
+      expect(screen.queryByRole('menu')).not.to.equal(null);
       const menuItemCategory1 = screen.queryByRole('menuitem', {
         name: 'Stop grouping by category1',
       });
@@ -1056,10 +1178,12 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
       expect(apiRef.current.state.groupingColumns.model).to.deep.equal(['category2']);
 
       apiRef.current.hideColumnMenu();
-      await waitFor(() => expect(screen.queryByRole('menu')).to.equal(null));
+      clock.runToLast();
+      expect(screen.queryByRole('menu')).to.equal(null);
 
       apiRef.current.showColumnMenu('__row_group_by_columns_group_category2__');
-      await waitFor(() => expect(screen.queryByRole('menu')).not.to.equal(null));
+      clock.runToLast();
+      expect(screen.queryByRole('menu')).not.to.equal(null);
       const menuItemCategory2 = screen.queryByRole('menuitem', {
         name: 'Stop grouping by category2',
       });
@@ -1067,7 +1191,7 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
       expect(apiRef.current.state.groupingColumns.model).to.deep.equal([]);
     });
 
-    it('should add a "Stop grouping {field} menu item for each grouping criteria on the grouping column when prop.groupingColumnMode = "single"', async () => {
+    it('should add a "Stop grouping {field} menu item for each grouping criteria on the grouping column when prop.groupingColumnMode = "single"', () => {
       render(
         <Test
           columns={[
@@ -1091,7 +1215,8 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
       );
 
       apiRef.current.showColumnMenu('__row_group_by_columns_group__');
-      await waitFor(() => expect(screen.queryByRole('menu')).not.to.equal(null));
+      clock.runToLast();
+      expect(screen.queryByRole('menu')).not.to.equal(null);
       const menuItemCategory1 = screen.queryByRole('menuitem', {
         name: 'Stop grouping by category1',
       });
@@ -1104,7 +1229,7 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
       expect(apiRef.current.state.groupingColumns.model).to.deep.equal([]);
     });
 
-    it('should use the colDef.headerName property for grouping menu item label', async () => {
+    it('should use the colDef.headerName property for grouping menu item label', () => {
       render(
         <Test
           columns={[
@@ -1119,11 +1244,12 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
         />,
       );
       apiRef.current.showColumnMenu('category1');
-      await waitFor(() => expect(screen.queryByRole('menu')).not.to.equal(null));
+      clock.runToLast();
+      expect(screen.queryByRole('menu')).not.to.equal(null);
       expect(screen.queryByRole('menuitem', { name: 'Group by Category 1' })).not.to.equal(null);
     });
 
-    it('should use the colDef.headerName property for ungrouping menu item label', async () => {
+    it('should use the colDef.headerName property for ungrouping menu item label', () => {
       render(
         <Test
           columns={[
@@ -1143,7 +1269,8 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
         />,
       );
       apiRef.current.showColumnMenu('category1');
-      await waitFor(() => expect(screen.queryByRole('menu')).not.to.equal(null));
+      clock.runToLast();
+      expect(screen.queryByRole('menu')).not.to.equal(null);
       expect(screen.queryByRole('menuitem', { name: 'Stop grouping by Category 1' })).not.to.equal(
         null,
       );
