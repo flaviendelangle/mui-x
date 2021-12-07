@@ -204,15 +204,6 @@ DataGridRaw.propTypes = {
    */
   getRowId: PropTypes.func,
   /**
-   * If `single`, all column we are grouping by will be represented in the same grouping the same column.
-   * If `multiple`, each column we are grouping by will be represented in its own column.
-   */
-  groupingColumnMode: PropTypes.oneOf(['multiple', 'single']),
-  /**
-   * Set the grouping columns of the grid.
-   */
-  groupingColumnsModel: PropTypes.arrayOf(PropTypes.string),
-  /**
    * Set the height in pixel of the column headers in the grid.
    * @default 56
    */
@@ -422,12 +413,6 @@ DataGridRaw.propTypes = {
    * @param {GridCallbackDetails} details Additional details for this callback.
    */
   onFilterModelChange: PropTypes.func,
-  /**
-   * Callback fired when the grouping columns model changes.
-   * @param {GridGroupingColumnsModel} model Columns used as grouping criteria
-   * @param {GridCallbackDetails} details Additional details for this callback.
-   */
-  onGroupingColumnsModelChange: PropTypes.func,
   /**
    * Callback fired when the current page has changed.
    * @param {number} page Index of the page displayed on the Grid.
