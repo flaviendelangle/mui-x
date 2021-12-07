@@ -28,6 +28,8 @@ export type DataGridProps = Omit<
   | 'getTreeDataPath'
   | 'groupingColDef'
   | 'defaultGroupingExpansionDepth'
+  | 'groupingColumnMode'
+  | 'groupingColumnsModel'
   | 'groupingColumnsPanel'
   | 'signature'
 > & {

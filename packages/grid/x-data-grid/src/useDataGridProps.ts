@@ -32,6 +32,8 @@ const FORCED_PROPS: { [key in ForcedPropsKey]-?: GridInputComponentProps[key] } 
   defaultGroupingExpansionDepth: undefined,
   treeData: undefined,
   groupingColumnsPanel: undefined,
+  groupingColumnMode: undefined,
+  groupingColumnsModel: undefined,
   signature: 'DataGrid',
 };
 
