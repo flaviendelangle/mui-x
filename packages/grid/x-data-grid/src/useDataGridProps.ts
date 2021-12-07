@@ -34,6 +34,7 @@ const FORCED_PROPS: { [key in ForcedPropsKey]-?: GridInputComponentProps[key] } 
   groupingColumnsPanel: undefined,
   groupingColumnMode: undefined,
   groupingColumnsModel: undefined,
+  onGroupingColumnsModelChange: undefined,
   signature: 'DataGrid',
 };
 

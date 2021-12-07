@@ -31,6 +31,7 @@ export type DataGridProps = Omit<
   | 'groupingColumnMode'
   | 'groupingColumnsModel'
   | 'groupingColumnsPanel'
+  | 'onGroupingColumnsModelChange'
   | 'signature'
 > & {
   pagination?: true;
