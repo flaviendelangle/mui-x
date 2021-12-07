@@ -109,7 +109,7 @@ export interface GridValueGetterSimpleParams<R = any> {
    */
   id: GridRowId;
   /**
-   * The column field of the cell that triggered the event
+   * The column field of the cell that triggered the event.
    */
   field: string;
   /**
@@ -155,7 +155,7 @@ export interface GridValueFormatterParams {
    */
   id?: GridRowId;
   /**
-   * The column field of the cell that triggered the event
+   * The column field of the cell that triggered the event.
    */
   field: string;
   /**
