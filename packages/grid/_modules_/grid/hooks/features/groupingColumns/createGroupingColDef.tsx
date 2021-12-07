@@ -42,7 +42,7 @@ const groupingFieldIndexComparator: GridComparatorFn = (v1, v2, cellParams1, cel
   const groupingField1 = cellParams1.rowNode.groupingField;
   const groupingField2 = cellParams2.rowNode.groupingField;
 
-  if (groupingField1 == null && groupingField2 == null) {
+  if (groupingField1 === groupingField2) {
     return 0;
   }
 

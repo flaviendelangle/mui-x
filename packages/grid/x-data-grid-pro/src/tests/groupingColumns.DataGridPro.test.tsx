@@ -50,7 +50,7 @@ const baselineProps: DataGridProProps = {
   ],
 };
 
-describe('<DataGridPro /> - Group Rows By Column', () => {
+describe.only('<DataGridPro /> - Group Rows By Column', () => {
   const { render, clock } = createRenderer({ clock: 'fake' });
 
   let apiRef: GridApiRef;
@@ -762,6 +762,58 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
         ]);
       });
     });
+
+    describe('prop: groupingColDef.hideDescendantCount', () => {
+      it('should render descendant count when hideDescendantCount = false', () => {
+        render(
+          <Test
+            initialState={{ groupingColumns: { model: ['category1', 'category2'] } }}
+            groupingColumnMode="single"
+            groupingColDef={{ hideDescendantCount: false }}
+            defaultGroupingExpansionDepth={-1}
+          />,
+        );
+
+        expect(getColumnValues(0)).to.deep.equal([
+          'Cat A (3)',
+          'Cat 1 (1)',
+          '',
+          'Cat 2 (2)',
+          '',
+          '',
+          'Cat B (2)',
+          'Cat 2 (1)',
+          '',
+          'Cat 1 (1)',
+          '',
+        ]);
+      });
+
+      it('should not render descendant count when hideDescendantCount = true', () => {
+        render(
+          <Test
+            initialState={{ groupingColumns: { model: ['category1', 'category2'] } }}
+            groupingColumnMode="single"
+            groupingColDef={{ hideDescendantCount: true }}
+            defaultGroupingExpansionDepth={-1}
+          />,
+        );
+
+        expect(getColumnValues(0)).to.deep.equal([
+          'Cat A',
+          'Cat 1',
+          '',
+          'Cat 2',
+          '',
+          '',
+          'Cat B',
+          'Cat 2',
+          '',
+          'Cat 1',
+          '',
+        ]);
+      });
+    });
   });
 
   describe('props: groupingColDef when groupingColumMode = "multiple"', () => {
@@ -991,6 +1043,84 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
           'id',
           'category1',
           'category2',
+        ]);
+      });
+    });
+
+    describe('prop: groupingColDef.hideDescendantCount', () => {
+      it('should render descendant count when hideDescendantCount = false', () => {
+        render(
+          <Test
+            initialState={{ groupingColumns: { model: ['category1', 'category2'] } }}
+            groupingColumnMode="multiple"
+            groupingColDef={{ hideDescendantCount: false }}
+            defaultGroupingExpansionDepth={-1}
+          />,
+        );
+
+        expect(getColumnValues(0)).to.deep.equal([
+          'Cat A (3)',
+          '',
+          '',
+          '',
+          '',
+          '',
+          'Cat B (2)',
+          '',
+          '',
+          '',
+          '',
+        ]);
+        expect(getColumnValues(1)).to.deep.equal([
+          '',
+          'Cat 1 (1)',
+          '',
+          'Cat 2 (2)',
+          '',
+          '',
+          '',
+          'Cat 2 (1)',
+          '',
+          'Cat 1 (1)',
+          '',
+        ]);
+      });
+
+      it('should not render descendant count when hideDescendantCount = true', () => {
+        render(
+          <Test
+            initialState={{ groupingColumns: { model: ['category1', 'category2'] } }}
+            groupingColumnMode="multiple"
+            groupingColDef={{ hideDescendantCount: true }}
+            defaultGroupingExpansionDepth={-1}
+          />,
+        );
+
+        expect(getColumnValues(0)).to.deep.equal([
+          'Cat A',
+          '',
+          '',
+          '',
+          '',
+          '',
+          'Cat B',
+          '',
+          '',
+          '',
+          '',
+        ]);
+        expect(getColumnValues(1)).to.deep.equal([
+          '',
+          'Cat 1',
+          '',
+          'Cat 2',
+          '',
+          '',
+          '',
+          'Cat 2',
+          '',
+          'Cat 1',
+          '',
         ]);
       });
     });
@@ -1435,12 +1565,12 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
         );
 
         expect(getColumnValues(0)).to.deep.equal([
-          'Cat B (2)',
-          '3',
-          '2',
           'Cat A (2)',
           '1',
           '0',
+          'Cat B (2)',
+          '3',
+          '2',
           '5',
           '4',
         ]);
