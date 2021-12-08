@@ -33,6 +33,8 @@ export type DataGridProps = Omit<
   | 'groupingColumnsPanel'
   | 'onGroupingColumnsModelChange'
   | 'signature'
+  // TODO: Remove if we have an experimental feature concerning the DataGrid and override the property to only expose the experimental features of the DataGrid.
+  | 'experimentalFeatures'
 > & {
   pagination?: true;
 };

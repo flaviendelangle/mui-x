@@ -36,6 +36,9 @@ export default function GroupingColumnsKeyGetter() {
             model: ['composer'],
           },
         }}
+        experimentalFeatures={{
+          groupingColumns: true,
+        }}
       />
     </div>
   );

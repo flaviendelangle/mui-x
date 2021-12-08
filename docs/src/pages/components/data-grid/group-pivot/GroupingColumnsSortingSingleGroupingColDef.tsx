@@ -60,6 +60,9 @@ export default function GroupingColumnsSortingSingleGroupingColDef() {
                 ? undefined
                 : mainGroupingCriteria,
           }}
+          experimentalFeatures={{
+            groupingColumns: true,
+          }}
         />
       </div>
     </Stack>

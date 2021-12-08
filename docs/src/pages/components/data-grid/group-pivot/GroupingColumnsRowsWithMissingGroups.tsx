@@ -37,6 +37,9 @@ export default function GroupingColumnsInitialState() {
         groupingColDef={{
           leafField: 'title',
         }}
+        experimentalFeatures={{
+          groupingColumns: true,
+        }}
       />
     </div>
   );

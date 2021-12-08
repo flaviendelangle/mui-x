@@ -48,9 +48,12 @@ const baselineProps: DataGridProProps = {
       field: 'category2',
     },
   ],
+  experimentalFeatures: {
+    groupingColumns: true,
+  },
 };
 
-describe.only('<DataGridPro /> - Group Rows By Column', () => {
+describe('<DataGridPro /> - Group Rows By Column', () => {
   const { render, clock } = createRenderer({ clock: 'fake' });
 
   let apiRef: GridApiRef;
@@ -64,6 +67,45 @@ describe.only('<DataGridPro /> - Group Rows By Column', () => {
       </div>
     );
   };
+
+  // TODO: Remove once the feature is stable
+  it('should disable grouping columns when experimentalFeatures.groupingColumns = false', () => {
+    render(
+      <Test
+        initialState={{ groupingColumns: { model: ['category1'] } }}
+        defaultGroupingExpansionDepth={-1}
+        experimentalFeatures={{
+          groupingColumns: false,
+        }}
+      />,
+    );
+
+    // No grouping applied on rows
+    expect(apiRef.current.state.rows.groupingName).to.equal('none');
+    expect(getColumnValues(0)).to.deep.equal(['0', '1', '2', '3', '4']);
+
+    // No grouping column rendered
+    expect(getColumnHeadersTextContent()).to.deep.equal(['id', 'category1', 'category2']);
+
+    // No menu item on column menu to add / remove grouping field
+    apiRef.current.showColumnMenu('category1');
+    clock.runToLast();
+    expect(screen.queryByRole('menu')).not.to.equal(null);
+    const category1Menuitem = screen.queryByRole('menuitem', {
+      name: 'Stop grouping by category1',
+    });
+    expect(category1Menuitem).to.equal(null);
+
+    apiRef.current.hideColumnMenu();
+    clock.runToLast();
+    expect(screen.queryByRole('menu')).to.equal(null);
+
+    apiRef.current.showColumnMenu('category2');
+    clock.runToLast();
+    expect(screen.queryByRole('menu')).not.to.equal(null);
+    const category2Menuitem = screen.queryByRole('menuitem', { name: 'Group by category2' });
+    expect(category2Menuitem).to.equal(null);
+  });
 
   describe('Setting grouping fields', () => {
     describe('initialState: groupingColumns.model', () => {

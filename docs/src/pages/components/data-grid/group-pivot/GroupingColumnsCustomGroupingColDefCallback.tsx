@@ -53,6 +53,9 @@ export default function GroupingColumnsCustomGroupingColDefObject() {
                 }
               : {}
           }
+          experimentalFeatures={{
+            groupingColumns: true,
+          }}
         />
       </Box>
     </div>

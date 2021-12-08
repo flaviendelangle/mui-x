@@ -2,7 +2,7 @@ import * as React from 'react';
 import MUICheckbox from '@mui/material/Checkbox';
 import { GRID_DEFAULT_LOCALE_TEXT } from '../../constants/localeTextConstants';
 import { GridComponentProps, GridInputComponentProps } from '../../GridComponentProps';
-import { GRID_DEFAULT_SIMPLE_OPTIONS } from '../../models/gridOptions';
+import { GRID_DEFAULT_SIMPLE_OPTIONS, GridExperimentalFeatures } from '../../models/gridOptions';
 import { GridIconSlotsComponent, GridSlotsComponent } from '../../models';
 import {
   GridArrowDownwardIcon,
@@ -101,13 +101,25 @@ export const useGridProcessedProps = (inProps: GridInputComponentProps) => {
     return mergedComponents;
   }, [inProps.components]);
 
+  const experimentalFeatures = React.useMemo(
+    () =>
+      Object.fromEntries(
+        Object.values(GridExperimentalFeatures).map((feature) => [
+          feature,
+          inProps.experimentalFeatures?.[feature] ?? false,
+        ]),
+      ) as Record<GridExperimentalFeatures, true>,
+    [inProps.experimentalFeatures],
+  );
+
   return React.useMemo<GridComponentProps>(
     () => ({
       ...GRID_DEFAULT_SIMPLE_OPTIONS,
       ...inProps,
       localeText,
       components,
+      experimentalFeatures,
     }),
-    [inProps, localeText, components],
+    [inProps, localeText, components, experimentalFeatures],
   );
 };

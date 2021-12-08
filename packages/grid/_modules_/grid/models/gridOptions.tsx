@@ -10,6 +10,14 @@ export type GridMergedOptions = {
   [key in keyof GridProcessedMergedOptions]: Partial<GridProcessedMergedOptions[key]>;
 };
 
+export enum GridExperimentalFeatures {
+  /**
+   * Only available on the pro-plan
+   * Will be part of the premium-plan when fully ready
+   */
+  groupingColumns = 'groupingColumns',
+}
+
 /**
  * The grid options with a default in value which is merged with the value given through props.
  */
@@ -23,6 +31,10 @@ export interface GridProcessedMergedOptions {
    * You can find all the translation keys supported in [the source](https://github.com/mui-org/material-ui-x/blob/HEAD/packages/grid/_modules_/grid/constants/localeTextConstants.ts) in the GitHub repository.
    */
   localeText: GridLocaleText;
+  /**
+   * Features under development.
+   */
+  experimentalFeatures: Record<GridExperimentalFeatures, boolean>;
 }
 
 /**

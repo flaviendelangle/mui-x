@@ -50,6 +50,9 @@ export default function GroupingColumnsKeyGetter() {
             model: ['decade'],
           },
         }}
+        experimentalFeatures={{
+          groupingColumns: true,
+        }}
       />
     </div>
   );

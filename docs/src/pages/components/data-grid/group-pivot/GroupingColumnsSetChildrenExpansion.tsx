@@ -47,6 +47,9 @@ export default function GroupingColumnsSetChildrenExpansion() {
               model: ['company'],
             },
           }}
+          experimentalFeatures={{
+            groupingColumns: true,
+          }}
         />
       </div>
     </Stack>
