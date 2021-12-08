@@ -197,6 +197,11 @@ DataGridProRaw.propTypes = {
    */
   disableExtendRowFullWidth: PropTypes.bool,
   /**
+   * If `true`, the grouping columns are disabled.
+   * @default false
+   */
+  disableGroupingColumns: PropTypes.bool,
+  /**
    * If `true`, filtering with multiple columns is disabled.
    * @default false
    */
@@ -236,6 +241,7 @@ DataGridProRaw.propTypes = {
   error: PropTypes.any,
   /**
    * Features under development.
+   * For each feature, if the flag is not explicitly set to `true`, the feature will be fully disabled and any property / method call will not have any effect.
    */
   experimentalFeatures: PropTypes.shape({
     groupingColumns: PropTypes.bool,

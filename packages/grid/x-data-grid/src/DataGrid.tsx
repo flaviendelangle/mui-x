@@ -143,6 +143,11 @@ DataGridRaw.propTypes = {
    */
   disableExtendRowFullWidth: PropTypes.bool,
   /**
+   * If `true`, the grouping columns are disabled.
+   * @default false
+   */
+  disableGroupingColumns: PropTypes.bool,
+  /**
    * If `true`, the selection on click on a row or cell is disabled.
    * @default false
    */
