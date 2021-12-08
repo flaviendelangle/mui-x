@@ -235,6 +235,12 @@ DataGridProRaw.propTypes = {
    */
   error: PropTypes.any,
   /**
+   * Features under development.
+   */
+  experimentalFeatures: PropTypes.shape({
+    groupingColumns: PropTypes.bool,
+  }),
+  /**
    * Filtering can be processed on the server or client-side.
    * Set it to 'server' if you would like to handle filtering on the server-side.
    * @default "client"
