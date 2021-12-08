@@ -7,7 +7,7 @@ type Movie = {
   company: string;
   year: number;
   composer: { name: string };
-  marvelCinematicUniversePhase?: number;
+  cinematicUniverse?: string;
 };
 
 const COLUMNS: GridColumns = [
@@ -29,17 +29,20 @@ const COLUMNS: GridColumns = [
     field: 'company',
     headerName: 'Company',
     width: 200,
-    hide: true,
   },
   {
     field: 'director',
     headerName: 'Director',
     width: 200,
-    hide: true,
   },
   {
     field: 'year',
     headerName: 'Year',
+  },
+  {
+    field: 'cinematicUniverse',
+    headerName: 'Cinematic Universe',
+    width: 220,
   },
 ];
 
@@ -60,7 +63,7 @@ const ROWS: GridRowModel<Movie>[] = [
     director: 'Anthony & Joe Russo',
     company: 'Disney Studios',
     year: 2019,
-    marvelCinematicUniversePhase: 3,
+    cinematicUniverse: 'Marvel Cinematic Universe',
     composer: {
       name: 'Alan Silvestri',
     },
@@ -81,6 +84,7 @@ const ROWS: GridRowModel<Movie>[] = [
     director: 'J. J. Abrams',
     company: 'Disney Studios',
     year: 2015,
+    cinematicUniverse: 'Star Wars',
     composer: {
       name: 'John Williams',
     },
@@ -91,7 +95,7 @@ const ROWS: GridRowModel<Movie>[] = [
     director: 'Anthony & Joe Russo',
     company: 'Disney Studios',
     year: 2018,
-    marvelCinematicUniversePhase: 3,
+    cinematicUniverse: 'Star Wars',
     composer: {
       name: 'Alan Silvestri',
     },
@@ -102,6 +106,7 @@ const ROWS: GridRowModel<Movie>[] = [
     director: 'Colin Trevorrow',
     company: 'Universal Pictures',
     year: 2015,
+    cinematicUniverse: 'Jurassic Park',
     composer: {
       name: 'Michael Giacchino',
     },
@@ -122,7 +127,7 @@ const ROWS: GridRowModel<Movie>[] = [
     director: 'Joss Whedon',
     company: 'Disney Studios',
     year: 2012,
-    marvelCinematicUniversePhase: 1,
+    cinematicUniverse: 'Marvel Cinematic Universe',
     composer: {
       name: 'Alan Silvestri',
     },
@@ -133,6 +138,7 @@ const ROWS: GridRowModel<Movie>[] = [
     director: 'James Wan',
     company: 'Universal Pictures',
     year: 2015,
+    cinematicUniverse: 'Fast & Furious',
     composer: {
       name: 'Brian Tyler',
     },
@@ -143,6 +149,7 @@ const ROWS: GridRowModel<Movie>[] = [
     director: 'Chris Buck & Jennifer Lee',
     company: 'Disney Studios',
     year: 2019,
+    cinematicUniverse: 'Frozen',
     composer: {
       name: 'Christophe Beck',
     },
@@ -153,7 +160,7 @@ const ROWS: GridRowModel<Movie>[] = [
     director: 'Joss Whedon',
     company: 'Disney Studios',
     year: 2015,
-    marvelCinematicUniversePhase: 2,
+    cinematicUniverse: 'Marvel Cinematic Universe',
     composer: {
       name: 'Danny Elfman',
     },
@@ -164,9 +171,104 @@ const ROWS: GridRowModel<Movie>[] = [
     director: 'Ryan Coogler',
     company: 'Disney Studios',
     year: 2018,
-    marvelCinematicUniversePhase: 3,
+    cinematicUniverse: 'Marvel Cinematic Universe',
     composer: {
       name: 'Ludwig Göransson',
+    },
+  },
+  {
+    title: 'Harry Potter and the Deathly Hallows – Part 2',
+    gross: 1342025430,
+    director: 'David Yates',
+    company: 'Warner Bros. Pictures',
+    year: 2011,
+    composer: {
+      name: 'Alexandre Desplat',
+    },
+  },
+  {
+    title: 'Star Wars: The Last Jedi',
+    gross: 1332539889,
+    director: 'Rian Johnson',
+    company: 'Disney Studios',
+    year: 2017,
+    cinematicUniverse: 'Star Wars',
+    composer: {
+      name: 'John Williams',
+    },
+  },
+  {
+    title: 'Jurassic World: Fallen Kingdom',
+    gross: 1309484461,
+    director: 'J. A. Bayona',
+    company: 'Universal Pictures',
+    year: 2018,
+    cinematicUniverse: 'Jurassic Park',
+    composer: {
+      name: 'Michael Giacchino',
+    },
+  },
+  {
+    title: 'Frozen',
+    gross: 1290000000,
+    director: 'Chris Buck & Jennifer Lee',
+    company: 'Disney Studios',
+    year: 2013,
+    cinematicUniverse: 'Frozen',
+    composer: {
+      name: 'Christophe Beck',
+    },
+  },
+  {
+    title: 'Beauty and the Beast',
+    gross: 1263521136,
+    director: 'Bill Condon',
+    company: 'Disney Studios',
+    year: 2017,
+    composer: {
+      name: 'Alan Menken',
+    },
+  },
+  {
+    title: 'Incredibles 2',
+    gross: 1242805359,
+    director: 'Brad Bird',
+    company: 'Disney Studios',
+    year: 2018,
+    composer: {
+      name: 'Michael Giacchino',
+    },
+  },
+  {
+    title: 'The Fate of the Furious',
+    gross: 1238764765,
+    director: 'F. Gary Gray',
+    company: 'Universal Pictures',
+    year: 2017,
+    cinematicUniverse: 'Fast & Furious',
+    composer: {
+      name: 'Brian Tyler',
+    },
+  },
+  {
+    title: 'Iron Man 3',
+    gross: 1214811252,
+    director: 'Shane Black',
+    company: 'Disney Studios',
+    year: 2013,
+    cinematicUniverse: 'Marvel Cinematic Universe',
+    composer: {
+      name: 'Brian Tyler',
+    },
+  },
+  {
+    title: 'Minions',
+    gross: 11159398397,
+    director: 'Pierre Coffin & Kyle Balda',
+    company: 'Universal Pictures',
+    year: 2015,
+    composer: {
+      name: 'Heitor Pereira',
     },
   },
 ];

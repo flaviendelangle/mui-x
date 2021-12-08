@@ -8,17 +8,10 @@ export default function GroupingColumnsInitialState() {
   const columns = React.useMemo(
     () => [
       ...data.columns.map((colDef) =>
-        ['title'].includes(colDef.field) ? { ...colDef, hide: true } : colDef,
+        ['title', 'cinematicUniverse'].includes(colDef.field)
+          ? { ...colDef, hide: true }
+          : colDef,
       ),
-      {
-        field: 'marvelCinematicUniversePhase',
-        headerName: 'MCU Phase',
-        valueGetter: (params) =>
-          params.row.marvelCinematicUniversePhase == null
-            ? null
-            : `Phase n°${params.row.marvelCinematicUniversePhase}`,
-        hide: true,
-      },
     ],
     [data.columns],
   );
@@ -31,7 +24,7 @@ export default function GroupingColumnsInitialState() {
         disableSelectionOnClick
         initialState={{
           groupingColumns: {
-            model: ['marvelCinematicUniversePhase'],
+            model: ['cinematicUniverse'],
           },
         }}
         groupingColDef={{
