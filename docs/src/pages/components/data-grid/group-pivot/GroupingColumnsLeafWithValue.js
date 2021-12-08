@@ -26,6 +26,9 @@ export default function GroupingColumnsLeafWithValue() {
             model: ['company'],
           },
         }}
+        experimentalFeatures={{
+          groupingColumns: true,
+        }}
       />
     </div>
   );

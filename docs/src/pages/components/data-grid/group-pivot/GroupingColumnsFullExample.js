@@ -42,6 +42,9 @@ export default function GroupingColumnsFullExample() {
             columns: hideGroupedColumns(data.columns, model),
           })
         }
+        experimentalFeatures={{
+          groupingColumns: true,
+        }}
       />
     </div>
   );

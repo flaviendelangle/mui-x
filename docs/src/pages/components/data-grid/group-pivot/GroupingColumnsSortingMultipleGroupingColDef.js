@@ -35,6 +35,9 @@ export default function GroupingColumnsSortingMultipleGroupingColDef() {
               }
             : {}
         }
+        experimentalFeatures={{
+          groupingColumns: true,
+        }}
       />
     </div>
   );

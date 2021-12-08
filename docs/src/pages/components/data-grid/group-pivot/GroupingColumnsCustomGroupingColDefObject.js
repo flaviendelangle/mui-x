@@ -29,6 +29,9 @@ export default function GroupingColumnsCustomGroupingColDefObject() {
         groupingColDef={{
           headerName: 'Group',
         }}
+        experimentalFeatures={{
+          groupingColumns: true,
+        }}
       />
     </div>
   );

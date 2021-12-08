@@ -27,6 +27,9 @@ export default function GroupingColumnsDefaultExpansionDepth() {
             model: ['company', 'director'],
           },
         }}
+        experimentalFeatures={{
+          groupingColumns: true,
+        }}
       />
     </div>
   );

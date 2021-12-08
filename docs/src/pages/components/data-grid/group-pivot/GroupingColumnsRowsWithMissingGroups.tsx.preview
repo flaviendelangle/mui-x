@@ -10,4 +10,7 @@
   groupingColDef={{
     leafField: 'title',
   }}
+  experimentalFeatures={{
+    groupingColumns: true,
+  }}
 />

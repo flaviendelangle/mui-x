@@ -6,4 +6,7 @@
       model: ['composer'],
     },
   }}
+  experimentalFeatures={{
+    groupingColumns: true,
+  }}
 />

@@ -6,4 +6,7 @@
       model: ['decade'],
     },
   }}
+  experimentalFeatures={{
+    groupingColumns: true,
+  }}
 />

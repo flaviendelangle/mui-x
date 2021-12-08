@@ -29,6 +29,9 @@ export default function GroupingColumnsInitialState() {
         groupingColDef={{
           hideDescendantCount: true,
         }}
+        experimentalFeatures={{
+          groupingColumns: true,
+        }}
       />
     </div>
   );

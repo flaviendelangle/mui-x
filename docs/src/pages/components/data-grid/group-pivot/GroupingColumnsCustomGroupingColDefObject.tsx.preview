@@ -10,4 +10,7 @@
   groupingColDef={{
     headerName: 'Group',
   }}
+  experimentalFeatures={{
+    groupingColumns: true,
+  }}
 />

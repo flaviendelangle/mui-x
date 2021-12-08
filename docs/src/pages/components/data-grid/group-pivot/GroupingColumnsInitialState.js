@@ -26,6 +26,9 @@ export default function GroupingColumnsInitialState() {
             model: ['company', 'director'],
           },
         }}
+        experimentalFeatures={{
+          groupingColumns: true,
+        }}
       />
     </div>
   );

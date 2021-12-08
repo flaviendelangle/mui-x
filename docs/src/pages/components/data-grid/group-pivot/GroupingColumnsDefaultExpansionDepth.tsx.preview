@@ -8,4 +8,7 @@
       model: ['company', 'director'],
     },
   }}
+  experimentalFeatures={{
+    groupingColumns: true,
+  }}
 />
