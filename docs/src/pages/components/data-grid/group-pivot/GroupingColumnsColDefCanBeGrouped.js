@@ -14,7 +14,7 @@ export default function GroupingColumnsColDefCanBeGrouped() {
           colDef.hide = true;
         }
 
-        if (colDef.field === 'title') {
+        if (colDef.field === 'director') {
           colDef.canBeGrouped = false;
         }
 

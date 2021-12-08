@@ -1,13 +1,13 @@
 <DataGridPro
-    {...data}
-    columns={columns}
-    disableSelectionOnClick
-    initialState={{
-        groupingColumns: {
-            model: ['company', 'director'],
-        },
-    }}
-    experimentalFeatures={{
-        groupingColumns: true,
-    }}
+  {...data}
+  columns={columns}
+  disableSelectionOnClick
+  initialState={{
+    groupingColumns: {
+      model: ['company', 'director'],
+    },
+  }}
+  experimentalFeatures={{
+    groupingColumns: true,
+  }}
 />

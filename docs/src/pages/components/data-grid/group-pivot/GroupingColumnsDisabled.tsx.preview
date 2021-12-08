@@ -1,8 +1,8 @@
 <DataGridPro
-    {...data}
-    disableSelectionOnClick
-    disableGroupingColumns
-    experimentalFeatures={{
-        groupingColumns: true,
-    }}
+  {...data}
+  disableSelectionOnClick
+  disableGroupingColumns
+  experimentalFeatures={{
+    groupingColumns: true,
+  }}
 />

@@ -6,7 +6,7 @@ title: Data Grid - Group & Pivot
 
 <p class="description">Use grouping, pivoting, and more to analyze the data in depth.</p>
 
-## Row grouping [<span class="plan-premium"></span>](https://mui.com/store/items/material-ui-pro/)
+## Grouping Columns [<span class="plan-premium"></span>](https://mui.com/store/items/material-ui-pro/)
 
 Use grouping columns to group the rows according to one or several columns value</p>
 
@@ -43,9 +43,9 @@ Use it together with `onGroupingColumnsModelChange` to know when a grouping crit
 
 {{"demo": "pages/components/data-grid/group-pivot/GroupingColumnsControlled.js", "bg": "inline", "defaultCodeOpen": false}}
 
-### Block grouping columns
+### Disable the grouping
 
-#### Block grouping for all columns
+#### Disable the grouping for all columns
 
 To block the grouping of all columns, set the `disableGroupingColumns` prop to `true`.
 
@@ -53,7 +53,7 @@ It will disable all the features related to the grouping columns, even if a mode
 
 {{"demo": "pages/components/data-grid/group-pivot/GroupingColumnsDisabled.js", "bg": "inline", "defaultCodeOpen": false}}
 
-#### Block grouping for some columns
+#### Disable the grouping for some columns
 
 To block the grouping of certain columns, set the `canBeGrouped` property of `GridColDef` to `false`.
 In the example below, the `director` column can not be grouped. And in all example, the `title` and `gross` columns can not be grouped.
@@ -72,7 +72,7 @@ To have a grouping column for each grouping fields, set the `groupingColumnMode`
 
 {{"demo": "pages/components/data-grid/group-pivot/GroupingColumnsMultipleGroupingCol.js", "bg": "inline", "defaultCodeOpen": false}}
 
-### Grouping columns customization
+### Grouping column customization
 
 Use the `groupingColDef` prop to customize the rendering of the grouping column. You can override any property of the `GridColDef` interface except the `field`, the `type` and the properties related to the edition.
 
@@ -230,6 +230,10 @@ const rows: GridRowsProp = [
 If some entries are missing to build the full tree, the `DataGridPro` will automatically create rows to fill those gaps.
 
 {{"demo": "pages/components/data-grid/group-pivot/TreeDataWithGap.js", "bg": "inline", "defaultCodeOpen": false}}
+
+### Group expansion
+
+The behavior is the same as for the [Grouping Columns](#group-expansion)
 
 ### Filtering
 

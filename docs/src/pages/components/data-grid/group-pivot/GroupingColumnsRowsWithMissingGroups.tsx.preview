@@ -4,7 +4,7 @@
   disableSelectionOnClick
   initialState={{
     groupingColumns: {
-      model: ['marvelCinematicUniversePhase'],
+      model: ['cinematicUniverse'],
     },
   }}
   groupingColDef={{
