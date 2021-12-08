@@ -53,6 +53,9 @@
     },
     "editRowsModel": { "type": { "name": "object" } },
     "error": { "type": { "name": "any" } },
+    "experimentalFeatures": {
+      "type": { "name": "shape", "description": "{ groupingColumns?: bool }" }
+    },
     "filterMode": {
       "type": { "name": "custom", "description": "'client'<br>&#124;&nbsp;'server'" },
       "default": "\"client\""
