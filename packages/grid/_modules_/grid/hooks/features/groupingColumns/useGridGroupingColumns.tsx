@@ -58,12 +58,9 @@ export const useGridGroupingColumns = (
     | 'defaultGroupingExpansionDepth'
     | 'groupingColDef'
     | 'groupingColumnMode'
-    | 'experimentalFeatures'
+    | 'disableGroupingColumns'
   >,
 ) => {
-  // TODO: Remove once the feature is stable
-  const isGroupingColumnsEnabled = props.experimentalFeatures.groupingColumns;
-
   useGridStateInit(apiRef, (state) => ({
     ...state,
     groupingColumns: {
@@ -93,7 +90,7 @@ export const useGridGroupingColumns = (
       const columnsLookup = gridColumnLookupSelector(apiRef.current.state);
       sanitizedGroupingColumnsModelOnLastRowPreProcessing.current = groupingColumnsModel;
 
-      if (!isGroupingColumnsEnabled || groupingColumnsModel.length === 0) {
+      if (props.disableGroupingColumns || groupingColumnsModel.length === 0) {
         return null;
       }
 
@@ -175,7 +172,7 @@ export const useGridGroupingColumns = (
     };
 
     return apiRef.current.unstable_registerRowGroupsBuilder('rowGrouping', groupRows);
-  }, [apiRef, props.defaultGroupingExpansionDepth, isGroupingColumnsEnabled]);
+  }, [apiRef, props.defaultGroupingExpansionDepth, props.disableGroupingColumns]);
 
   useFirstRender(() => {
     updateRowGrouping();
@@ -240,7 +237,7 @@ export const useGridGroupingColumns = (
 
   const updateGroupingColumn = React.useCallback(
     (columnsState: GridColumnsRawState) => {
-      if (!isGroupingColumnsEnabled) {
+      if (props.disableGroupingColumns) {
         return columnsState;
       }
 
@@ -270,18 +267,18 @@ export const useGridGroupingColumns = (
 
       return columnsState;
     },
-    [getGroupingColDefs, isGroupingColumnsEnabled],
+    [getGroupingColDefs, props.disableGroupingColumns],
   );
 
   const addColumnMenuButtons = React.useCallback(
     (initialValue: JSX.Element[]) => {
-      if (!isGroupingColumnsEnabled) {
+      if (props.disableGroupingColumns) {
         return initialValue;
       }
 
       return [...initialValue, <GridGroupingColumnsMenuItems />];
     },
-    [isGroupingColumnsEnabled],
+    [props.disableGroupingColumns],
   );
 
   const filteringMethod = React.useCallback<GridFilteringMethod>(

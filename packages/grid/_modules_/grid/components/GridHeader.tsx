@@ -14,7 +14,7 @@ export const GridHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<
           <rootProps.components.Toolbar {...rootProps.componentsProps?.toolbar} />
         )}
 
-        {rootProps.groupingColumnsPanel && rootProps.experimentalFeatures.groupingColumns && (
+        {rootProps.groupingColumnsPanel && !rootProps.disableGroupingColumns && (
           <GridGroupingColumnsPanel />
         )}
       </div>

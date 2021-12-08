@@ -12,6 +12,7 @@ import {
   GridSimpleOptions,
   GridProcessedMergedOptions,
   GridMergedOptions,
+  GridExperimentalFeatures,
 } from './models/gridOptions';
 import { GridRowIdGetter, GridRowModel, GridRowsProp } from './models/gridRows';
 import { GridColumnTypesRecord } from './models/colDef/gridColumnTypesRecord';
@@ -34,7 +35,13 @@ import type { GridGroupingColumnsModel } from './hooks/features/groupingColumns'
 export interface GridInputComponentProps
   extends Partial<GridSimpleOptions>,
     Partial<GridMergedOptions>,
-    GridComponentOtherProps {}
+    GridComponentOtherProps {
+  /**
+   * Features under development.
+   * For each feature, if the flag is not explicitly set to `true`, the feature will be fully disabled and any property / method call will not have any effect.
+   */
+  experimentalFeatures?: { [key in GridExperimentalFeatures]?: boolean };
+}
 
 /**
  * The grid component react props after applying the default values.

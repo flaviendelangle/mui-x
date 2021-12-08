@@ -101,25 +101,15 @@ export const useGridProcessedProps = (inProps: GridInputComponentProps) => {
     return mergedComponents;
   }, [inProps.components]);
 
-  const experimentalFeatures = React.useMemo(
-    () =>
-      Object.fromEntries(
-        Object.values(GridExperimentalFeatures).map((feature) => [
-          feature,
-          inProps.experimentalFeatures?.[feature] ?? false,
-        ]),
-      ) as Record<GridExperimentalFeatures, true>,
-    [inProps.experimentalFeatures],
-  );
-
   return React.useMemo<GridComponentProps>(
     () => ({
       ...GRID_DEFAULT_SIMPLE_OPTIONS,
       ...inProps,
+      disableGroupingColumns:
+        inProps.disableGroupingColumns || !inProps.experimentalFeatures?.groupingColumns,
       localeText,
       components,
-      experimentalFeatures,
     }),
-    [inProps, localeText, components, experimentalFeatures],
+    [inProps, localeText, components],
   );
 };
