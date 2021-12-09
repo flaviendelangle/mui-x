@@ -149,6 +149,8 @@ If you are rendering leaves with the `leafField` property of `groupColDef`, the 
 
 In both cases, you can force the sorting and filtering to be applied on another grouping criteria with the `mainGroupingCriteria` property of `groupColDef`
 
+> ⚠️ This feature is not yet compatible with `sortingMode = "server` and `filteringMode = "server"`
+
 {{"demo": "pages/components/data-grid/group-pivot/GroupingColumnsSortingSingleGroupingColDef.js", "bg": "inline", "defaultCodeOpen": false}}
 
 #### Multiple grouping column
