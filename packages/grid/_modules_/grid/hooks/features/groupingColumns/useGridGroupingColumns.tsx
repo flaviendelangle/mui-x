@@ -6,6 +6,7 @@ import type {
   GridColDef,
   GridKeyValue,
   GridCellValue,
+  GridValueGetterSimpleParams,
 } from '../../../models';
 import { GridEvents, GridEventListener } from '../../../models/events';
 import { GridRowGroupingPreProcessing } from '../../core/rowGroupsPerProcessing';
@@ -22,6 +23,7 @@ import {
   getGroupingColDefFieldFromGroupingCriteriaField,
   getColDefOverrides,
   GROUPING_COLUMNS_FEATURE_NAME,
+  isGroupingColumn,
 } from './gridGroupingColumnsUtils';
 import {
   createGroupingColDefForOneGroupingCriteria,
@@ -42,13 +44,13 @@ import { GridGroupingColumnsApi, GridGroupingColumnsModel } from './gridGrouping
 import { useGridApiMethod, useGridState } from '../../utils';
 import { gridColumnLookupSelector } from '../columns';
 import { GridGroupingColumnsMenuItems } from '../../../components/menu/columnMenu/GridGroupingColumnsMenuItems';
-import { GridValueGetterSimpleParams } from '../../../models';
 
 /**
  * Only available in DataGridPro
  * @requires useGridColumns (state, method) - can be after, async only
  * @requires useGridRows (state, method) - can be after, async only
  * @requires useGridParamsApi (method) - can be after, async only
+ * TODO: Move the the Premium plan once available and remove the `experimentalFeatures.groupingColumns` flag
  */
 export const useGridGroupingColumns = (
   apiRef: GridApiRef,
@@ -83,14 +85,14 @@ export const useGridGroupingColumns = (
   /**
    * ROW GROUPING
    */
-  const sanitizedGroupingColumnsModelOnLastRowPreProcessing =
-    React.useRef<GridGroupingColumnsModel>([]);
+  // Tracks the model on the last pre-processing to check if we need to re-build the grouping columns when the grid upserts a column.
+  const sanitizedModelOnLastRowPreProcessing = React.useRef<GridGroupingColumnsModel>([]);
 
   const updateRowGrouping = React.useCallback(() => {
     const groupRows: GridRowGroupingPreProcessing = (params) => {
       const groupingColumnsModel = gridGroupingColumnsSanitizedModelSelector(apiRef.current.state);
       const columnsLookup = gridColumnLookupSelector(apiRef.current.state);
-      sanitizedGroupingColumnsModelOnLastRowPreProcessing.current = groupingColumnsModel;
+      sanitizedModelOnLastRowPreProcessing.current = groupingColumnsModel;
 
       if (props.disableGroupingColumns || groupingColumnsModel.length === 0) {
         return null;
@@ -174,8 +176,13 @@ export const useGridGroupingColumns = (
           )
           .filter((cell) => cell.key != null) as BuildRowTreeGroupingCriteria[];
 
+        const leafGroupingCriteria: BuildRowTreeGroupingCriteria = {
+          key: rowId.toString(),
+          field: null,
+        };
+
         return {
-          path: [...parentPath, { key: rowId.toString(), field: null }],
+          path: [...parentPath, leafGroupingCriteria],
           id: rowId,
         };
       });
@@ -210,6 +217,10 @@ export const useGridGroupingColumns = (
    */
   const getGroupingColDefs = React.useCallback(
     (columnsState: GridColumnsRawState) => {
+      if (props.disableGroupingColumns) {
+        return [];
+      }
+
       const propGroupingColDef = props.groupingColDef;
 
       // We can't use `gridGroupingRowsSanitizedModelSelector` here because the new columns are not in the state yet
@@ -249,21 +260,17 @@ export const useGridGroupingColumns = (
         }
       }
     },
-    [apiRef, props.groupingColDef, props.groupingColumnMode],
+    [apiRef, props.groupingColDef, props.groupingColumnMode, props.disableGroupingColumns],
   );
 
   const updateGroupingColumn = React.useCallback(
     (columnsState: GridColumnsRawState) => {
-      if (props.disableGroupingColumns) {
-        return columnsState;
-      }
-
       const groupingColDefs = getGroupingColDefs(columnsState);
 
       // We remove the grouping columns
       const newColumnFields: string[] = [];
       columnsState.all.forEach((field) => {
-        if (columnsState.lookup[field].type === 'rowGroupByColumnsGroup') {
+        if (isGroupingColumn(field)) {
           delete columnsState.lookup[field];
         } else {
           newColumnFields.push(field);
@@ -284,7 +291,7 @@ export const useGridGroupingColumns = (
 
       return columnsState;
     },
-    [getGroupingColDefs, props.disableGroupingColumns],
+    [getGroupingColDefs],
   );
 
   const addColumnMenuButtons = React.useCallback(
@@ -449,11 +456,10 @@ export const useGridGroupingColumns = (
     GridEventListener<GridEvents.columnsChange>
   >(() => {
     const groupingColumnsModel = gridGroupingColumnsSanitizedModelSelector(apiRef.current.state);
-    const lastGroupingColumnsModelApplied =
-      sanitizedGroupingColumnsModelOnLastRowPreProcessing.current;
+    const lastGroupingColumnsModelApplied = sanitizedModelOnLastRowPreProcessing.current;
 
     if (!isDeepEqual(lastGroupingColumnsModelApplied, groupingColumnsModel)) {
-      sanitizedGroupingColumnsModelOnLastRowPreProcessing.current = groupingColumnsModel;
+      sanitizedModelOnLastRowPreProcessing.current = groupingColumnsModel;
 
       // Refresh the column pre-processing
       apiRef.current.updateColumns([]);
