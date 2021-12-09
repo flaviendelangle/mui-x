@@ -1,0 +1,16 @@
+<DataGridPro
+  loading={loading}
+  disableSelectionOnClick
+  {...data}
+  {...state}
+  groupingColumnMode="multiple"
+  onGroupingColumnsModelChange={(model) =>
+    setState({
+      groupingColumnsModel: model,
+      columns: hideGroupedColumns(data.columns, model),
+    })
+  }
+  experimentalFeatures={{
+    groupingColumns: true,
+  }}
+/>
