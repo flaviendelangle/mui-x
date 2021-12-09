@@ -46,7 +46,9 @@ import { GridValueGetterSimpleParams } from '../../../models';
 
 /**
  * Only available in DataGridPro
- * TODO: Add requirements
+ * @requires useGridColumns (state, method) - can be after, async only
+ * @requires useGridRows (state, method) - can be after, async only
+ * @requires useGridParamsApi (method) - can be after, async only
  */
 export const useGridGroupingColumns = (
   apiRef: GridApiRef,

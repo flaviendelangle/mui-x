@@ -1,11 +1,4 @@
-import {
-  GridColDef,
-  GridRowId,
-  GridRowTreeConfig,
-  GridRowTreeNodeConfig,
-  GridStateColDef,
-  GridValueGetterSimpleParams,
-} from '../../../models';
+import { GridRowId, GridRowTreeConfig, GridRowTreeNodeConfig } from '../../../models';
 import { GridFilterState } from '../filter';
 import { GridComponentProps } from '../../../GridComponentProps';
 
@@ -43,7 +36,8 @@ interface FilterRowTreeFromTreeDataParams {
 }
 
 /**
- * A node is visible if one all the following criteria are met:
+ * A leaf is visible if it passed the filter
+ * A group is visible if all the following criteria are met:
  * - One of its children is passing the filter
  * - It is passing the filter
  */
