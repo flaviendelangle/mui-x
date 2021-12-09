@@ -1,10 +1,11 @@
 <DataGridPro
   {...data}
+  apiRef={apiRef}
   columns={columns}
   disableSelectionOnClick
   initialState={{
     groupingColumns: {
-      model: ['company', 'director'],
+      model: INITIAL_GROUPING_COLUMN_MODEL,
     },
   }}
   experimentalFeatures={{

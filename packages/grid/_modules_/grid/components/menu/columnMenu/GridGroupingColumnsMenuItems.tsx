@@ -34,9 +34,6 @@ const GridGroupingColumnsMenuItems = (props: GridColumnPinningMenuItemsProps) =>
 
     const groupColumn = (event: React.MouseEvent<HTMLElement>) => {
       apiRef.current.addGroupingCriteria(field);
-      // TODO: Clarify if we should hide columns or let the user do it manually
-      apiRef.current.updateColumns([{ field, hide: true }]);
-
       if (onClick) {
         onClick(event);
       }
@@ -50,8 +47,6 @@ const GridGroupingColumnsMenuItems = (props: GridColumnPinningMenuItemsProps) =>
   const renderUnGroupingMenuItem = (field: string) => {
     const ungroupColumn = (event: React.MouseEvent<HTMLElement>) => {
       apiRef.current.removeGroupingCriteria(field);
-      apiRef.current.updateColumns([{ field, hide: false }]);
-
       if (onClick) {
         onClick(event);
       }

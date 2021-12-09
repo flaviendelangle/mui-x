@@ -45,9 +45,9 @@ Use it together with `onGroupingColumnsModelChange` to know when a grouping crit
 
 ### Disable the grouping
 
-#### Disable the grouping for all columns
+#### Fully disable the grouping
 
-To block the grouping of all columns, set the `disableGroupingColumns` prop to `true`.
+To fully disable the grouping feature, set the `disableGroupingColumns` prop to `true`.
 
 It will disable all the features related to the grouping columns, even if a model is provided.
 
@@ -62,13 +62,13 @@ In the example below, the `director` column can not be grouped. And in all examp
 
 #### Single grouping column
 
-By default, the grid will create only one grouping column even if you have several grouping criteria:
+By default, the grid will create only one grouping column even if you have several grouping criteria.
 
 {{"demo": "pages/components/data-grid/group-pivot/GroupingColumnsSingleGroupingCol.js", "bg": "inline", "defaultCodeOpen": false}}
 
 #### Multiple grouping column
 
-To have a grouping column for each grouping criteria, set the `groupingColumnMode` prop to `multiple`:
+To have a grouping column for each grouping criteria, set the `groupingColumnMode` prop to `multiple`.
 
 {{"demo": "pages/components/data-grid/group-pivot/GroupingColumnsMultipleGroupingCol.js", "bg": "inline", "defaultCodeOpen": false}}
 
@@ -76,12 +76,12 @@ To have a grouping column for each grouping criteria, set the `groupingColumnMod
 
 Use the `groupingColDef` prop to customize the rendering of the grouping column. You can override any property of the `GridColDef` interface except the `field`, the `type` and the properties related to the edition.
 
-If you want to apply your overrides to every grouping column, use the object format of `groupingColDef`:
+If you want to apply your overrides to every grouping column, use the object format of `groupingColDef`.
 
 {{"demo": "pages/components/data-grid/group-pivot/GroupingColumnsCustomGroupingColDefObject.js", "bg": "inline", "defaultCodeOpen": false}}
 
 If you want to only override properties of certain grouping columns or to apply different overrides based on the current grouping criteria, use the callback format of `groupingColDef`.
-It will be called for each grouping column with the fields of the columns used to build it:
+It will be called for each grouping column with the fields of the columns used to build it.
 
 {{"demo": "pages/components/data-grid/group-pivot/GroupingColumnsCustomGroupingColDefCallback.js", "bg": "inline", "defaultCodeOpen": false}}
 
@@ -233,7 +233,7 @@ If some entries are missing to build the full tree, the `DataGridPro` will autom
 
 ### Group expansion
 
-The behavior is the same as for the [Grouping Columns](#group-expansion)
+Same behavior as for the [Grouping Columns](#group-expansion)
 
 ### Filtering
 

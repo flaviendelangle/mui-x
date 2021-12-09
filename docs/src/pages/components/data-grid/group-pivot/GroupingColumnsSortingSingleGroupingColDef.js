@@ -1,24 +1,57 @@
 import * as React from 'react';
-import { DataGridPro } from '@mui/x-data-grid-pro';
+import { DataGridPro, GridEvents, useGridApiRef } from '@mui/x-data-grid-pro';
 import { useMovieData } from '@mui/x-data-grid-generator';
 import Stack from '@mui/material/Stack';
 import { InputLabel, Select } from '@mui/material';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 
+const INITIAL_GROUPING_COLUMN_MODEL = ['company', 'director'];
+
+const useKeepGroupingColumnsHidden = (apiRef, columns, initialModel, leafField) => {
+  const prevModel = React.useRef(initialModel);
+
+  React.useEffect(() => {
+    apiRef.current.subscribeEvent(
+      GridEvents.groupingColumnsModelChange,
+      (newModel) => {
+        apiRef.current.updateColumns([
+          ...newModel
+            .filter((field) => !prevModel.current.includes(field))
+            .map((field) => ({ field, hide: true })),
+          ...prevModel.current
+            .filter((field) => !newModel.includes(field))
+            .map((field) => ({ field, hide: false })),
+        ]);
+
+        prevModel.current = initialModel;
+      },
+    );
+  }, [apiRef, initialModel]);
+
+  return React.useMemo(
+    () =>
+      columns.map((colDef) =>
+        initialModel.includes(colDef.field) ||
+        (leafField && colDef.field === leafField)
+          ? { ...colDef, hide: true }
+          : colDef,
+      ),
+    [columns, initialModel, leafField],
+  );
+};
+
 export default function GroupingColumnsSortingSingleGroupingColDef() {
   const data = useMovieData();
   const [mainGroupingCriteria, setMainGroupingCriteria] =
     React.useState('undefined');
 
-  const columns = React.useMemo(
-    () =>
-      data.columns.map((colDef) =>
-        ['company', 'director'].includes(colDef.field)
-          ? { ...colDef, hide: true }
-          : colDef,
-      ),
-    [data.columns],
+  const apiRef = useGridApiRef();
+
+  const columns = useKeepGroupingColumnsHidden(
+    apiRef,
+    data.columns,
+    INITIAL_GROUPING_COLUMN_MODEL,
   );
 
   return (
@@ -45,12 +78,13 @@ export default function GroupingColumnsSortingSingleGroupingColDef() {
       <div style={{ height: 400, width: '100%' }}>
         <DataGridPro
           {...data}
+          apiRef={apiRef}
           columns={columns}
           disableSelectionOnClick
           defaultGroupingExpansionDepth={-1}
           initialState={{
             groupingColumns: {
-              model: ['company', 'director'],
+              model: INITIAL_GROUPING_COLUMN_MODEL,
             },
           }}
           groupingColumnMode="single"

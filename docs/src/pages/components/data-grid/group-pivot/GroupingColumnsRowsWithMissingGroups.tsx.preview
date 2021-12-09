@@ -1,14 +1,12 @@
 <DataGridPro
   {...data}
+  apiRef={apiRef}
   columns={columns}
   disableSelectionOnClick
   initialState={{
     groupingColumns: {
-      model: ['cinematicUniverse'],
+      model: INITIAL_GROUPING_COLUMN_MODEL,
     },
-  }}
-  groupingColDef={{
-    leafField: 'title',
   }}
   experimentalFeatures={{
     groupingColumns: true,
