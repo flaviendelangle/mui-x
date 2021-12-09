@@ -69,7 +69,7 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
     );
   };
 
-  describe('Setting grouping fields', () => {
+  describe('Setting grouping criteria', () => {
     describe('initialState: groupingColumns.model', () => {
       it('should allow to initialize the grouping columns', () => {
         render(
@@ -136,7 +136,7 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
       });
     });
 
-    it('should ignore grouping fields that do not match any column', () => {
+    it('should ignore grouping criteria that do not match any column', () => {
       render(
         <Test
           initialState={{ groupingColumns: { model: ['category1', 'category3'] } }}
@@ -146,7 +146,7 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
       expect(getColumnValues(0)).to.deep.equal(['Cat A (3)', '', '', '', 'Cat B (2)', '', '']);
     });
 
-    it('should ignore grouping fields with colDef.canBeGrouped = false', () => {
+    it('should ignore grouping criteria with colDef.canBeGrouped = false', () => {
       render(
         <Test
           columns={[
@@ -169,7 +169,7 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
       expect(getColumnValues(0)).to.deep.equal(['Cat A (3)', '', '', '', 'Cat B (2)', '', '']);
     });
 
-    it('should allow to use several time the same grouping field', () => {
+    it('should allow to use several time the same grouping criteria', () => {
       render(
         <Test
           initialState={{ groupingColumns: { model: ['category1', 'category1'] } }}
@@ -192,7 +192,7 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
   });
 
   describe('props: groupingColumnMode', () => {
-    it('should gather call the grouping fields into a single column when groupingColumnMode is not defined', () => {
+    it('should gather all the grouping criteria into a single column when groupingColumnMode is not defined', () => {
       render(
         <Test
           initialState={{ groupingColumns: { model: ['category1', 'category2'] } }}
@@ -221,7 +221,7 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
       ]);
     });
 
-    it('should gather call the grouping fields into a single column when groupingColumnMode = "single"', () => {
+    it('should gather all the grouping criteria into a single column when groupingColumnMode = "single"', () => {
       render(
         <Test
           initialState={{ groupingColumns: { model: ['category1', 'category2'] } }}
@@ -251,7 +251,7 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
       ]);
     });
 
-    it('should create on grouping column per grouping fields when groupingColumnMode = "multiple"', () => {
+    it('should create one grouping column per grouping criteria when groupingColumnMode = "multiple"', () => {
       render(
         <Test
           initialState={{ groupingColumns: { model: ['category1', 'category2'] } }}
@@ -511,7 +511,7 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
       // No grouping column rendered
       expect(getColumnHeadersTextContent()).to.deep.equal(['id', 'category1', 'category2']);
 
-      // No menu item on column menu to add / remove grouping field
+      // No menu item on column menu to add / remove grouping criteria
       apiRef.current.showColumnMenu('category1');
       clock.runToLast();
       expect(screen.queryByRole('menu')).not.to.equal(null);
@@ -1951,13 +1951,13 @@ describe('<DataGridPro /> - Group Rows By Column', () => {
   });
 
   describe('apiRef: addGroupingCriteria', () => {
-    it('should add grouping field to model', () => {
+    it('should add grouping criteria to model', () => {
       render(<Test initialState={{ groupingColumns: { model: ['category1'] } }} />);
       apiRef.current.addGroupingCriteria('category2');
       expect(apiRef.current.state.groupingColumns.model).to.deep.equal(['category1', 'category2']);
     });
 
-    it('should add grouping field to model at the right position', () => {
+    it('should add grouping criteria to model at the right position', () => {
       render(<Test initialState={{ groupingColumns: { model: ['category1'] } }} />);
       apiRef.current.addGroupingCriteria('category2', 0);
       expect(apiRef.current.state.groupingColumns.model).to.deep.equal(['category2', 'category1']);

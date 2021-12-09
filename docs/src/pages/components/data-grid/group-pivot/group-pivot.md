@@ -62,13 +62,13 @@ In the example below, the `director` column can not be grouped. And in all examp
 
 #### Single grouping column
 
-By default, the grid will create only one grouping column even if you have several grouping fields:
+By default, the grid will create only one grouping column even if you have several grouping criteria:
 
 {{"demo": "pages/components/data-grid/group-pivot/GroupingColumnsSingleGroupingCol.js", "bg": "inline", "defaultCodeOpen": false}}
 
 #### Multiple grouping column
 
-To have a grouping column for each grouping fields, set the `groupingColumnMode` prop to `multiple`:
+To have a grouping column for each grouping criteria, set the `groupingColumnMode` prop to `multiple`:
 
 {{"demo": "pages/components/data-grid/group-pivot/GroupingColumnsMultipleGroupingCol.js", "bg": "inline", "defaultCodeOpen": false}}
 
@@ -157,7 +157,7 @@ When using `groupingColumnMode = "multiple"`, the default behavior is to apply t
 
 If you are rendering leaves on one of those columns with the `leafField` property of `groupColDef`, the sorting and filtering will be applied on the leaves for this grouping column based on the `sortComparator` and `filterOperators` of the leave's original column.
 
-If you want to render leaves but apply the sorting and filtering on the grouping criteria of the column, you can force it by setting the `mainGroupingCriteria` property `groupColDef` to be equal to the grouping field.
+If you want to render leaves but apply the sorting and filtering on the grouping criteria of the column, you can force it by setting the `mainGroupingCriteria` property `groupColDef` to be equal to the grouping criteria.
 
 In the example below:
 

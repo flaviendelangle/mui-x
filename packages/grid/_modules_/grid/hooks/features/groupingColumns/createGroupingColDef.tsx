@@ -33,7 +33,7 @@ const GROUPING_COL_DEF_FORCED_PROPERTIES: Pick<GridColDef, 'type' | 'editable' |
 };
 
 /**
- * When sorting two cells with different grouping fields, we consider that the cell with the grouping field coming first in the model should be displayed below.
+ * When sorting two cells with different grouping criteria, we consider that the cell with the grouping criteria coming first in the model should be displayed below.
  * This can occur when some rows don't have all the fields. In which case we want the rows with the missing field to be displayed above.
  * TODO: Make this index comparator depth invariant, the logic should not be inverted when sorting in the "desc" direction (but the current return format of `sortComparator` does not support this behavior).
  */

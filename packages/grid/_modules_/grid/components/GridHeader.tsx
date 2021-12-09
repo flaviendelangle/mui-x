@@ -11,7 +11,6 @@ export const GridHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<
         {rootProps.components.Toolbar && (
           <rootProps.components.Toolbar {...rootProps.componentsProps?.toolbar} />
         )}
-
       </div>
     );
   },
