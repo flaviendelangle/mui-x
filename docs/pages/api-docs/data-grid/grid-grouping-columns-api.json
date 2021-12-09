@@ -5,12 +5,12 @@
     {
       "name": "addGroupingCriteria",
       "description": "Add the field to the groupingColumnsModel.",
-      "type": "(field: string, groupingIndex?: number) => void"
+      "type": "(groupingCriteriaField: string, groupingIndex?: number) => void"
     },
     {
       "name": "removeGroupingCriteria",
       "description": "Remove the field from to groupingColumnsModel.",
-      "type": "(field: string) => void"
+      "type": "(groupingCriteriaField: string) => void"
     },
     {
       "name": "setGroupingColumnsModel",

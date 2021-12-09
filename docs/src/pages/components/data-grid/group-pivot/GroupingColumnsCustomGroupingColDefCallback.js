@@ -40,7 +40,7 @@ const useKeepGroupingColumnsHidden = (apiRef, columns, initialModel, leafField) 
   );
 };
 
-export default function GroupingColumnsCustomGroupingColDefObject() {
+export default function GroupingColumnsCustomGroupingColDefCallback() {
   const data = useMovieData();
   const apiRef = useGridApiRef();
   const [groupingColumnsModel, setGroupingColumnsModel] = React.useState(

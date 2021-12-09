@@ -85,7 +85,7 @@ export interface GridColDef {
    */
   editable?: boolean;
   /**
-   * If `true`, the column can be grouped through the grouping columns panel or through the column menu (pro-plan only)
+   * If `true`, the rows can be grouped based on this column values (pro-plan only).
    * @default true
    */
   canBeGrouped?: boolean;

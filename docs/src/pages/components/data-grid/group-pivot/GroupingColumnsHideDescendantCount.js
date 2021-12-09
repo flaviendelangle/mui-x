@@ -37,7 +37,7 @@ const useKeepGroupingColumnsHidden = (apiRef, columns, initialModel, leafField) 
   );
 };
 
-export default function GroupingColumnsInitialState() {
+export default function GroupingColumnsHideDescendantCount() {
   const data = useMovieData();
   const apiRef = useGridApiRef();
 

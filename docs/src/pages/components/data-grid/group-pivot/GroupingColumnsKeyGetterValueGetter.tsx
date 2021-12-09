@@ -52,7 +52,7 @@ const useKeepGroupingColumnsHidden = (
   );
 };
 
-export default function GroupingColumnsKeyGetter() {
+export default function GroupingColumnsKeyGetterValueGetter() {
   const data = useMovieData();
   const apiRef = useGridApiRef();
 

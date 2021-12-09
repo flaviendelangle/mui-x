@@ -37,7 +37,7 @@ const useKeepGroupingColumnsHidden = (apiRef, columns, initialModel, leafField) 
   );
 };
 
-export default function GroupingColumnsKeyGetter() {
+export default function GroupingColumnsKeyGetterValueGetter() {
   const data = useMovieData();
   const apiRef = useGridApiRef();
 

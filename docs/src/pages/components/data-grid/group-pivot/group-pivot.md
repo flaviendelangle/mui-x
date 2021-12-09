@@ -227,15 +227,19 @@ const rows: GridRowsProp = [
 
 {{"demo": "pages/components/data-grid/group-pivot/TreeDataSimple.js", "bg": "inline", "defaultCodeOpen": false}}
 
+### Grouping column customization
+
+Same behavior as for the [Grouping Columns](##grouping-column-customization) except for the `leafField` and `mainGroupingCriteria` which are not applicable for the Tree Data.
+
+### Group expansion
+
+Same behavior as for the [Grouping Columns](#group-expansion)
+
 ### Gaps in the tree
 
 If some entries are missing to build the full tree, the `DataGridPro` will automatically create rows to fill those gaps.
 
 {{"demo": "pages/components/data-grid/group-pivot/TreeDataWithGap.js", "bg": "inline", "defaultCodeOpen": false}}
-
-### Group expansion
-
-Same behavior as for the [Grouping Columns](#group-expansion)
 
 ### Filtering
 

@@ -17,16 +17,16 @@ export interface GridGroupingColumnsApi {
 
   /**
    * Add the field to the groupingColumnsModel.
-   * @param {string} field The field from which we want to group the rows.
+   * @param {string} groupingCriteriaField The field from which we want to group the rows.
    * @param {number | undefined} groupingIndex The grouping index at which we want to insert the new grouping criteria. By default, it will be inserted at the end of the model.
    */
-  addGroupingCriteria: (field: string, groupingIndex?: number) => void;
+  addGroupingCriteria: (groupingCriteriaField: string, groupingIndex?: number) => void;
 
   /**
    * Remove the field from to groupingColumnsModel.
-   * @param {string} field The field from which we want to stop grouping the rows.
+   * @param {string} groupingCriteriaField The field from which we want to stop grouping the rows.
    */
-  removeGroupingCriteria: (field: string) => void;
+  removeGroupingCriteria: (groupingCriteriaField: string) => void;
 
   /**
    * Sets the grouping index of a grouping criteria.
