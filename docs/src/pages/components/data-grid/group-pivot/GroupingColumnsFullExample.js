@@ -34,7 +34,6 @@ export default function GroupingColumnsFullExample() {
         disableSelectionOnClick
         {...data}
         {...state}
-        groupingColumnsPanel
         groupingColumnMode="multiple"
         onGroupingColumnsModelChange={(model) =>
           setState({

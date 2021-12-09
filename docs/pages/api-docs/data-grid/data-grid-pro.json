@@ -76,7 +76,6 @@
       "type": { "name": "enum", "description": "'multiple'<br>&#124;&nbsp;'single'" }
     },
     "groupingColumnsModel": { "type": { "name": "arrayOf", "description": "Array&lt;string&gt;" } },
-    "groupingColumnsPanel": { "type": { "name": "bool" } },
     "headerHeight": { "type": { "name": "number" }, "default": "56" },
     "hideFooter": { "type": { "name": "bool" } },
     "hideFooterPagination": { "type": { "name": "bool" } },
