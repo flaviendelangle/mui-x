@@ -98,10 +98,11 @@ export const useGridGroupingColumns = (
         return null;
       }
 
-      const distinctValues: { [field: string]: { map: { [val: string]: boolean }; list: any[] } } =
-        Object.fromEntries(
-          groupingColumnsModel.map((groupingField) => [groupingField, { map: {}, list: [] }]),
-        );
+      const distinctValues: {
+        [field: string]: { lookup: { [val: string]: boolean }; list: any[] };
+      } = Object.fromEntries(
+        groupingColumnsModel.map((groupingField) => [groupingField, { lookup: {}, list: [] }]),
+      );
 
       const getCellGroupingCriteria = ({
         row,
@@ -157,8 +158,8 @@ export const useGridGroupingColumns = (
           });
           const groupingFieldsDistinctKeys = distinctValues[groupingCriteria];
 
-          if (key != null && !groupingFieldsDistinctKeys.map[key.toString()]) {
-            groupingFieldsDistinctKeys.map[key.toString()] = true;
+          if (key != null && !groupingFieldsDistinctKeys.lookup[key.toString()]) {
+            groupingFieldsDistinctKeys.lookup[key.toString()] = true;
             groupingFieldsDistinctKeys.list.push(key);
           }
         });
