@@ -9,7 +9,6 @@ import type {
 import { GridEvents, GridEventListener } from '../../../models/events';
 import { GridRowGroupingPreProcessing } from '../../core/rowGroupsPerProcessing';
 import { useFirstRender } from '../../utils/useFirstRender';
-import { isSpaceKey } from '../../../utils/keyboardUtils';
 import { buildRowTree, BuildRowTreeGroupingCriteria } from '../../../utils/tree/buildRowTree';
 import { useGridApiEventHandler } from '../../utils/useGridApiEventHandler';
 import {
@@ -130,13 +129,13 @@ export const useGridGroupingColumns = (
       params.ids.forEach((rowId) => {
         const row = params.idRowsLookup[rowId];
 
-        groupingColumnsModel.forEach((groupedByField) => {
+        groupingColumnsModel.forEach((groupingCriteria) => {
           const { key } = getCellGroupingCriteria({
             row,
             id: rowId,
-            colDef: columnsLookup[groupedByField],
+            colDef: columnsLookup[groupingCriteria],
           });
-          const groupingFieldsDistinctKeys = distinctValues[groupedByField];
+          const groupingFieldsDistinctKeys = distinctValues[groupingCriteria];
 
           if (key != null && !groupingFieldsDistinctKeys.map[key.toString()]) {
             groupingFieldsDistinctKeys.map[key.toString()] = true;
@@ -217,11 +216,11 @@ export const useGridGroupingColumns = (
         }
 
         case 'multiple': {
-          return groupingColumnsModel.map((groupedByField) =>
+          return groupingColumnsModel.map((groupingCriteria) =>
             createGroupingColDefForOneGroupingCriteria({
-              groupedByField,
-              colDefOverride: getColDefOverrides(propGroupingColDef, [groupedByField]),
-              groupedByColDef: columnsState.lookup[groupedByField],
+              groupingCriteria,
+              colDefOverride: getColDefOverrides(propGroupingColDef, [groupingCriteria]),
+              groupedByColDef: columnsState.lookup[groupingCriteria],
               columnsLookup: columnsState.lookup,
             }),
           );

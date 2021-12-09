@@ -139,7 +139,7 @@ interface CreateGroupingColDefMonoCriteriaParams {
   /**
    * The field from which we are grouping the rows
    */
-  groupedByField: string;
+  groupingCriteria: string;
 
   /**
    * The col def from which we are grouping the rows
@@ -159,7 +159,7 @@ interface CreateGroupingColDefMonoCriteriaParams {
 export const createGroupingColDefForOneGroupingCriteria = ({
   columnsLookup,
   groupedByColDef,
-  groupedByField,
+  groupingCriteria,
   colDefOverride,
 }: CreateGroupingColDefMonoCriteriaParams): GridColDef => {
   const { leafField, mainGroupingCriteria, hideDescendantCount, ...colDefOverrideProperties } =
@@ -189,7 +189,7 @@ export const createGroupingColDefForOneGroupingCriteria = ({
         return null;
       }
 
-      if (params.rowNode.groupingField === groupedByField) {
+      if (params.rowNode.groupingField === groupingCriteria) {
         return <GridGroupingCriteriaCell {...params} hideDescendantCount={hideDescendantCount} />;
       }
 
@@ -201,7 +201,7 @@ export const createGroupingColDefForOneGroupingCriteria = ({
         return undefined;
       }
 
-      if (fullParams.rowNode.groupingField === groupedByField) {
+      if (fullParams.rowNode.groupingField === groupingCriteria) {
         return fullParams.rowNode.groupingKey;
       }
 
@@ -218,7 +218,7 @@ export const createGroupingColDefForOneGroupingCriteria = ({
     },
   };
 
-  // If we have a `mainGroupingCriteria` defined and matching the `groupedByField`
+  // If we have a `mainGroupingCriteria` defined and matching the `groupingCriteria`
   // Then we apply the sorting / filtering on the groups of this column's grouping criteria based on the properties of `groupedByColDef`.
   // It can be useful to define a `leafField` for leaves rendering but still use the grouping criteria for the sorting / filtering
   //
@@ -227,7 +227,7 @@ export const createGroupingColDefForOneGroupingCriteria = ({
   //
   // By default, we apply the sorting / filtering on the groups of this column's grouping criteria based on the properties of `groupedColDef`.
   let sourceProperties: Partial<GridColDef>;
-  if (mainGroupingCriteria && mainGroupingCriteria === groupedByField) {
+  if (mainGroupingCriteria && mainGroupingCriteria === groupingCriteria) {
     sourceProperties = getGroupingCriteriaProperties(groupedByColDef, true);
   } else if (leafColDef) {
     sourceProperties = getLeafProperties(leafColDef);
@@ -237,7 +237,7 @@ export const createGroupingColDefForOneGroupingCriteria = ({
 
   // The properties that can't be overridden with `colDefOverride`
   const forcedProperties: Pick<GridColDef, 'field' | 'editable'> = {
-    field: getGroupingColDefFieldFromGroupingCriteriaField(groupedByField),
+    field: getGroupingColDefFieldFromGroupingCriteriaField(groupingCriteria),
     ...GROUPING_COL_DEF_FORCED_PROPERTIES,
   };
 

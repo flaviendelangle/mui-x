@@ -13,12 +13,14 @@ export const GROUPING_COLUMN_SINGLE = '__row_group_by_columns_group__';
 
 export const GROUPING_COLUMNS_FEATURE_NAME = 'grouping-columns';
 
-export const getGroupingColDefFieldFromGroupingCriteriaField = (groupedByField: string | null) => {
-  if (groupedByField === null) {
+export const getGroupingColDefFieldFromGroupingCriteriaField = (
+  groupingCriteria: string | null,
+) => {
+  if (groupingCriteria === null) {
     return GROUPING_COLUMN_SINGLE;
   }
 
-  return `__row_group_by_columns_group_${groupedByField}__`;
+  return `__row_group_by_columns_group_${groupingCriteria}__`;
 };
 
 export const getGroupingCriteriaFieldFromGroupingColDefField = (groupingColDefField: string) => {
