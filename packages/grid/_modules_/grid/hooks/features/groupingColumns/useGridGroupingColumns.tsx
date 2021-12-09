@@ -427,11 +427,7 @@ export const useGridGroupingColumns = (
   const handleCellKeyDown = React.useCallback<GridEventListener<GridEvents.cellKeyDown>>(
     (params, event) => {
       const cellParams = apiRef.current.getCellParams(params.id, params.field);
-      if (
-        cellParams.colDef.type === 'rowGroupByColumnsGroup' &&
-        event.key === ' ' &&
-        !event.shiftKey
-      ) {
+      if (isGroupingColumn(cellParams.field) && event.key === ' ' && !event.shiftKey) {
         event.stopPropagation();
         event.preventDefault();
 
