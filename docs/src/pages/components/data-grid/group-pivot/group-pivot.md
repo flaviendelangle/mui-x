@@ -12,7 +12,7 @@ Use grouping columns to group the rows according to one or several columns value
 
 > ⚠️ This feature is temporarily available on the Pro plan until the release of the Premium plan.
 >
-> To avoid future regression for users of the pro-plan, the feature needs to be explicitly activated using the `groupingColumns` experimental feature flag.
+> To avoid future regression for users of the Pro plan, the feature needs to be explicitly activated using the `groupingColumns` experimental feature flag.
 >
 > ```tsx
 > <DataGridPro experimentalFeatures={{ groupingColumns: true }} {...otherProps} />

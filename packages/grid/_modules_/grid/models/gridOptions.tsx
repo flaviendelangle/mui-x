@@ -12,7 +12,7 @@ export type GridMergedOptions = {
 
 export enum GridExperimentalFeatures {
   /**
-   * Only available on the pro-plan.
+   * Only available on the Pro plan.
    * Will be part of the premium-plan when fully ready.
    */
   groupingColumns = 'groupingColumns',
