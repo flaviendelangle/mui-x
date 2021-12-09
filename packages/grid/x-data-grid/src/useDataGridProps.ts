@@ -19,6 +19,7 @@ const FORCED_PROPS: { [key in ForcedPropsKey]-?: GridInputComponentProps[key] } 
   disableChildrenFiltering: undefined,
   disableChildrenSorting: undefined,
   disableColumnPinning: undefined,
+  disableGroupingColumns: undefined,
   getTreeDataPath: undefined,
   groupingColDef: undefined,
   throttleRowsMs: undefined,

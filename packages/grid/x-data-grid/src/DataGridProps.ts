@@ -17,6 +17,7 @@ export type DataGridProps = Omit<
   | 'disableChildrenFiltering'
   | 'disableChildrenSorting'
   | 'disableColumnPinning'
+  | 'disableGroupingColumns'
   | 'throttleRowsMs'
   | 'hideFooterRowCount'
   | 'options'
