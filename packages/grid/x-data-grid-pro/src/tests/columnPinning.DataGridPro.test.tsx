@@ -47,7 +47,7 @@ describe('<DataGridPro /> - Column pinning', () => {
     render(<TestCase initialState={{ pinnedColumns: { left: ['id'] } }} />);
     const virtualScroller = document.querySelector(`.${gridClasses.virtualScroller}`)!;
     virtualScroller.scrollLeft = 100;
-    fireEvent.scroll(virtualScroller);
+    virtualScroller.dispatchEvent(new Event('scroll'));
     const cell = getCell(0, 2);
     fireEvent.mouseUp(cell);
     fireEvent.click(cell);
