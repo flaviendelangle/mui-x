@@ -195,11 +195,11 @@ export interface GridKeyGetterParams<V = any> {
    */
   id: GridRowId;
   /**
-   * The column field of the cell that triggered the event
+   * The column field of the cell that triggered the event.
    */
   field: string;
   /**
-   * The cell value (if the column has valueGetter, this is the value returned by it)
+   * The cell value (if the column has valueGetter, this is the value returned by it).
    */
   value: V;
 }

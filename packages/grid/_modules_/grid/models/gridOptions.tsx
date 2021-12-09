@@ -243,6 +243,7 @@ export interface GridSimpleOptions {
   /**
    * If `single`, all column we are grouping by will be represented in the same grouping the same column.
    * If `multiple`, each column we are grouping by will be represented in its own column.
+   * @default 'single'
    */
   groupingColumnMode: 'single' | 'multiple';
   /**

@@ -73,7 +73,8 @@
     "getTreeDataPath": { "type": { "name": "func" } },
     "groupingColDef": { "type": { "name": "union", "description": "func<br>&#124;&nbsp;object" } },
     "groupingColumnMode": {
-      "type": { "name": "enum", "description": "'multiple'<br>&#124;&nbsp;'single'" }
+      "type": { "name": "enum", "description": "'multiple'<br>&#124;&nbsp;'single'" },
+      "default": "'single'"
     },
     "groupingColumnsModel": { "type": { "name": "arrayOf", "description": "Array&lt;string&gt;" } },
     "headerHeight": { "type": { "name": "number" }, "default": "56" },

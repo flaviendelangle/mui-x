@@ -241,7 +241,13 @@ export interface GridColumnsMeta {
 export interface GridGroupingColDefOverride
   extends Omit<
     GridColDef,
-    'editable' | 'valueSetter' | 'field' | 'type' | 'preProcessEditCellProps' | 'renderEditCell'
+    | 'editable'
+    | 'valueSetter'
+    | 'field'
+    | 'type'
+    | 'preProcessEditCellProps'
+    | 'renderEditCell'
+    | 'canBeGrouped'
   > {
   /**
    * The field from which we want to apply the sorting and the filtering for the grouping column.
