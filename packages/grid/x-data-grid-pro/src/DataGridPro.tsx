@@ -535,7 +535,7 @@ DataGridProRaw.propTypes = {
   onFilterModelChange: PropTypes.func,
   /**
    * Callback fired when the grouping columns model changes.
-   * @param {GridGroupingColumnsModel} model Columns used as grouping criteria
+   * @param {GridGroupingColumnsModel} model Columns used as grouping criteria.
    * @param {GridCallbackDetails} details Additional details for this callback.
    */
   onGroupingColumnsModelChange: PropTypes.func,

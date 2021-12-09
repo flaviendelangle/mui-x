@@ -11,14 +11,14 @@ import {
   GROUPING_COLUMN_SINGLE,
   isGroupingColumn,
 } from '../../../hooks/features/groupingColumns/gridGroupingColumnsUtils';
-import { gridColumnLookupSelector } from '../../../hooks';
+import { gridColumnLookupSelector } from '../../../hooks/features/columns/gridColumnsSelector';
 
-interface GridColumnPinningMenuItemsProps {
+interface GridGroupingColumnsMenuItemsProps {
   column?: GridColDef;
   onClick?: (event: React.MouseEvent<any>) => void;
 }
 
-const GridGroupingColumnsMenuItems = (props: GridColumnPinningMenuItemsProps) => {
+const GridGroupingColumnsMenuItems = (props: GridGroupingColumnsMenuItemsProps) => {
   const { column, onClick } = props;
   const apiRef = useGridApiContext();
   const groupingColumnsModel = useGridSelector(apiRef, gridGroupingColumnsSanitizedModelSelector);

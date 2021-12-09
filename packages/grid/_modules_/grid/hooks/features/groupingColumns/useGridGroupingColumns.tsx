@@ -405,7 +405,7 @@ export const useGridGroupingColumns = (
       const cellParams = apiRef.current.getCellParams(params.id, params.field);
       if (
         cellParams.colDef.type === 'rowGroupByColumnsGroup' &&
-        isSpaceKey(event.key) &&
+        event.key === ' ' &&
         !event.shiftKey
       ) {
         event.stopPropagation();

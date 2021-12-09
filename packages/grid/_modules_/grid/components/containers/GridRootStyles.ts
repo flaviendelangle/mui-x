@@ -301,12 +301,12 @@ export const GridRootStyles = styled('div', {
       alignSelf: 'stretch',
       marginRight: theme.spacing(2),
     },
-    [`& .${gridClasses.groupingColumnGroupingCriteriaCell}`]: {
+    [`& .${gridClasses.groupingCriteriaCell}`]: {
       display: 'flex',
       alignItems: 'center',
       width: '100%',
     },
-    [`& .${gridClasses.groupingColumnGroupingCriteriaCellToggle}`]: {
+    [`& .${gridClasses.groupingCriteriaCellToggle}`]: {
       flex: '0 0 28px',
       alignSelf: 'stretch',
       marginRight: theme.spacing(2),

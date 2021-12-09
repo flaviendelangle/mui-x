@@ -19,20 +19,18 @@ const useUtilityClasses = (ownerState: OwnerState) => {
   const { classes } = ownerState;
 
   const slots = {
-    root: ['groupingColumnGroupingCriteriaCell'],
-    toggle: ['groupingColumnGroupingCriteriaCellToggle'],
+    root: ['groupingCriteriaCell'],
+    toggle: ['groupingCriteriaCellToggle'],
   };
 
   return composeClasses(slots, getDataGridUtilityClass, classes);
 };
 
-interface GridGroupingColumnGroupingCriteriaCellProps extends GridRenderCellParams {
+interface GridGroupingCriteriaCellProps extends GridRenderCellParams {
   hideDescendantCount?: boolean;
 }
 
-const GridGroupingColumnGroupingCriteriaCell = (
-  props: GridGroupingColumnGroupingCriteriaCellProps,
-) => {
+const GridGroupingCriteriaCell = (props: GridGroupingCriteriaCellProps) => {
   const { id, field, rowNode, hideDescendantCount } = props;
 
   const rootProps = useGridRootProps();
@@ -50,7 +48,7 @@ const GridGroupingColumnGroupingCriteriaCell = (
     : rootProps.components.TreeDataExpandIcon;
 
   const handleKeyDown = (event) => {
-    if (isSpaceKey(event.key)) {
+    if (event.key === ' ') {
       event.stopPropagation();
     }
     if (isNavigationKey(event.key) && !event.shiftKey) {
@@ -58,7 +56,7 @@ const GridGroupingColumnGroupingCriteriaCell = (
     }
   };
 
-  const handleClick = (event) => {
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     apiRef.current.setRowChildrenExpansion(id, !rowNode.childrenExpanded);
     apiRef.current.setCellFocus(id, field);
     event.stopPropagation();
@@ -93,7 +91,7 @@ const GridGroupingColumnGroupingCriteriaCell = (
   );
 };
 
-GridGroupingColumnGroupingCriteriaCell.propTypes = {
+GridGroupingCriteriaCell.propTypes = {
   // ----------------------------- Warning --------------------------------
   // | These PropTypes are generated from the TypeScript type definitions |
   // | To update them edit the TypeScript types and run "yarn proptypes"  |
@@ -163,4 +161,4 @@ GridGroupingColumnGroupingCriteriaCell.propTypes = {
   ]),
 } as any;
 
-export { GridGroupingColumnGroupingCriteriaCell };
+export { GridGroupingCriteriaCell };
