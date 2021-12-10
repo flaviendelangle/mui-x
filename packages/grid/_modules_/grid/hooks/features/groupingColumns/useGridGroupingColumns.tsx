@@ -473,7 +473,7 @@ export const useGridGroupingColumns = (
   );
 
   /**
-   * UPDATES
+   * EFFECTS
    */
   React.useEffect(() => {
     if (props.groupingColumnsModel !== undefined) {
