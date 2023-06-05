@@ -1,4 +1,12 @@
-import { GridColDef, gridStringOrNumberComparator } from '@mui/x-data-grid-premium';
+import * as React from 'react';
+import { LineChart } from '@mui/x-charts/LineChart';
+import {
+  GRID_STRING_COL_DEF,
+  GridColDef,
+  GridColTypeDef,
+  GridRenderCellParams,
+  gridStringOrNumberComparator,
+} from '@mui/x-data-grid-premium';
 import {
   randomCommodity,
   randomDesk,
@@ -27,6 +35,7 @@ import {
   randomRateType,
   randomContractType,
   randomTaxCode,
+  randomCurencyRate,
 } from '../services';
 import {
   renderCountry,
@@ -52,6 +61,59 @@ import {
   TAXCODE_OPTIONS,
 } from '../services/static-data';
 import { GridColDefGenerator } from '../services/gridColDefGenerator';
+
+interface SparklineProps {
+  data: number[];
+  width: number;
+}
+
+function Sparkline(props: SparklineProps) {
+  const { data, width } = props;
+
+  const xAxisData = React.useMemo(
+    () => Array.from({ length: data.length }).map((_, index) => index),
+    [data],
+  );
+
+  return (
+    <LineChart
+      margin={{ left: 6, right: 6, top: 4, bottom: 4 }}
+      yAxis={[{ hidden: true }]}
+      xAxis={[{ hidden: true, data: xAxisData }]}
+      tooltip={{ trigger: 'none' }}
+      series={[
+        {
+          data,
+        },
+      ]}
+      width={width}
+      height={40}
+      sx={{
+        '& .MuiMarkElement-root': {
+          display: 'none',
+        },
+      }}
+    />
+  );
+}
+
+function GridSparklineCell(props: GridRenderCellParams<any, number[]>) {
+  if (props.value == null) {
+    return null;
+  }
+
+  return <Sparkline data={props.value} width={props.colDef.computedWidth} />;
+}
+
+const sparklineColumnType: GridColTypeDef<number[]> = {
+  ...GRID_STRING_COL_DEF,
+  resizable: false,
+  filterable: false,
+  sortable: false,
+  editable: false,
+  groupable: false,
+  renderCell: (params: GridRenderCellParams) => <GridSparklineCell {...params} />,
+};
 
 export const getCommodityColumns = (editable = false): GridColDefGenerator[] => [
   {
@@ -144,6 +206,13 @@ export const getCommodityColumns = (editable = false): GridColDefGenerator[] => 
     valueOptions: CURRENCY_OPTIONS,
     width: 120,
     editable,
+  },
+  {
+    field: 'currencyExcahngeRate',
+    headerName: 'Currency Exchange Rate',
+    width: 150,
+    generateData: randomCurencyRate,
+    ...sparklineColumnType,
   },
   {
     field: 'subTotal',
