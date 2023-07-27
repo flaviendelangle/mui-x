@@ -351,7 +351,15 @@ export class AdapterDayjs implements MuiPickersAdapter<Dayjs, string> {
       return null;
     }
 
-    return this.dayjs(value, format, this.locale, true);
+    const dayjs = this.rawDayJsInstance ?? defaultDayjs;
+
+    // UTC and timezone plugins don't work well with strict mode
+    // https://github.com/iamkun/dayjs/issues/929
+    if (this.hasUTCPlugin()) {
+      return dayjs(value, format, this.locale);
+    }
+
+    return dayjs(value, format, this.locale, true);
   };
 
   public getCurrentLocaleCode = () => {
