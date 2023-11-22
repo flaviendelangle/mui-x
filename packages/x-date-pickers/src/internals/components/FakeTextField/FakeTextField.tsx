@@ -61,7 +61,10 @@ export const FakeTextField = React.forwardRef(function FakeTextField(
   const [focused, setFocused] = React.useState(focusedProp);
 
   const rootRef = React.useRef<HTMLDivElement>(null);
-  const handleRef = useForkRef(ref, rootRef);
+  const handleRootRef = useForkRef(ref, rootRef);
+
+  const inputRef = React.useRef<HTMLDivElement>(null);
+  const handleInputRef = useForkRef(inputRef, InputProps?.ref);
 
   const id = useId(idOverride);
   const helperTextId = helperText && id ? `${id}-helper-text` : undefined;
@@ -78,26 +81,17 @@ export const FakeTextField = React.forwardRef(function FakeTextField(
 
   const classes = useUtilityClasses(ownerState);
 
-  // TODO: delete after behavior implementation
   const onWrapperClick = () => {
     if (!focused) {
       setFocused(true);
-      const container = rootRef.current;
-
-      // Find the first input element within the container
-      const firstInput = container?.querySelector('.content') as HTMLElement;
-
-      // Check if the input element exists before focusing it
-      if (firstInput) {
-        firstInput.focus();
-      }
+      inputRef.current?.focus();
     }
   };
 
   return (
     <FakeTextFieldRoot
       className={clsx(classes.root, className)}
-      ref={handleRef}
+      ref={handleRootRef}
       {...{
         focused,
         disabled,
@@ -114,10 +108,10 @@ export const FakeTextField = React.forwardRef(function FakeTextField(
         {label}
       </InputLabel>
       <FakeInput
-        ref={InputProps?.ref}
         {...{ elements, valueStr, valueType, onWrapperClick, inputProps, label }}
         {...other}
         {...InputProps}
+        ref={handleInputRef}
       />
       {helperText && (
         <FormHelperText id={helperTextId} {...FormHelperTextProps}>
