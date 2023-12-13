@@ -17,6 +17,8 @@ import {
   Unstable_PickersSectionListSectionContent as PickersSectionListSectionContent,
 } from '../../../PickersSectionList';
 
+const round = (value) => Math.round(value * 1e5) / 1e5;
+
 const PickersInputRoot = styled(Box, {
   name: 'MuiPickersInput',
   slot: 'Root',
@@ -34,6 +36,7 @@ const PickersInputRoot = styled(Box, {
     outline: 'none',
     borderRadius: (theme.vars || theme).shape.borderRadius,
     boxSizing: 'border-box', // Prevent padding issue with fullWidth.
+    letterSpacing: `${round(0.15 / 16)}em`,
 
     [`&:hover .${pickersInputClasses.notchedOutline}`]: {
       borderColor: (theme.vars || theme).palette.text.primary,
@@ -88,6 +91,7 @@ const PickersInputSectionsContainer = styled(PickersSectionListRoot, {
   width: '20ch',
   flexGrow: 1,
   overflow: 'hidden',
+  letterSpacing: 'inherit',
 
   ...(ownerState.size === 'small' && {
     padding: '8.5px 0',
@@ -114,6 +118,7 @@ const PickersInputSection = styled(PickersSectionListSection, {
 })(({ theme }) => ({
   fontFamily: theme.typography.fontFamily,
   fontSize: 'inherit',
+  letterSpacing: 'inherit',
   lineHeight: '1.4375em', // 23px
   display: 'flex',
 }));
@@ -133,7 +138,10 @@ const PickersInputSeparator = styled(PickersSectionListSectionSeparator, {
   name: 'MuiPickersInput',
   slot: 'Separator',
   overridesResolver: (props, styles) => styles.separator,
-})(() => ({}));
+})(() => ({
+  whiteSpace: 'pre',
+  letterSpacing: 'inherit',
+}));
 
 const PickersInputInput = styled('input', {
   name: 'MuiPickersInput',
