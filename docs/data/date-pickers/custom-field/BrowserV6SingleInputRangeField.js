@@ -24,6 +24,7 @@ const BrowserField = React.forwardRef((props, ref) => {
     focused,
     ownerState,
     sx,
+    textField,
     ...other
   } = props;
 
@@ -45,42 +46,35 @@ const BrowserField = React.forwardRef((props, ref) => {
 const BrowserSingleInputDateRangeField = React.forwardRef((props, ref) => {
   const { slots, slotProps, onAdornmentClick, ...other } = props;
 
-  const { inputRef: externalInputRef, ...textFieldProps } = useSlotProps({
+  const textFieldProps = useSlotProps({
     elementType: 'input',
     externalSlotProps: slotProps?.textField,
     externalForwardedProps: other,
     ownerState: props,
   });
 
-  const {
-    ref: inputRef,
-    onClear,
-    clearable,
-    ...fieldProps
-  } = useSingleInputDateRangeField({
-    props: textFieldProps,
-    inputRef: externalInputRef,
+  textFieldProps.InputProps = {
+    ...textFieldProps.InputProps,
+    endAdornment: (
+      <InputAdornment position="end">
+        <IconButton onClick={onAdornmentClick}>
+          <DateRangeIcon />
+        </IconButton>
+      </InputAdornment>
+    ),
+  };
+
+  const fieldResponse = useSingleInputDateRangeField({
+    ...textFieldProps,
+    shouldUseV6TextField: true,
   });
 
   /* If you don't need a clear button, you can skip the use of this hook */
-  const { InputProps: ProcessedInputProps, fieldProps: processedFieldProps } =
-    useClearableField({
-      onClear,
-      clearable,
-      fieldProps,
-      InputProps: {
-        ...fieldProps.InputProps,
-        endAdornment: (
-          <InputAdornment position="end">
-            <IconButton onClick={onAdornmentClick}>
-              <DateRangeIcon />
-            </IconButton>
-          </InputAdornment>
-        ),
-      },
-      slots,
-      slotProps,
-    });
+  const processedFieldProps = useClearableField({
+    ...fieldResponse,
+    slots,
+    slotProps,
+  });
 
   return (
     <BrowserField
@@ -89,8 +83,6 @@ const BrowserSingleInputDateRangeField = React.forwardRef((props, ref) => {
       style={{
         minWidth: 300,
       }}
-      inputRef={inputRef}
-      InputProps={{ ...ProcessedInputProps }}
     />
   );
 });
@@ -113,19 +105,19 @@ const BrowserSingleInputDateRangePicker = React.forwardRef((props, ref) => {
       open={isOpen}
       onClose={handleClose}
       onOpen={handleOpen}
-      slots={{ field: BrowserSingleInputDateRangeField }}
+      slots={{ ...props.slots, field: BrowserSingleInputDateRangeField }}
       slotProps={{
-        ...props?.slotProps,
+        ...props.slotProps,
         field: {
           onAdornmentClick: toggleOpen,
-          ...props?.slotProps?.field,
+          ...props.slotProps?.field,
         },
       }}
     />
   );
 });
 
-export default function RangePickerWithSingleInputBrowserField() {
+export default function BrowserV6SingleInputRangeField() {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <BrowserSingleInputDateRangePicker

@@ -26,16 +26,19 @@ export interface UseMobileRangePickerSlots<TDate, TView extends DateOrTimeViewWi
     ExportedPickersLayoutSlots<DateRange<TDate>, TDate, TView>,
     RangePickerFieldSlots {}
 
-export interface UseMobileRangePickerSlotProps<TDate, TView extends DateOrTimeViewWithMeridiem>
-  extends PickersModalDialogSlotProps,
+export interface UseMobileRangePickerSlotProps<
+  TDate,
+  TView extends DateOrTimeViewWithMeridiem,
+  TUseV6TextField extends boolean,
+> extends PickersModalDialogSlotProps,
     ExportedPickersLayoutSlotProps<DateRange<TDate>, TDate, TView>,
-    RangePickerFieldSlotProps<TDate> {
+    RangePickerFieldSlotProps<TDate, TUseV6TextField> {
   toolbar?: ExportedBaseToolbarProps;
 }
 
-export interface MobileRangeOnlyPickerProps<TDate>
+export interface MobileRangeOnlyPickerProps
   extends BaseNonStaticPickerProps,
-    UsePickerValueNonStaticProps<TDate | null, RangeFieldSection>,
+    UsePickerValueNonStaticProps,
     UsePickerViewsNonStaticProps,
     BaseRangeNonStaticPickerProps,
     UseRangePositionProps {}
@@ -43,9 +46,10 @@ export interface MobileRangeOnlyPickerProps<TDate>
 export interface UseMobileRangePickerProps<
   TDate,
   TView extends DateOrTimeViewWithMeridiem,
+  TUseV6TextField extends boolean,
   TError,
   TExternalProps extends UsePickerViewsProps<any, any, TView, any, any>,
-> extends MobileRangeOnlyPickerProps<TDate>,
+> extends MobileRangeOnlyPickerProps,
     BasePickerProps<
       DateRange<TDate>,
       TDate,
@@ -63,7 +67,7 @@ export interface UseMobileRangePickerProps<
    * The props used for each component slot.
    * @default {}
    */
-  slotProps?: UseMobileRangePickerSlotProps<TDate, TView>;
+  slotProps?: UseMobileRangePickerSlotProps<TDate, TView, TUseV6TextField>;
 }
 
 export interface MobileRangePickerAdditionalViewProps
@@ -72,7 +76,14 @@ export interface MobileRangePickerAdditionalViewProps
 export interface UseMobileRangePickerParams<
   TDate,
   TView extends DateOrTimeViewWithMeridiem,
-  TExternalProps extends UseMobileRangePickerProps<TDate, TView, any, TExternalProps>,
+  TUseV6TextField extends boolean,
+  TExternalProps extends UseMobileRangePickerProps<
+    TDate,
+    TView,
+    TUseV6TextField,
+    any,
+    TExternalProps
+  >,
 > extends Pick<
     UsePickerParams<
       DateRange<TDate>,

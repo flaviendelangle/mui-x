@@ -1,10 +1,14 @@
 import * as React from 'react';
 import { SlotComponentProps } from '@mui/base/utils';
 import TextField from '@mui/material/TextField';
-import { FieldSlots, FieldSlotProps } from '../internals/hooks/useField/useField.types';
+import {
+  ExportedUseClearableFieldProps,
+  UseClearableFieldSlots,
+  UseClearableFieldSlotProps,
+} from '../hooks/useClearableField';
 import { DateValidationError, FieldSection } from '../models';
 import { UseFieldInternalProps } from '../internals/hooks/useField';
-import { DefaultizedProps, MakeOptional } from '../internals/models/helpers';
+import { MakeOptional } from '../internals/models/helpers';
 import {
   BaseDateValidationProps,
   DayValidationProps,
@@ -13,34 +17,32 @@ import {
 } from '../internals/models/validation';
 import { FieldsTextFieldProps } from '../internals/models/fields';
 
-export interface UseDateFieldParams<TDate, TChildProps extends {}> {
-  props: UseDateFieldComponentProps<TDate, TChildProps>;
-  inputRef?: React.Ref<HTMLInputElement>;
-}
-
-export interface UseDateFieldProps<TDate>
+export interface UseDateFieldProps<TDate, TUseV6TextField extends boolean>
   extends MakeOptional<
-      UseFieldInternalProps<TDate | null, TDate, FieldSection, DateValidationError>,
+      UseFieldInternalProps<
+        TDate | null,
+        TDate,
+        FieldSection,
+        TUseV6TextField,
+        DateValidationError
+      >,
       'format'
     >,
     DayValidationProps<TDate>,
     MonthValidationProps<TDate>,
     YearValidationProps<TDate>,
-    BaseDateValidationProps<TDate> {}
+    BaseDateValidationProps<TDate>,
+    ExportedUseClearableFieldProps {}
 
-export type UseDateFieldDefaultizedProps<TDate> = DefaultizedProps<
-  UseDateFieldProps<TDate>,
-  keyof BaseDateValidationProps<any> | 'format'
->;
+export type UseDateFieldComponentProps<
+  TDate,
+  TUseV6TextField extends boolean,
+  TChildProps extends {},
+> = Omit<TChildProps, keyof UseDateFieldProps<TDate, TUseV6TextField>> &
+  UseDateFieldProps<TDate, TUseV6TextField>;
 
-export type UseDateFieldComponentProps<TDate, TChildProps extends {}> = Omit<
-  TChildProps,
-  keyof UseDateFieldProps<TDate>
-> &
-  UseDateFieldProps<TDate>;
-
-export interface DateFieldProps<TDate>
-  extends UseDateFieldComponentProps<TDate, FieldsTextFieldProps> {
+export interface DateFieldProps<TDate, TUseV6TextField extends boolean = false>
+  extends UseDateFieldComponentProps<TDate, TUseV6TextField, FieldsTextFieldProps> {
   /**
    * Overridable component slots.
    * @default {}
@@ -50,12 +52,15 @@ export interface DateFieldProps<TDate>
    * The props used for each component slot.
    * @default {}
    */
-  slotProps?: DateFieldSlotProps<TDate>;
+  slotProps?: DateFieldSlotProps<TDate, TUseV6TextField>;
 }
 
-export type DateFieldOwnerState<TDate> = DateFieldProps<TDate>;
+export type DateFieldOwnerState<TDate, TUseV6TextField extends boolean> = DateFieldProps<
+  TDate,
+  TUseV6TextField
+>;
 
-export interface DateFieldSlots extends FieldSlots {
+export interface DateFieldSlots extends UseClearableFieldSlots {
   /**
    * Form control with an input to render the value.
    * Receives the same props as `@mui/material/TextField`.
@@ -64,6 +69,7 @@ export interface DateFieldSlots extends FieldSlots {
   textField?: React.ElementType;
 }
 
-export interface DateFieldSlotProps<TDate> extends FieldSlotProps {
-  textField?: SlotComponentProps<typeof TextField, {}, DateFieldOwnerState<TDate>>;
+export interface DateFieldSlotProps<TDate, TUseV6TextField extends boolean>
+  extends UseClearableFieldSlotProps {
+  textField?: SlotComponentProps<typeof TextField, {}, DateFieldOwnerState<TDate, TUseV6TextField>>;
 }

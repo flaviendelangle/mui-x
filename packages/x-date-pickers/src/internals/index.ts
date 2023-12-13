@@ -1,3 +1,4 @@
+export { PickersTextField } from './components/PickersTextField';
 export { PickersArrowSwitcher } from './components/PickersArrowSwitcher/PickersArrowSwitcher';
 export type {
   ExportedPickersArrowSwitcherProps,
@@ -52,19 +53,16 @@ export { useControlledValueWithTimezone } from './hooks/useValueWithTimezone';
 export type { DesktopOnlyPickerProps } from './hooks/useDesktopPicker';
 export {
   useField,
-  createDateStrForInputFromSections,
-  addPositionPropertiesToSections,
+  createDateStrForV7HiddenInputFromSections,
+  createDateStrForV6InputFromSections,
 } from './hooks/useField';
 export type {
   UseFieldInternalProps,
   UseFieldParams,
   UseFieldResponse,
-  UseFieldForwardedProps,
   FieldValueManager,
   FieldChangeHandler,
   FieldChangeHandlerContext,
-  FieldSlots,
-  FieldSlotProps,
 } from './hooks/useField';
 export type { MobileOnlyPickerProps } from './hooks/useMobilePicker';
 export { usePicker } from './hooks/usePicker';
@@ -116,6 +114,7 @@ export type {
   DateTimeValidationProps,
 } from './models/validation';
 
+export { convertFieldResponseIntoMuiTextFieldProps } from './utils/convertFieldResponseIntoMuiTextFieldProps';
 export {
   applyDefaultDate,
   replaceInvalidDateByNull,
@@ -130,6 +129,11 @@ export {
   onSpaceOrEnter,
   DEFAULT_DESKTOP_MODE_MEDIA_QUERY,
 } from './utils/utils';
+export {
+  useDefaultizedDateField,
+  useDefaultizedTimeField,
+  useDefaultizedDateTimeField,
+} from './hooks/defaultizedFieldProps';
 export { useDefaultReduceAnimations } from './hooks/useDefaultReduceAnimations';
 export { extractValidationProps } from './utils/validation/extractValidationProps';
 export { validateDate } from './utils/validation/validateDate';

@@ -4,16 +4,14 @@ import MuiTextField from '@mui/material/TextField';
 import { useThemeProps } from '@mui/material/styles';
 import { useSlotProps } from '@mui/base/utils';
 import { refType } from '@mui/utils';
-import {
-  DateTimeFieldProps,
-  DateTimeFieldSlots,
-  DateTimeFieldSlotProps,
-} from './DateTimeField.types';
+import { DateTimeFieldProps } from './DateTimeField.types';
 import { useDateTimeField } from './useDateTimeField';
 import { useClearableField } from '../hooks';
+import { PickersTextField } from '../internals/components/PickersTextField';
+import { convertFieldResponseIntoMuiTextFieldProps } from '../internals/utils/convertFieldResponseIntoMuiTextFieldProps';
 
-type DateTimeFieldComponent = (<TDate>(
-  props: DateTimeFieldProps<TDate> & React.RefAttributes<HTMLDivElement>,
+type DateTimeFieldComponent = (<TDate, TUseV6TextField extends boolean = false>(
+  props: DateTimeFieldProps<TDate, TUseV6TextField> & React.RefAttributes<HTMLDivElement>,
 ) => React.JSX.Element) & { propTypes?: any };
 
 /**
@@ -26,10 +24,10 @@ type DateTimeFieldComponent = (<TDate>(
  *
  * - [DateTimeField API](https://mui.com/x/api/date-pickers/date-time-field/)
  */
-const DateTimeField = React.forwardRef(function DateTimeField<TDate>(
-  inProps: DateTimeFieldProps<TDate>,
-  ref: React.Ref<HTMLDivElement>,
-) {
+const DateTimeField = React.forwardRef(function DateTimeField<
+  TDate,
+  TUseV6TextField extends boolean = false,
+>(inProps: DateTimeFieldProps<TDate, TUseV6TextField>, inRef: React.Ref<HTMLDivElement>) {
   const themeProps = useThemeProps({
     props: inProps,
     name: 'MuiDateTimeField',
@@ -39,55 +37,34 @@ const DateTimeField = React.forwardRef(function DateTimeField<TDate>(
 
   const ownerState = themeProps;
 
-  const TextField = slots?.textField ?? MuiTextField;
-  const { inputRef: externalInputRef, ...textFieldProps }: DateTimeFieldProps<TDate> = useSlotProps(
-    {
-      elementType: TextField,
-      externalSlotProps: slotProps?.textField,
-      externalForwardedProps: other,
-      ownerState,
+  const TextField =
+    slots?.textField ?? (inProps.shouldUseV6TextField ? MuiTextField : PickersTextField);
+  const textFieldProps: DateTimeFieldProps<TDate, TUseV6TextField> = useSlotProps({
+    elementType: TextField,
+    externalSlotProps: slotProps?.textField,
+    externalForwardedProps: other,
+    ownerState,
+    additionalProps: {
+      ref: inRef,
     },
-  );
+  });
 
   // TODO: Remove when mui/material-ui#35088 will be merged
   textFieldProps.inputProps = { ...inputProps, ...textFieldProps.inputProps };
   textFieldProps.InputProps = { ...InputProps, ...textFieldProps.InputProps };
 
-  const {
-    ref: inputRef,
-    onPaste,
-    onKeyDown,
-    inputMode,
-    readOnly,
-    clearable,
-    onClear,
-    ...fieldProps
-  } = useDateTimeField<TDate, typeof textFieldProps>({
-    props: textFieldProps,
-    inputRef: externalInputRef,
-  });
+  const fieldResponse = useDateTimeField<TDate, TUseV6TextField, typeof textFieldProps>(
+    textFieldProps,
+  );
+  const convertedFieldResponse = convertFieldResponseIntoMuiTextFieldProps(fieldResponse);
 
-  const { InputProps: ProcessedInputProps, fieldProps: processedFieldProps } = useClearableField<
-    typeof fieldProps,
-    typeof fieldProps.InputProps,
-    DateTimeFieldSlots,
-    DateTimeFieldSlotProps<TDate>
-  >({
-    onClear,
-    clearable,
-    fieldProps,
-    InputProps: fieldProps.InputProps,
+  const processedFieldProps = useClearableField({
+    ...convertedFieldResponse,
     slots,
     slotProps,
   });
-  return (
-    <TextField
-      ref={ref}
-      {...processedFieldProps}
-      InputProps={{ ...ProcessedInputProps, readOnly }}
-      inputProps={{ ...fieldProps.inputProps, inputMode, onPaste, onKeyDown, ref: inputRef }}
-    />
-  );
+
+  return <TextField {...processedFieldProps} />;
 }) as DateTimeFieldComponent;
 
 DateTimeField.propTypes = {
@@ -106,10 +83,6 @@ DateTimeField.propTypes = {
    */
   autoFocus: PropTypes.bool,
   className: PropTypes.string,
-  /**
-   * If `true`, a clear button will be shown in the field allowing value clearing.
-   * @default false
-   */
   clearable: PropTypes.bool,
   /**
    * The color of the component.
@@ -255,9 +228,6 @@ DateTimeField.propTypes = {
    * @param {FieldChangeHandlerContext<TError>} context The context containing the validation result of the current value.
    */
   onChange: PropTypes.func,
-  /**
-   * Callback fired when the clear button is clicked.
-   */
   onClear: PropTypes.func,
   /**
    * Callback fired when the error associated to the current value changes.
@@ -294,9 +264,9 @@ DateTimeField.propTypes = {
    * The currently selected sections.
    * This prop accept four formats:
    * 1. If a number is provided, the section at this index will be selected.
-   * 2. If an object with a `startIndex` and `endIndex` properties are provided, the sections between those two indexes will be selected.
-   * 3. If a string of type `FieldSectionType` is provided, the first section with that name will be selected.
-   * 4. If `null` is provided, no section will be selected
+   * 2. If a string of type `FieldSectionType` is provided, the first section with that name will be selected.
+   * 3. If `"all"` is provided, all the sections will be selected.
+   * 4. If `null` is provided, no section will be selected.
    * If not provided, the selected sections will be handled internally.
    */
   selectedSections: PropTypes.oneOfType([
@@ -313,10 +283,6 @@ DateTimeField.propTypes = {
       'year',
     ]),
     PropTypes.number,
-    PropTypes.shape({
-      endIndex: PropTypes.number.isRequired,
-      startIndex: PropTypes.number.isRequired,
-    }),
   ]),
   /**
    * Disable specific date.
@@ -365,6 +331,10 @@ DateTimeField.propTypes = {
    * @default `false`
    */
   shouldRespectLeadingZeros: PropTypes.bool,
+  /**
+   * @defauilt false
+   */
+  shouldUseV6TextField: PropTypes.bool,
   /**
    * The size of the component.
    */

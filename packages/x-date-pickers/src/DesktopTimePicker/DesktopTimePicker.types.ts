@@ -18,21 +18,24 @@ import {
 } from '../MultiSectionDigitalClock';
 import { TimeView } from '../models';
 
-export interface DesktopTimePickerSlots<TDate>
+export interface DesktopTimePickerSlots<TDate, TUseV6TextField extends boolean>
   extends BaseTimePickerSlots<TDate>,
-    MakeOptional<UseDesktopPickerSlots<TDate, TimeViewWithMeridiem>, 'field' | 'openPickerIcon'>,
+    MakeOptional<
+      UseDesktopPickerSlots<TDate, TimeViewWithMeridiem, TUseV6TextField>,
+      'field' | 'openPickerIcon'
+    >,
     DigitalClockSlots,
     MultiSectionDigitalClockSlots {}
 
-export interface DesktopTimePickerSlotProps<TDate>
+export interface DesktopTimePickerSlotProps<TDate, TUseV6TextField extends boolean>
   extends BaseTimePickerSlotProps,
-    ExportedUseDesktopPickerSlotProps<TDate, TimeViewWithMeridiem>,
+    ExportedUseDesktopPickerSlotProps<TDate, TimeViewWithMeridiem, TUseV6TextField>,
     DigitalClockSlotProps,
     MultiSectionDigitalClockSlotProps {}
 
-export interface DesktopTimePickerProps<TDate>
+export interface DesktopTimePickerProps<TDate, TUseV6TextField extends boolean = false>
   extends BaseTimePickerProps<TDate, TimeViewWithMeridiem>,
-    DesktopOnlyPickerProps<TDate>,
+    DesktopOnlyPickerProps,
     DesktopOnlyTimePickerProps<TDate> {
   /**
    * Available views.
@@ -42,10 +45,10 @@ export interface DesktopTimePickerProps<TDate>
    * Overridable component slots.
    * @default {}
    */
-  slots?: DesktopTimePickerSlots<TDate>;
+  slots?: DesktopTimePickerSlots<TDate, TUseV6TextField>;
   /**
    * The props used for each component slot.
    * @default {}
    */
-  slotProps?: DesktopTimePickerSlotProps<TDate>;
+  slotProps?: DesktopTimePickerSlotProps<TDate, TUseV6TextField>;
 }

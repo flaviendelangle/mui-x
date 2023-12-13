@@ -9,10 +9,6 @@ import {
   unstable_useDateField as useDateField,
   UseDateFieldProps,
 } from '@mui/x-date-pickers/DateField';
-import {
-  DateFieldSlots,
-  DateFieldSlotProps,
-} from '@mui/x-date-pickers/DateField/DateField.types';
 import { useClearableField } from '@mui/x-date-pickers/hooks';
 import {
   BaseSingleInputFieldProps,
@@ -33,6 +29,7 @@ interface BrowserFieldProps
   focused?: boolean;
   ownerState?: any;
   sx?: any;
+  textField: 'v6' | 'v7';
 }
 
 type BrowserFieldComponent = ((
@@ -52,6 +49,7 @@ const BrowserField = React.forwardRef(
       focused,
       ownerState,
       sx,
+      textField,
       ...other
     } = props;
 
@@ -72,72 +70,48 @@ const BrowserField = React.forwardRef(
 ) as BrowserFieldComponent;
 
 interface BrowserDateFieldProps
-  extends UseDateFieldProps<Dayjs>,
+  extends UseDateFieldProps<Dayjs, true>,
     BaseSingleInputFieldProps<
       Dayjs | null,
       Dayjs,
       FieldSection,
+      true,
       DateValidationError
     > {}
 
 const BrowserDateField = React.forwardRef(
   (props: BrowserDateFieldProps, ref: React.Ref<HTMLDivElement>) => {
-    const {
-      inputRef: externalInputRef,
-      slots,
-      slotProps,
-      ...textFieldProps
-    } = props;
+    const { slots, slotProps, ...textFieldProps } = props;
 
-    const {
-      onClear,
-      clearable,
-      ref: inputRef,
-      ...fieldProps
-    } = useDateField<Dayjs, typeof textFieldProps>({
-      props: textFieldProps,
-      inputRef: externalInputRef,
+    const fieldResponse = useDateField<Dayjs, true, typeof textFieldProps>({
+      ...textFieldProps,
+      shouldUseV6TextField: true,
     });
 
     /* If you don't need a clear button, you can skip the use of this hook */
-    const { InputProps: ProcessedInputProps, fieldProps: processedFieldProps } =
-      useClearableField<
-        {},
-        typeof textFieldProps.InputProps,
-        DateFieldSlots,
-        DateFieldSlotProps<Dayjs>
-      >({
-        onClear,
-        clearable,
-        fieldProps,
-        InputProps: fieldProps.InputProps,
-        slots,
-        slotProps,
-      });
-    return (
-      <BrowserField
-        ref={ref}
-        inputRef={inputRef}
-        {...processedFieldProps}
-        InputProps={ProcessedInputProps}
-      />
-    );
+    const processedFieldProps = useClearableField({
+      ...fieldResponse,
+      slots,
+      slotProps,
+    });
+
+    return <BrowserField ref={ref} {...processedFieldProps} />;
   },
 );
 
 const BrowserDatePicker = React.forwardRef(
-  (props: DatePickerProps<Dayjs>, ref: React.Ref<HTMLDivElement>) => {
+  (props: DatePickerProps<Dayjs, true>, ref: React.Ref<HTMLDivElement>) => {
     return (
-      <DatePicker
+      <DatePicker<Dayjs, true>
         ref={ref}
         {...props}
-        slots={{ field: BrowserDateField, ...props.slots }}
+        slots={{ ...props.slots, field: BrowserDateField }}
       />
     );
   },
 );
 
-export default function PickerWithBrowserField() {
+export default function BrowserV6Field() {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <BrowserDatePicker

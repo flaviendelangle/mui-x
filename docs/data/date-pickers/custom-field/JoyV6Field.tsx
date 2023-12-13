@@ -21,10 +21,6 @@ import {
   unstable_useDateField as useDateField,
   UseDateFieldProps,
 } from '@mui/x-date-pickers/DateField';
-import {
-  DateFieldSlots,
-  DateFieldSlotProps,
-} from '@mui/x-date-pickers/DateField/DateField.types';
 import { useClearableField } from '@mui/x-date-pickers/hooks';
 import {
   BaseSingleInputFieldProps,
@@ -36,6 +32,8 @@ const joyTheme = extendJoyTheme();
 
 interface JoyFieldProps extends InputProps {
   label?: React.ReactNode;
+  inputRef?: React.Ref<HTMLInputElement>;
+  textField?: 'v6' | 'v7';
   InputProps?: {
     ref?: React.Ref<any>;
     endAdornment?: React.ReactNode;
@@ -59,6 +57,7 @@ const JoyField = React.forwardRef(
       endDecorator,
       startDecorator,
       slotProps,
+      inputRef,
       ...other
     } = props;
 
@@ -88,6 +87,7 @@ const JoyField = React.forwardRef(
           slotProps={{
             ...slotProps,
             root: { ...slotProps?.root, ref: containerRef },
+            input: { ...slotProps?.input, ref: inputRef },
           }}
           {...other}
         />
@@ -97,71 +97,42 @@ const JoyField = React.forwardRef(
 ) as JoyFieldComponent;
 
 interface JoyDateFieldProps
-  extends UseDateFieldProps<Dayjs>,
+  extends UseDateFieldProps<Dayjs, true>,
     BaseSingleInputFieldProps<
       Dayjs | null,
       Dayjs,
       FieldSection,
+      true,
       DateValidationError
     > {}
 
 const JoyDateField = React.forwardRef(
   (props: JoyDateFieldProps, ref: React.Ref<HTMLDivElement>) => {
-    const {
-      inputRef: externalInputRef,
-      slots,
-      slotProps,
-      ...textFieldProps
-    } = props;
+    const { slots, slotProps, ...textFieldProps } = props;
 
-    const {
-      onClear,
-      clearable,
-      ref: inputRef,
-      ...fieldProps
-    } = useDateField<Dayjs, typeof textFieldProps>({
-      props: textFieldProps,
-      inputRef: externalInputRef,
+    const fieldResponse = useDateField<Dayjs, true, typeof textFieldProps>({
+      ...textFieldProps,
+      shouldUseV6TextField: true,
     });
 
     /* If you don't need a clear button, you can skip the use of this hook */
-    const { InputProps: ProcessedInputProps, fieldProps: processedFieldProps } =
-      useClearableField<
-        {},
-        typeof textFieldProps.InputProps,
-        DateFieldSlots,
-        DateFieldSlotProps<Dayjs>
-      >({
-        onClear,
-        clearable,
-        fieldProps,
-        InputProps: fieldProps.InputProps,
-        slots,
-        slotProps,
-      });
+    const processedFieldProps = useClearableField({
+      ...fieldResponse,
+      slots,
+      slotProps,
+    });
 
-    return (
-      <JoyField
-        ref={ref}
-        slotProps={{
-          input: {
-            ref: inputRef,
-          },
-        }}
-        {...processedFieldProps}
-        InputProps={ProcessedInputProps}
-      />
-    );
+    return <JoyField ref={ref} {...processedFieldProps} />;
   },
 );
 
 const JoyDatePicker = React.forwardRef(
-  (props: DatePickerProps<Dayjs>, ref: React.Ref<HTMLDivElement>) => {
+  (props: DatePickerProps<Dayjs, true>, ref: React.Ref<HTMLDivElement>) => {
     return (
       <DatePicker
         ref={ref}
         {...props}
-        slots={{ field: JoyDateField, ...props.slots }}
+        slots={{ ...props.slots, field: JoyDateField }}
         slotProps={{
           ...props.slotProps,
           field: {
@@ -190,7 +161,7 @@ function SyncThemeMode({ mode }: { mode: 'light' | 'dark' }) {
   return null;
 }
 
-export default function PickerWithJoyField() {
+export default function JoyV6Field() {
   const materialTheme = useMaterialTheme();
   return (
     <MaterialCssVarsProvider>

@@ -3,7 +3,7 @@ import { SlotComponentProps } from '@mui/base/utils';
 import TextField from '@mui/material/TextField';
 import { DateTimeValidationError, FieldSection } from '../models';
 import { UseFieldInternalProps } from '../internals/hooks/useField';
-import { DefaultizedProps, MakeOptional } from '../internals/models/helpers';
+import { MakeOptional } from '../internals/models/helpers';
 import {
   BaseDateValidationProps,
   BaseTimeValidationProps,
@@ -14,16 +14,21 @@ import {
   YearValidationProps,
 } from '../internals/models/validation';
 import { FieldsTextFieldProps } from '../internals/models/fields';
-import { FieldSlots, FieldSlotProps } from '../internals/hooks/useField/useField.types';
+import {
+  ExportedUseClearableFieldProps,
+  UseClearableFieldSlots,
+  UseClearableFieldSlotProps,
+} from '../hooks/useClearableField';
 
-export interface UseDateTimeFieldParams<TDate, TChildProps extends {}> {
-  props: UseDateTimeFieldComponentProps<TDate, TChildProps>;
-  inputRef?: React.Ref<HTMLInputElement>;
-}
-
-export interface UseDateTimeFieldProps<TDate>
+export interface UseDateTimeFieldProps<TDate, TUseV6TextField extends boolean>
   extends MakeOptional<
-      UseFieldInternalProps<TDate | null, TDate, FieldSection, DateTimeValidationError>,
+      UseFieldInternalProps<
+        TDate | null,
+        TDate,
+        FieldSection,
+        TUseV6TextField,
+        DateTimeValidationError
+      >,
       'format'
     >,
     DayValidationProps<TDate>,
@@ -32,7 +37,8 @@ export interface UseDateTimeFieldProps<TDate>
     BaseDateValidationProps<TDate>,
     TimeValidationProps<TDate>,
     BaseTimeValidationProps,
-    DateTimeValidationProps<TDate> {
+    DateTimeValidationProps<TDate>,
+    ExportedUseClearableFieldProps {
   /**
    * 12h/24h view for hour selection clock.
    * @default `utils.is12HourCycleInCurrentLocale()`
@@ -40,19 +46,15 @@ export interface UseDateTimeFieldProps<TDate>
   ampm?: boolean;
 }
 
-export type UseDateTimeFieldDefaultizedProps<TDate> = DefaultizedProps<
-  UseDateTimeFieldProps<TDate>,
-  keyof BaseDateValidationProps<any> | keyof BaseTimeValidationProps | 'format'
->;
+export type UseDateTimeFieldComponentProps<
+  TDate,
+  TUseV6TextField extends boolean,
+  TChildProps extends {},
+> = Omit<TChildProps, keyof UseDateTimeFieldProps<TDate, TUseV6TextField>> &
+  UseDateTimeFieldProps<TDate, TUseV6TextField>;
 
-export type UseDateTimeFieldComponentProps<TDate, TChildProps extends {}> = Omit<
-  TChildProps,
-  keyof UseDateTimeFieldProps<TDate>
-> &
-  UseDateTimeFieldProps<TDate>;
-
-export interface DateTimeFieldProps<TDate>
-  extends UseDateTimeFieldComponentProps<TDate, FieldsTextFieldProps> {
+export interface DateTimeFieldProps<TDate, TUseV6TextField extends boolean = false>
+  extends UseDateTimeFieldComponentProps<TDate, TUseV6TextField, FieldsTextFieldProps> {
   /**
    * Overridable component slots.
    * @default {}
@@ -62,12 +64,15 @@ export interface DateTimeFieldProps<TDate>
    * The props used for each component slot.
    * @default {}
    */
-  slotProps?: DateTimeFieldSlotProps<TDate>;
+  slotProps?: DateTimeFieldSlotProps<TDate, TUseV6TextField>;
 }
 
-export type DateTimeFieldOwnerState<TDate> = DateTimeFieldProps<TDate>;
+export type DateTimeFieldOwnerState<TDate, TUseV6TextField extends boolean> = DateTimeFieldProps<
+  TDate,
+  TUseV6TextField
+>;
 
-export interface DateTimeFieldSlots extends FieldSlots {
+export interface DateTimeFieldSlots extends UseClearableFieldSlots {
   /**
    * Form control with an input to render the value.
    * Receives the same props as `@mui/material/TextField`.
@@ -76,6 +81,11 @@ export interface DateTimeFieldSlots extends FieldSlots {
   textField?: React.ElementType;
 }
 
-export interface DateTimeFieldSlotProps<TDate> extends FieldSlotProps {
-  textField?: SlotComponentProps<typeof TextField, {}, DateTimeFieldOwnerState<TDate>>;
+export interface DateTimeFieldSlotProps<TDate, TUseV6TextField extends boolean>
+  extends UseClearableFieldSlotProps {
+  textField?: SlotComponentProps<
+    typeof TextField,
+    {},
+    DateTimeFieldOwnerState<TDate, TUseV6TextField>
+  >;
 }

@@ -9,14 +9,15 @@ export interface UseMultiInputRangeFieldParams<
 > {
   sharedProps: TSharedProps;
   startTextFieldProps: TTextFieldSlotProps;
-  startInputRef?: React.Ref<HTMLInputElement>;
   unstableStartFieldRef?: React.Ref<FieldRef<RangeFieldSection>>;
   endTextFieldProps: TTextFieldSlotProps;
-  endInputRef?: React.Ref<HTMLInputElement>;
   unstableEndFieldRef?: React.Ref<FieldRef<RangeFieldSection>>;
 }
 
-export interface UseMultiInputRangeFieldResponse<TForwardedProps extends {}> {
-  startDate: UseFieldResponse<TForwardedProps>;
-  endDate: UseFieldResponse<TForwardedProps>;
+export interface UseMultiInputRangeFieldResponse<
+  TUseV6TextField extends boolean,
+  TForwardedProps extends {},
+> {
+  startDate: UseFieldResponse<TUseV6TextField, TForwardedProps>;
+  endDate: UseFieldResponse<TUseV6TextField, TForwardedProps>;
 }

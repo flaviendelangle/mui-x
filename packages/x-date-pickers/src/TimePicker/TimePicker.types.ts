@@ -10,17 +10,17 @@ import {
   MobileTimePickerSlotProps,
 } from '../MobileTimePicker';
 
-export interface TimePickerSlots<TDate>
-  extends DesktopTimePickerSlots<TDate>,
-    MobileTimePickerSlots<TDate, TimeViewWithMeridiem> {}
+export interface TimePickerSlots<TDate, TUseV6TextField extends boolean>
+  extends DesktopTimePickerSlots<TDate, TUseV6TextField>,
+    MobileTimePickerSlots<TDate, TimeViewWithMeridiem, TUseV6TextField> {}
 
-export interface TimePickerSlotProps<TDate>
-  extends DesktopTimePickerSlotProps<TDate>,
-    MobileTimePickerSlotProps<TDate, TimeViewWithMeridiem> {}
+export interface TimePickerSlotProps<TDate, TUseV6TextField extends boolean>
+  extends DesktopTimePickerSlotProps<TDate, TUseV6TextField>,
+    MobileTimePickerSlotProps<TDate, TimeViewWithMeridiem, TUseV6TextField> {}
 
-export interface TimePickerProps<TDate>
-  extends DesktopTimePickerProps<TDate>,
-    Omit<MobileTimePickerProps<TDate, TimeViewWithMeridiem>, 'views'> {
+export interface TimePickerProps<TDate, TUseV6TextField extends boolean = false>
+  extends DesktopTimePickerProps<TDate, TUseV6TextField>,
+    Omit<MobileTimePickerProps<TDate, TimeViewWithMeridiem, TUseV6TextField>, 'views'> {
   /**
    * CSS media query when `Mobile` mode will be changed to `Desktop`.
    * @default '@media (pointer: fine)'
@@ -31,10 +31,10 @@ export interface TimePickerProps<TDate>
    * Overridable component slots.
    * @default {}
    */
-  slots?: TimePickerSlots<TDate>;
+  slots?: TimePickerSlots<TDate, TUseV6TextField>;
   /**
    * The props used for each component slot.
    * @default {}
    */
-  slotProps?: TimePickerSlotProps<TDate>;
+  slotProps?: TimePickerSlotProps<TDate, TUseV6TextField>;
 }

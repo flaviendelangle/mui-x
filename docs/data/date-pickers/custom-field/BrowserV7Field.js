@@ -1,13 +1,25 @@
 import * as React from 'react';
 
 import { unstable_useForkRef as useForkRef } from '@mui/utils';
-import Box from '@mui/material/Box';
+import Box from '@mui/system/Box';
+import styled from '@mui/system/styled';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { unstable_useDateField as useDateField } from '@mui/x-date-pickers/DateField';
-
 import { useClearableField } from '@mui/x-date-pickers/hooks';
+
+import { Unstable_PickersSectionList as PickersSectionList } from '@mui/x-date-pickers/PickersSectionList';
+
+const BrowserFieldContent = styled('div', { name: 'BrowserField', slot: 'Content' })(
+  {
+    border: '1px solid grey',
+    fontSize: 13.33333,
+    lineHeight: 'normal',
+    padding: '1px 2px',
+    width: '20ch',
+  },
+);
 
 const BrowserField = React.forwardRef((props, ref) => {
   const {
@@ -21,6 +33,15 @@ const BrowserField = React.forwardRef((props, ref) => {
     focused,
     ownerState,
     sx,
+    textField,
+    elements,
+    onClick,
+    onInput,
+    sectionRef,
+    contentEditable,
+    onFocus,
+    onBlur,
+    tabIndex,
     ...other
   } = props;
 
@@ -31,45 +52,40 @@ const BrowserField = React.forwardRef((props, ref) => {
       sx={{ ...(sx || {}), display: 'flex', alignItems: 'center' }}
       id={id}
       ref={handleRef}
+      {...other}
     >
       {startAdornment}
-      <input disabled={disabled} ref={inputRef} {...other} />
+      <BrowserFieldContent>
+        <PickersSectionList
+          elements={elements}
+          sectionRef={sectionRef}
+          contentEditable={contentEditable}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          tabIndex={tabIndex}
+        />
+      </BrowserFieldContent>
       {endAdornment}
     </Box>
   );
 });
 
 const BrowserDateField = React.forwardRef((props, ref) => {
-  const { inputRef: externalInputRef, slots, slotProps, ...textFieldProps } = props;
+  const { slots, slotProps, ...textFieldProps } = props;
 
-  const {
-    onClear,
-    clearable,
-    ref: inputRef,
-    ...fieldProps
-  } = useDateField({
-    props: textFieldProps,
-    inputRef: externalInputRef,
+  const fieldResponse = useDateField({
+    ...textFieldProps,
+    shouldUseV6TextField: false,
   });
 
   /* If you don't need a clear button, you can skip the use of this hook */
-  const { InputProps: ProcessedInputProps, fieldProps: processedFieldProps } =
-    useClearableField({
-      onClear,
-      clearable,
-      fieldProps,
-      InputProps: fieldProps.InputProps,
-      slots,
-      slotProps,
-    });
-  return (
-    <BrowserField
-      ref={ref}
-      inputRef={inputRef}
-      {...processedFieldProps}
-      InputProps={ProcessedInputProps}
-    />
-  );
+  const processedFieldProps = useClearableField({
+    ...fieldResponse,
+    slots,
+    slotProps,
+  });
+
+  return <BrowserField ref={ref} {...processedFieldProps} />;
 });
 
 const BrowserDatePicker = React.forwardRef((props, ref) => {
@@ -82,7 +98,7 @@ const BrowserDatePicker = React.forwardRef((props, ref) => {
   );
 });
 
-export default function PickerWithBrowserField() {
+export default function BrowserV7Field() {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <BrowserDatePicker
