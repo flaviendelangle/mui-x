@@ -1,12 +1,12 @@
 # @mui/x-codemod
 
-> Codemod scripts for MUI X
+> Codemod scripts for MUI X
 
 [![npm version](https://img.shields.io/npm/v/@mui/x-codemod.svg?style=flat-square)](https://www.npmjs.com/package/@mui/x-codemod)
 [![npm downloads](https://img.shields.io/npm/dm/@mui/x-codemod.svg?style=flat-square)](https://www.npmjs.com/package/@mui/x-codemod)
 
 This repository contains a collection of codemod scripts based for use with
-[jscodeshift](https://github.com/facebook/jscodeshift) that help update MUI X APIs.
+[jscodeshift](https://github.com/facebook/jscodeshift) that help update MUI X APIs.
 
 ## Setup & run
 
@@ -251,8 +251,8 @@ Renames the `useTreeItem` hook to `useTreeItemState`
 +import { TreeItem, useTreeItemState } from '@mui/x-tree-view/TreeItem';
 
  const CustomContent = React.forwardRef((props, ref) => {
--  const { disabled }  = useTreeItem(props.nodeId);
-+  const { disabled }  = useTreeItemState(props.nodeId);
+-  const { disabled } = useTreeItem(props.nodeId);
++  const { disabled } = useTreeItemState(props.nodeId);
 
    // Render some UI
  });
