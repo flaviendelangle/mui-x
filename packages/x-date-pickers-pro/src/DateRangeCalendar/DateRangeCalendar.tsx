@@ -25,8 +25,6 @@ import {
   DEFAULT_DESKTOP_MODE_MEDIA_QUERY,
   useControlledValueWithTimezone,
   useViews,
-  PickerRangeValue,
-  usePickerPrivateContext,
   areDatesEqual,
 } from '@mui/x-date-pickers/internals';
 import { warnOnce } from '@mui/x-internals/warning';
@@ -453,7 +451,11 @@ const DateRangeCalendar = React.forwardRef(function DateRangeCalendar<
         cleanNewRangePreviewDay = newRangePreviewDay;
       }
 
-      if (!areDatesEqual(utils, cleanNewRangePreviewDay, rangePreviewDay)) {
+      if (
+        ((cleanNewRangePreviewDay == null || rangePreviewDay == null) &&
+          ((cleanNewRangePreviewDay == null) !== newRangePreviewDay) == null) ||
+        !areDatesEqual(utils, cleanNewRangePreviewDay, rangePreviewDay)
+      ) {
         setRangePreviewDay(cleanNewRangePreviewDay);
       }
     },
