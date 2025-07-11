@@ -2,14 +2,9 @@ import { getAdapter } from '../../../primitives/utils/adapter/getAdapter';
 import { ViewType } from '../../models/views';
 import { SchedulerValidDate } from '../../../primitives/models';
 import { useEventCallback } from '../../../base-ui-copy/utils/useEventCallback';
+import { useEventCalendarStore } from './useEventCalendarStore';
 
 const adapter = getAdapter();
-
-type UseDateNavigationProps = {
-  visibleDate: SchedulerValidDate;
-  setVisibleDate: (date: SchedulerValidDate) => void;
-  view: ViewType;
-};
 
 function getNavigationDate(view: ViewType, visibleDate: SchedulerValidDate, delta: number) {
   switch (view) {
@@ -25,24 +20,23 @@ function getNavigationDate(view: ViewType, visibleDate: SchedulerValidDate, delt
   }
 }
 
-export function useDateNavigation({ visibleDate, setVisibleDate, view }: UseDateNavigationProps) {
-  const handleNext = useEventCallback(() => {
-    const nextDate = getNavigationDate(view, visibleDate, 1);
-    setVisibleDate(nextDate);
+export function useDateNavigation() {
+  const store = useEventCalendarStore();
+
+  const goToNext = useEventCallback(() => {
+    store.apply({
+      visibleDate: getNavigationDate(store.state.currentView, store.state.visibleDate, 1),
+    });
   });
 
-  const handlePrevious = useEventCallback(() => {
-    const prevDate = getNavigationDate(view, visibleDate, -1);
-    setVisibleDate(prevDate);
-  });
-
-  const handleToday = useEventCallback(() => {
-    setVisibleDate(adapter.date());
+  const goToPrevious = useEventCallback(() => {
+    store.apply({
+      visibleDate: getNavigationDate(store.state.currentView, store.state.visibleDate, -1),
+    });
   });
 
   return {
-    onNextClick: handleNext,
-    onPreviousClick: handlePrevious,
-    onTodayClick: handleToday,
+    goToNext,
+    goToPrevious,
   };
 }
