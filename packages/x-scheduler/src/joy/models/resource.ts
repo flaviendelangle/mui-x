@@ -13,7 +13,7 @@ export interface CalendarResource {
    */
   name: string;
   /**
-   * The color palette to use.
+   * The color palette to use for all the events inside this resource.
    * @default "mauve"
    */
   color?: CalendarEventColor;

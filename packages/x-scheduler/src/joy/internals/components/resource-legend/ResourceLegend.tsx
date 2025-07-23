@@ -20,7 +20,9 @@ function ResourceLegendItem(props: { resource: CalendarResource }) {
 
   return (
     <label className="ResourceLegendItem">
-      <span className={clsx('ResourceLegendColor', getColorClassName({ resource }))} />
+      <span
+        className={clsx('ResourceLegendColor', getColorClassName({ event: undefined, resource }))}
+      />
       <span className="ResourceLegendName">{resource.name}</span>
       <Checkbox.Root
         className={clsx('NeutralTextButton', 'Button', 'ResourceLegendButton')}

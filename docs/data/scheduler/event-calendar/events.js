@@ -8,6 +8,7 @@ export const events = [
     end: DateTime.fromISO('2025-07-14T10:30:00'),
     title: 'Team Standup',
     resource: 'work',
+    color: 'violet',
   },
   {
     id: '2',

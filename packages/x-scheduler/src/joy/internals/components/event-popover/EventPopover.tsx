@@ -95,7 +95,7 @@ export const EventPopover = React.forwardRef(function EventPopover(
           trackAnchor={false}
           className={clsx(
             'PopoverPositioner',
-            getColorClassName({ resource: calendarEventResource }),
+            getColorClassName({ event: calendarEvent, resource: calendarEventResource }),
           )}
         >
           <Popover.Popup finalFocus={{ current: anchor }}>

@@ -28,6 +28,11 @@ export interface CalendarEvent {
    * The id of the resource this event is associated with.
    */
   resource?: CalendarResourceId;
+  /**
+   * The color palette to use for the event.
+   * This will override the color of the resource if set.
+   */
+  color?: CalendarEventColor;
 }
 
 export type CalendarEventId = string | number;

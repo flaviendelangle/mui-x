@@ -88,7 +88,7 @@ export const TimeGridEvent = React.forwardRef(function TimeGridEvent(
         'EventCard',
         `EventCard--${variant}`,
         (isLessThan30Minutes || isBetween30and60Minutes) && 'UnderHourEventCard',
-        getColorClassName({ resource: eventResource }),
+        getColorClassName({ event: eventProp, resource: eventResource }),
       )}
       aria-labelledby={`${ariaLabelledBy} ${id}`}
       start={eventProp.start}

@@ -83,7 +83,7 @@ export const DayGridEvent = React.forwardRef(function DayGridEvent(
         'EventContainer',
         'EventCard',
         `EventCard--${variant}`,
-        getColorClassName({ resource: eventResource }),
+        getColorClassName({ event: eventProp, resource: eventResource }),
       )}
       aria-labelledby={`${ariaLabelledBy} ${id}`}
       start={eventProp.start}

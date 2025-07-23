@@ -1,13 +1,15 @@
+import { CalendarEvent } from '../../models/events';
 import { CalendarResource } from '../../models/resource';
 
-// TODO: Add support for event.color and props.color
+// TODO: Add support for props.color
 export function getColorClassName(parameters: GetColorClassNameParameters): string {
-  const { resource } = parameters;
-  const color = resource?.color ?? 'primary';
+  const { event, resource } = parameters;
+  const color = event?.color ?? resource?.color ?? 'primary';
 
   return `palette-${color}`;
 }
 
 interface GetColorClassNameParameters {
+  event: CalendarEvent | undefined;
   resource: CalendarResource | undefined;
 }
