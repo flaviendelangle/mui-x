@@ -2,6 +2,15 @@ import { CalendarResource, CalendarEvent } from '@mui/x-scheduler/joy';
 import { DateTime } from 'luxon';
 
 export const events: CalendarEvent[] = [
+  {
+    id: '100',
+    start: DateTime.fromISO('2025-07-12T09:00:00'),
+    end: DateTime.fromISO('2025-07-15T10:30:00'),
+    title: 'Test',
+    resource: 'work',
+    allDay: true,
+  },
+
   // Work events
   {
     id: '1',
