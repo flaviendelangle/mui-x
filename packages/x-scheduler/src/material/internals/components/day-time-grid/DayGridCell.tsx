@@ -1,25 +1,22 @@
 'use client';
 import * as React from 'react';
 import { useStore } from '@base-ui-components/utils/store';
-import {
-  SchedulerValidDate,
-  CalendarEventOccurrenceWithPosition,
-} from '../../../../primitives/models';
-import { getEventWithLargestRowIndex } from '../../../../primitives/utils/event-utils';
+
 import { DayGrid } from '../../../../primitives/day-grid';
 import { useAdapter } from '../../../../primitives/utils/adapter/useAdapter';
 import { diffIn, isWeekend } from '../../../../primitives/utils/date-utils';
-import { useEventCalendarContext } from '../../hooks/useEventCalendarContext';
+import { useEventCalendarContext } from '../../../../primitives/utils/useEventCalendarContext';
+import { useAddRowPlacementToEventOccurrences } from '../../../../primitives/use-row-event-occurrences';
 import { selectors } from '../../../../primitives/use-event-calendar';
 import { EventPopoverTrigger } from '../event-popover';
 import { DayGridEvent } from '../event';
 import './DayTimeGrid.css';
 
 export function DayGridCell(props: DayGridCellProps) {
-  const { day, allDayEvents, dayIndexInRow, rowLength } = props;
+  const { day } = props;
   const adapter = useAdapter();
   const { store } = useEventCalendarContext();
-  const placeholder = DayGrid.usePlaceholderInDay(day);
+  const placeholder = DayGrid.usePlaceholderInDay(day.value);
   const initialDraggedEvent = useStore(store, selectors.event, placeholder?.eventId ?? null);
 
   const draggedEvent = React.useMemo(() => {
@@ -32,45 +29,44 @@ export function DayGridCell(props: DayGridCellProps) {
 
   return (
     <DayGrid.Cell
-      value={day}
+      value={day.value}
       className="DayTimeGridAllDayEventsCell"
       style={
         {
-          '--row-count': getEventWithLargestRowIndex(allDayEvents),
+          '--row-count': day.rowCount,
         } as React.CSSProperties
       }
-      aria-labelledby={`DayTimeGridHeaderCell-${adapter.getDate(day)} DayTimeGridAllDayEventsHeaderCell`}
+      aria-labelledby={`DayTimeGridHeaderCell-${adapter.getDate(day.value)} DayTimeGridAllDayEventsHeaderCell`}
       role="gridcell"
-      data-weekend={isWeekend(adapter, day) ? '' : undefined}
+      data-weekend={isWeekend(adapter, day.value) ? '' : undefined}
     >
       <div className="DayTimeGridAllDayEventsCellEvents">
-        {allDayEvents.map((event) => {
-          const durationInDays = diffIn(adapter, event.end, day, 'days') + 1;
-          const gridColumnSpan = Math.min(durationInDays, rowLength - dayIndexInRow); // Don't exceed available columns
-          const shouldRenderEvent = adapter.isSameDay(event.start, day) || dayIndexInRow === 0;
+        {day.withRowPlacement.map((event) => {
+          if (event.placement.columnSpan > 0) {
+            return (
+              <EventPopoverTrigger
+                key={`${event.key}-${day.key}`}
+                event={event}
+                render={
+                  <DayGridEvent
+                    event={event}
+                    variant="allDay"
+                    ariaLabelledBy={`MonthViewHeaderCell-${day.key}`}
+                    gridRow={event.placement.rowIndex}
+                    columnSpan={event.placement.columnSpan}
+                  />
+                }
+              />
+            );
+          }
 
-          return shouldRenderEvent ? (
-            <EventPopoverTrigger
-              key={`${event.key}-${day.toString()}`}
-              event={event}
-              render={
-                <DayGridEvent
-                  event={event}
-                  variant="allDay"
-                  ariaLabelledBy={`MonthViewHeaderCell-${day.toString()}`}
-                  gridRow={event.eventRowIndex}
-                  columnSpan={gridColumnSpan}
-                />
-              }
-            />
-          ) : (
+          return (
             <DayGridEvent
-              key={`invisible-${event.key}-${day.toString()}`}
+              key={`${event.key}-${day.key}`}
               event={event}
               variant="invisible"
-              ariaLabelledBy={`MonthViewHeaderCell-${day.toString()}`}
-              aria-hidden="true"
-              gridRow={event.eventRowIndex}
+              ariaLabelledBy={`MonthViewHeaderCell-${day.key}`}
+              gridRow={event.placement.rowIndex}
             />
           );
         })}
@@ -79,9 +75,9 @@ export function DayGridCell(props: DayGridCellProps) {
             <DayGridEvent
               event={draggedEvent}
               variant="dragPlaceholder"
-              ariaLabelledBy={`MonthViewHeaderCell-${day.toString()}`}
+              ariaLabelledBy={`MonthViewHeaderCell-${day.key}`}
               gridRow={1} // TODO: Fix
-              columnSpan={diffIn(adapter, draggedEvent.end, day, 'days') + 1}
+              columnSpan={diffIn(adapter, draggedEvent.end, day.value, 'days') + 1}
             />
           </div>
         )}
@@ -91,8 +87,5 @@ export function DayGridCell(props: DayGridCellProps) {
 }
 
 interface DayGridCellProps {
-  day: SchedulerValidDate;
-  allDayEvents: CalendarEventOccurrenceWithPosition[];
-  dayIndexInRow: number;
-  rowLength: number;
+  day: useAddRowPlacementToEventOccurrences.DayData;
 }
