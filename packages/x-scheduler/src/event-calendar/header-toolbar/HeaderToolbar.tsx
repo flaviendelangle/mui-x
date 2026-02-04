@@ -22,6 +22,7 @@ import { ViewSwitcher } from './view-switcher';
 import { useTranslations } from '../../internals/utils/TranslationsContext';
 import { PreferencesMenu } from './preferences-menu';
 import { useEventCalendarClasses } from '../EventCalendarClassesContext';
+import { AIEventCreationConfirmationDialog } from '../../internals/components/ai-event-creation-confirmation-dialog';
 
 const HeaderToolbarRoot = styled('header', {
   name: 'MuiEventCalendar',
@@ -114,6 +115,14 @@ export const HeaderToolbar = React.forwardRef(function HeaderToolbar(
         </HeaderToolbarLabel>
       </HeaderToolbarLeftElement>
       <HeaderToolbarActions className={classes.headerToolbarActions}>
+        <AIEventCreationConfirmationDialog
+          event={{
+            title: 'AI Generated Meeting',
+            start: adapter.addDays(adapter.startOfDay(visibleDate), 1),
+            end: adapter.addHours(adapter.addDays(adapter.startOfDay(visibleDate), 1), 1),
+          }}
+          summaryText="I've created a meeting for tomorrow. The meeting will last 1 hour."
+        />
         <PreferencesMenu />
 
         <HeaderToolbarDateNavigator className={classes.headerToolbarDateNavigator}>
