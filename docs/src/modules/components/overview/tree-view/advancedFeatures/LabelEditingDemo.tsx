@@ -11,7 +11,9 @@ import { MUI_X_PRODUCTS } from './products';
 import DemoWrapper from '../../DemoWrapper';
 
 function CustomContent(props: UseTreeItemContentSlotOwnProps & { itemId: string }) {
-  if (props?.itemId === 'grid-community' && !props.status?.editing) {
+  const editing = props['data-editing'] === '';
+
+  if (props?.itemId === 'grid-community' && !editing) {
     return (
       <Tooltip placement="left" open arrow title="Double click to edit">
         <TreeItemContent {...props} />

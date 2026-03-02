@@ -86,7 +86,6 @@ interface CustomTreeItemContentProps extends UseTreeItemContentSlotOwnProps {
 
 const CustomTreeItemContent = styled(TreeItemContent)(({
   theme,
-  status,
   density,
   corner,
 }: { theme: Theme } & CustomTreeItemContentProps) => {
@@ -109,32 +108,30 @@ const CustomTreeItemContent = styled(TreeItemContent)(({
       paddingTop: theme.spacing(0.1),
       paddingBottom: theme.spacing(0.1),
     }),
-    ...(status.selected && {
+    '&[data-selected]': {
       backgroundColor: alpha(theme.palette.primary.main, 0.1),
       color: theme.palette.primary.dark,
       '&:hover': {
         backgroundColor: alpha(theme.palette.primary.main, 0.13),
       },
-      ...(status.focused && {
+      '&[data-focused]': {
         backgroundColor: alpha(theme.palette.primary.main, 0.17),
         '&:hover': {
           backgroundColor: alpha(theme.palette.primary.main, 0.2),
         },
-      }),
-    }),
-    ...(status.focused &&
-      !status.selected && {
-        backgroundColor: alpha(theme.palette.primary.main, 0.05),
-
-        '&:hover': {
-          backgroundColor: alpha(theme.palette.primary.main, 0.07),
-        },
-      }),
+      },
+    },
+    '&[data-focused]:not([data-selected])': {
+      backgroundColor: alpha(theme.palette.primary.main, 0.05),
+      '&:hover': {
+        backgroundColor: alpha(theme.palette.primary.main, 0.07),
+      },
+    },
     ...theme.applyStyles('dark', {
       color: theme.palette.grey[400],
-      ...(status.selected && {
+      '&[data-selected]': {
         color: theme.palette.primary.light,
-      }),
+      },
     }),
   };
 });

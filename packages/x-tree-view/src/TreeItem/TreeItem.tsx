@@ -12,7 +12,7 @@ import { shouldForwardProp } from '@mui/system/createStyled';
 import composeClasses from '@mui/utils/composeClasses';
 import { styled, createUseThemeProps } from '../internals/zero-styled';
 import { TreeItemProps } from './TreeItem.types';
-import { useTreeItem, UseTreeItemLabelSlotOwnProps, UseTreeItemStatus } from '../useTreeItem';
+import { useTreeItem, UseTreeItemLabelSlotOwnProps } from '../useTreeItem';
 import { getTreeItemUtilityClass, TreeItemClasses } from './treeItemClasses';
 import { TreeItemIcon } from '../TreeItemIcon';
 import { TreeItemDragAndDropOverlay } from '../TreeItemDragAndDropOverlay';
@@ -35,8 +35,7 @@ export const TreeItemRoot = styled('li', {
 export const TreeItemContent = styled('div', {
   name: 'MuiTreeItem',
   slot: 'Content',
-  shouldForwardProp: (prop) => shouldForwardProp(prop) && prop !== 'status',
-})<{ status: UseTreeItemStatus }>(({ theme }) => ({
+})(({ theme }) => ({
   padding: theme.spacing(0.5, 1),
   paddingLeft: `calc(${theme.spacing(1)} + var(--TreeView-itemChildrenIndentation) * var(--TreeView-itemDepth))`,
   borderRadius: theme.shape.borderRadius,
